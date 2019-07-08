@@ -1,0 +1,8 @@
+Package: zcli
+Version: 0.1
+Maintainer: ZEVENET Company SL <support@zevenet.com>
+Architecture: amd64
+Section: admin
+Priority: optional
+Description: Zevenet client line interface
+Depends: libterm-shell-perl, LWP::UserAgent
