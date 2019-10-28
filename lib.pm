@@ -13,13 +13,19 @@ sub getOrdersDefs
 		LIST   => 'list',      # List all objects of the type
 		GET    => 'get',       # get the object with all its configuration
 		SET    => 'set',       # modify an object
-		DELETE => 'delete',    # remove an object
+		DELETE   => 'delete',    # delete an object
+		CREATE => 'create',    #  create a new object
+		REMOVE => 'remove',    # unlink an object with another one
+		ADD => 'add',			# link an object with another one
 		START =>
 		  'start', # apply a status action about the object start/stop/restart/up/down..
 		STOP =>
 		  'stop',  # apply a status action about the object start/stop/restart/up/down..
-		CREATE => 'create'
-		,          # apply a status action about the object start/stop/restart/up/down..
+		RESTART =>
+		  'restart',  # apply a status action about the object start/stop/restart/up/down..
+		MOVE =>
+		  'move',  # apply a action to move a item in a list
+
 	);
 }
 
@@ -147,8 +153,6 @@ sub checkInput
 
 		foreach my $id ( @ids )
 		{
-			&dev(Dumper($input->{ id }),"url $call{ uri }");
-
 			unless ( $call{ uri } =~ s/\<[\w -]+\>/$id/ )
 			{
 				die "The id '$id' was not expected";
@@ -165,8 +169,14 @@ sub checkInput
 	# get PARAMS
 	if ( $call{ method } eq 'POST' or $call{ method } eq 'PUT' )
 	{
+		# decidir aqui que hacer, si quitar los parametros para que la llamada
+		# busque los parametros necesarios, o saltarse la comprobacion si la llamada tiene algun parametro predefinido
+		if (exists $def->{params} )
+		{
+			$call{params}=$def->{params};
+		}
 		# get possible params
-		if ( !defined $input->{ params } )
+		elsif ( !defined $input->{ params } )
 		{
 			my $params = &listParams( \%call, $host );
 			if (ref $params eq 'ARRAY')
@@ -175,7 +185,7 @@ sub checkInput
 				print "The list of possible parameters are: \n\t> ";
 				print $join;
 				print "\n";
-				die "";
+				die "\n";	# the "\n" character remove the msg "Died at ./lib.pm line 188."
 			 }
 			 else
 			 {
@@ -358,7 +368,7 @@ sub zapi
 
 	my $response = $ua->request( $request );
 
-	&dev( Dumper( $response ), 'HTTP response', 3 );
+	#~ &dev( Dumper( $response ), 'HTTP response', 3 );
 
 	# ???? añadir tratamiento para descargar certs, backups...
 
@@ -528,6 +538,7 @@ sub hostInfo
 		$host_name = $Config->{ _ }->{ default_host };
 		print "Warning, there is no default host set\n" if ( !defined $host_name );
 	}
+	$Config->{ $host_name }->{name} = $host_name;
 
 	return $Config->{ $host_name };
 }

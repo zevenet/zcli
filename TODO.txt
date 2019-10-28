@@ -1,3 +1,8 @@
+- errores:
+	* farms-services, delete, <granja-gslb>    no muestra descripcion
+	* farms-services, --, <granja l4>		arreglar el error
+	* cuando no hay objectos. p.e. borrando cert de l4: "The farms-certificates remove l4 command has no proc or method to call!"
+
 - hacer llamada a IDs y que autocomplete
 
 - Separar los objectos en ficheros y meterlos en un directorio

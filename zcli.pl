@@ -25,22 +25,10 @@ my $host = &hostInfo() or do
 
 my $objects = $Objects::zcli_objects;
 
+our $id_tree = &getLBIdsTree($host);
+&dev(Dumper($id_tree),"treee",3);
 
-
-#~ my $input = &parseInput(@ARGV);
-
-#~ my $request = &checkInput($objects, $input, $host);
-
-#~ my $resp = &zapi($request, $host);
-
-#~ &printOutput($resp);
-#~ POSIX::_exit( $resp->{err} );
-
-
-my $id_tree = &getLBIdsTree($host);
-&dev(Dumper($id_tree),"treee",1);
-
-my $cmd_st = &gen_cmd_struct();
+our $cmd_st = &gen_cmd_struct();
 
 &dev(Dumper($cmd_st),"dump",3);
 
@@ -52,8 +40,9 @@ my $term = new Term::ShellUI(
     history_file => $zcli_history,
 );
 print "Zevenet Client Line Interface\n";
+$term->prompt("zcli($host->{name}):");
+$term->load_history();
 $term->run();
-
 
 
 
@@ -143,31 +132,42 @@ sub add_ids
 		}
 		@values = keys %{$tree};
 
-		foreach my $id (@values)
+		$def->{desc} = "Getting '$id_list[-1]'\n"; # tmp description
+
+		if (!@values)
 		{
-			my $sub_url = $url;
-
-			my @id_join = @id_list;
-			push @id_join, $id;
-
-			unless( $sub_url =~ s/\<[\w -]+\>/$id/ )
+			$def->{proc} = sub {
+				print ("This object '$id_list[-1]' is not using the feature '$key'\n");
+			};
+		}
+		else
+		{
+			foreach my $id (@values)
 			{
-				die "The id '$key' could not be replaced";
-			}
+				my $sub_url = $url;
 
-			# add description. It is used when the command is executed and it is not complete
-			my $id_msg = "";
-			my $ids_def = $objects->{$obj}->{$action}->{ids};
-			foreach my $i ( @{$ids_def} )
-			{
-				$id_msg .= " '$i'";
-			}
-			$id_msg =~ s/^ //;
-			$def->{desc} = "$obj: Applying '$action'";
-			$def->{desc} .= " about $id_msg" if ($id_msg ne '');
+				my @id_join = @id_list;
+				push @id_join, $id;
 
-			my @id_join =
-			$def->{cmds}->{$id} = &add_ids($obj, $action, $sub_url, $id_tree, \@id_join);
+				unless( $sub_url =~ s/\<[\w -]+\>/$id/ )
+				{
+					die "The id '$key' could not be replaced";
+				}
+
+				# add description. It is used when the command is executed and it is not complete
+				my $id_msg = "";
+				my $ids_def = $objects->{$obj}->{$action}->{ids};
+				foreach my $i ( @{$ids_def} )
+				{
+					$id_msg .= " '$i'";
+				}
+				$id_msg =~ s/^ //;
+				$def->{desc} = "$obj: Applying '$action'";
+				$def->{desc} .= " about $id_msg" if ($id_msg ne '');
+
+				my @id_join =
+				$def->{cmds}->{$id} = &add_ids($obj, $action, $sub_url, $id_tree, \@id_join);
+			}
 		}
 	}
 	# apply
@@ -204,11 +204,21 @@ sub gen_act
 			eval {
 				my @args=($obj,$act,@{$ids},@_);
 
+				$term->save_history();
+
 				my $input = &parseInput(@args);
+
+				#~ &dev(Dumper ($input),"??? input");
 				my $request = &checkInput($objects, $input, $host, $id_tree);
+
+
 				my $resp = &zapi($request, $host);
 				&printOutput($resp);
-				$id_tree = &getLBIdsTree($host);
+
+				# reload structs
+				$main::id_tree = &getLBIdsTree($host);
+				$main::cmd_st = &gen_cmd_struct();
+				$term->commands($main::cmd_st);
 			};
 			say $@ if $@;
 				#~ POSIX::_exit( $resp->{err} );
