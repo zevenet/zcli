@@ -5,4 +5,4 @@ Architecture: amd64
 Section: admin
 Priority: optional
 Description: Zevenet client line interface
-Depends: libterm-shell-perl, json-perl, LWP::UserAgent
+Depends: libterm-shell-perl, libjson-perl, libhash-merge-perl LWP::UserAgent

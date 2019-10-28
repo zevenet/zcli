@@ -5,29 +5,9 @@ use feature "say";
 use LWP::UserAgent;
 use JSON;
 
-require "./objects.pm";
+require "./Define.pm";
+require "./Objects.pm";
 
-sub getOrdersDefs
-{
-	return (
-		LIST   => 'list',      # List all objects of the type
-		GET    => 'get',       # get the object with all its configuration
-		SET    => 'set',       # modify an object
-		DELETE   => 'delete',    # delete an object
-		CREATE => 'create',    #  create a new object
-		REMOVE => 'remove',    # unlink an object with another one
-		ADD => 'add',			# link an object with another one
-		START =>
-		  'start', # apply a status action about the object start/stop/restart/up/down..
-		STOP =>
-		  'stop',  # apply a status action about the object start/stop/restart/up/down..
-		RESTART =>
-		  'restart',  # apply a status action about the object start/stop/restart/up/down..
-		MOVE =>
-		  'move',  # apply a action to move a item in a list
-
-	);
-}
 
 # pedir parametros de la uri
 

@@ -5,8 +5,10 @@ use Data::Dumper;
 use feature "say";
 use POSIX qw(_exit);
 
+require "./Define.pm";
 require "./lib.pm";
-require "./objects.pm";
+require "./Objects.pm";
+
 
 
 my $zcli_history = '.zcli-history';
