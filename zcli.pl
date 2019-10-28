@@ -37,8 +37,12 @@ my $objects = $Objects::zcli_objects;
 #~ POSIX::_exit( $resp->{err} );
 
 
+my $id_tree = &getLBIdsTree($host);
+&dev(Dumper($id_tree),"treee",1);
 
 my $cmd_st = &gen_cmd_struct();
+
+&dev(Dumper($cmd_st),"dump",3);
 
 
 # https://metacpan.org/pod/Term::ShellUI
@@ -100,38 +104,111 @@ sub gen_obj
 	my $def;
 
 	$def->{ desc } = "Apply an action about '$obj' objects";
-
 	foreach my $action ( keys %{$objects->{$obj}} )
 	{
-		$def->{cmds}->{$action} = &gen_act($obj, $action);
+		my @ids_def = &getIds($objects->{$obj}->{$action}->{uri});
+		$objects->{$obj}->{$action}->{ids} = \@ids_def;
+		$def->{cmds}->{$action} = &add_ids($obj, $action, $objects->{$obj}->{$action}->{uri}, $id_tree );
 	}
 
 	return $def;
 }
 
+
+sub add_ids
+{
+	my $obj = shift;
+	my $action = shift;
+	my $url = shift;
+	my $id_tree = shift;
+	my $id_list_ref = shift // [];
+	my @id_list = @{$id_list_ref};
+
+	my $def;
+
+	# replaceUrl
+	if ($url =~ /([^\<]+)\<([\w -]+)\>/)
+	{
+		my $first_url = $1;  # obtiene hasta la primera key
+		my $key = $2;
+
+		my @keys_list = split ('/', $first_url);
+		shift @keys_list;  # elimina el primer elemento, ya que empieza por /
+
+		my @values;
+		my $tree = $id_tree;
+		foreach my $k (@keys_list)
+		{
+			$tree = $tree->{$k};
+		}
+		@values = keys %{$tree};
+
+		foreach my $id (@values)
+		{
+			my $sub_url = $url;
+
+			my @id_join = @id_list;
+			push @id_join, $id;
+
+			unless( $sub_url =~ s/\<[\w -]+\>/$id/ )
+			{
+				die "The id '$key' could not be replaced";
+			}
+
+			# add description. It is used when the command is executed and it is not complete
+			my $id_msg = "";
+			my $ids_def = $objects->{$obj}->{$action}->{ids};
+			foreach my $i ( @{$ids_def} )
+			{
+				$id_msg .= " '$i'";
+			}
+			$id_msg =~ s/^ //;
+			$def->{desc} = "$obj: Applying '$action'";
+			$def->{desc} .= " about $id_msg" if ($id_msg ne '');
+
+			my @id_join =
+			$def->{cmds}->{$id} = &add_ids($obj, $action, $sub_url, $id_tree, \@id_join);
+		}
+	}
+	# apply
+	else
+	{
+		$def = &gen_act($obj, $action, \@id_list);
+	}
+
+	return $def;
+}
+
+
 sub gen_act
 {
 	my $obj = shift;
 	my $act = shift;
+	my $ids = shift;
+	my $ids_def = $objects->{$obj}->{$act}->{ids};
 	my $def;
-
 	my $call;
 
-		# posibilidad de listar los ids
-
-	my @ids = &getIds($objects->{$obj}->{$act}->{uri});
-	my $join = join (', ',@ids);
-	$def->{desc} = "$obj: Applying the action '$act' about $join";
+	# add description
+	my $id_msg = "";
+	my $ids_def = $objects->{$obj}->{$act}->{ids};
+	foreach my $i ( @{$ids_def} )
+	{
+		$id_msg .= " '$i'";
+	}
+	$id_msg =~ s/^ //;
+	$def->{desc} = "$obj: Applying '$act'";
+	$def->{desc} .= " about $id_msg" if ($id_msg ne '');
 
 	$def->{proc} = sub {
-
 			eval {
-				my @args=($obj,$act,@_);
+				my @args=($obj,$act,@{$ids},@_);
 
 				my $input = &parseInput(@args);
-				my $request = &checkInput($objects, $input, $host);
+				my $request = &checkInput($objects, $input, $host, $id_tree);
 				my $resp = &zapi($request, $host);
 				&printOutput($resp);
+				$id_tree = &getLBIdsTree($host);
 			};
 			say $@ if $@;
 				#~ POSIX::_exit( $resp->{err} );

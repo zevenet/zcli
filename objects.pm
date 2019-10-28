@@ -8,10 +8,11 @@ use Config::Tiny;
 my %V = &getOrdersDefs();
 
 # keys
-my $FARM_KEY='farm name';
+my $FARM_KEY='farm';
+my $SERVICE_KEY='service';
 
 package Global;
-our $DEBUG=0;
+our $DEBUG=3;
 
 
 package Objects;
@@ -55,9 +56,20 @@ our $zcli_objects =
 		},
 	},
 
-	#~ 'farms-http' => {
-
-	#~ },
+	'farms-services' => {
+		$V{CREATE} => {
+			uri => "/farms/<$FARM_KEY>/services",
+			method => 'POST',
+		},
+		$V{SET} => {
+			uri => "/farms/<$FARM_KEY>/services/<$SERVICE_KEY>",
+			method => 'PUT',
+		},
+		$V{DELETE} => {
+			uri => "/farms/<$FARM_KEY>/services/<$SERVICE_KEY>",
+			method => 'DELETE',
+		},
+	},
 
 	'interfaces' => {
 		$V{LIST} => {

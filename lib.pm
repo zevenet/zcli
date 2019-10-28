@@ -96,7 +96,7 @@ sub checkInput
 	my $input = shift;
 	my $host  = shift;
 	my $def;
-	my $call;
+	my %call;
 
 	# getting OBJECT
 	$def = $obj->{ $input->{ object } };
@@ -141,59 +141,68 @@ sub checkInput
 
 	# getting IDs
 	{
-		$call = $def;
+		%call = %{$def};
 
 		my @ids = @{ $input->{ id } };
 
 		foreach my $id ( @ids )
 		{
-			unless ( $call->{ uri } =~ s/\<[\w -]+\>/$id/ )
+			&dev(Dumper($input->{ id }),"url $call{ uri }");
+
+			unless ( $call{ uri } =~ s/\<[\w -]+\>/$id/ )
 			{
 				die "The id '$id' was not expected";
 			}
 		}
 
 		# error si falta algun id por sustituir
-		if ( $call->{ uri } =~ /\<([\w -]+)\>/ )
+		if ( $call{ uri } =~ /\<([\w -]+)\>/ )
 		{
 			die "The id '$1' was not set";
-
-		 # ????? añadir una llamada que pregunte los ids del objeto que se quiere rellenar.
-		 # ???? posibilidad - construir un arbol de IDs en zevenet
 		}
 	}
 
 	# get PARAMS
-	if ( $call->{ method } eq 'POST' or $call->{ method } eq 'PUT' )
+	if ( $call{ method } eq 'POST' or $call{ method } eq 'PUT' )
 	{
 		# get possible params
 		if ( !defined $input->{ params } )
 		{
-			my $params = &listParams( $call, $host );
-			my $join = join (', ', @{$params});
-			print "The list of possible parameters are: \n\t> ";
-			print $join;
-			print "\n";
-			die "";
+			my $params = &listParams( \%call, $host );
+			if (ref $params eq 'ARRAY')
+			{
+				my $join = join (', ', @{$params});
+				print "The list of possible parameters are: \n\t> ";
+				print $join;
+				print "\n";
+				die "";
+			 }
+			 else
+			 {
+				 print "Error: $params\n";
+			 }
 		}
 		else
 		{
-			$call->{params}=$input->{params};
+			$call{params}=$input->{params};
 		}
 	}
 
-	&dev( Dumper( $call ), "request sumary", 2 );
+	&dev( Dumper( \%call ), "request sumary", 2 );
 
-	return $call;
+	return \%call;
 }
 
 sub getIds
 {
 	my $uri = shift;
-	my @ids = grep (/\<([\w -]+)\>/,$uri);
+	#~ my @ids = grep (/\<([\w -]+)\>/,$uri);
+	my @ids ;
 
-	$_ =~ s/<// for (@ids);
-	$_ =~ s/>// for (@ids);
+	while ($uri =~ s/\<([\w -]+)\>//)
+	{
+		push @ids, $1;
+	}
 
 	return @ids;
 }
@@ -212,13 +221,93 @@ sub listParams
 
 	my $resp = &zapi( $request, $host );
 	my @params;
-	foreach my $p (@{$resp->{json}->{params}})
-	{
-		push @params, $p->{name};
-	}
 
+	if (exists $resp->{json}->{params})
+	{
+		foreach my $p (@{$resp->{json}->{params}})
+		{
+			push @params, $p->{name};
+		}
+	}
+	elsif ($resp->{err})
+	{
+		my $msg = ($resp->{json}->{message}) ? $resp->{json}->{message} :
+			"Action do not valid";
+		return $msg;
+	}
 	return \@params;
 }
+
+sub getLBIdsTree
+{
+	my $host    = shift;
+
+	my $request = {
+		uri => "/ids",
+		method => 'GET',
+	};
+	my $resp = &zapi( $request, $host );
+
+	#~ &dev(Dumper($resp),"id tree", 2);
+
+	return $resp->{'json'}->{'params'};
+}
+
+
+sub getIdValues
+{
+	my $tree = shift;	# arbol de keys, va comprobandose recursivamente
+	my $keys_arr = shift;	# claves que estoy buscando
+
+
+	my %hash_recursive = %{$tree};
+	my $href = \%hash_recursive;
+
+	# look for the key
+	foreach my $id (@{$keys_arr})
+	{
+		return undef if ! exists $href->{$id};
+		$href = $href->{$id};
+	}
+
+	my @values = keys %{$href};
+	return \@values;
+}
+
+
+
+
+
+# Devuelve:
+# array ref, si encuentra el id
+# undef, si no encuentra el id
+#~ sub getIdValues
+#~ {
+	#~ my $tree = shift;	# arbol de keys, va comprobandose recursivamente
+	#~ my $key = shift;	# clave que estoy buscando
+
+	#~ # look for the key
+	#~ foreach my $id (keys %{$tree})
+	#~ {
+		#~ # found
+		#~ if ( $key eq $id )
+		#~ {
+			#~ &dev("found");
+			#~ my @params = keys ${$tree->{$id}};
+			#~ return \@paramss;
+		#~ }
+		#~ # look for recursive
+		#~ elsif (defined $tree->{$key})
+		#~ {
+			#~ my $params = &getIdValues($tree->{$id}, $key);
+			#~ return $params if (defined $params);
+		#~ }
+	#~ }
+
+	#~ return undef;
+#~ }
+
+
 
 my $ua = getUserAgent();
 
@@ -238,6 +327,9 @@ sub zapi
 {
 	my $arg  = shift;
 	my $host = shift;
+
+	&dev( Dumper( $arg ), 'req', 2 );
+
 
 	# create URL
 	my $URL =

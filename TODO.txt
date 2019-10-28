@@ -1,0 +1,14 @@
+- hacer llamada a IDs y que autocomplete
+
+- Separar los objectos en ficheros y meterlos en un directorio
+
+- crear paquete
+
+- añadir parametros para otras llamadas como:
+	- subir ficheros
+
+- añadir opciones.
+	- registrar mas balanceadores
+	- modo script
+
+- doc
