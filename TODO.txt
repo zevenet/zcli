@@ -44,3 +44,12 @@
 
 - copy:  (Completar buscando parametro copy_from)
 	fg
+
+- devolver mensaje de error cuando api devuelva un 500
+
+- cambiar el mensaje de error cuando no se parsean bien los parametros. Actualmente hace referencia al ID
+	farms create -farmname copy -copy_from ff 192.168.100.241 54454
+	Error parsing IDs and parameters at ./lib.pm line 42.
+
+- hacer que si falla parseando, se pueda dar al autocompletado, parseando y añadiendo los parametros a la estructura cmd y recargandola
+

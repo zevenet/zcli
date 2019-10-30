@@ -59,10 +59,35 @@ sub parseOptions
 
 sub printHelp
 {
-	# ??? mientras se crea el autocompletado
-	print "$0 [-opt1 <val1> [..]] object order <id> -param1 value [-param2 value]";
+	print "\n";
+	print "A ZCLI command uses the following arguments:\n";
+	print "<object> <action> <id> <id2>... -param1 value [-param2 value]\n";
+	print "    'object' is the load balancer module over the command is going to be executed\n";
+	print "    'action' is the verb is going to be used. Each object has itself actions\n";
+	print "    'id' specify a object name inside of a module. For example a farm name, an interface name or blacklist name.\n";
+	print "         To execute some commands, it is necessary use more than one 'ids', to refer several objects that take part in the command.\n";
+	print "    'param value' some command need parameters. Theese parameters are indicated using the hyphen symbol '-' following with the param name, a black space and the param value.\n";
 	print "\n";
 
+	print "ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command\n";
+	print "If the autocomplete does not list more options, press <intro> to get further information\n";
+	print "\n";
+
+	print "ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation: \n";
+	print "https://www.zevenet.com/zapidocv4.0/\n";
+	print "\n";
+
+	print "\n";
+	print "Examples:\n";
+	print "farms set gslbfarm -vport 53 -vip 10.0.0.20\n";
+	print "  This command is setting the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm\n";
+	print "\n";
+	print "network-virtual create -name eth0:srv -ip 192.168.100.32\n";
+	print "  This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32\n";
+	print "\n";
+
+
+# 	print "$0 [-opt1 <val1> [..]] object order <id> -param1 value [-param2 value]";
 # añadir:
 # -h, help
 # -js, js output, borrar todos los mensajes que no sean el json de respuesta
@@ -70,9 +95,7 @@ sub printHelp
 # -h,  host, cambia el host destinatario de la peticion. Añadir opcion para mandar a varios hosts a la vez
 # -c, conf info. modifica la conf de un host
 
-	use Data::Dumper;
-	print Dumper $Objects::zcli_objects;
-	die "";
+	die "\n";
 }
 
 sub checkInput
