@@ -8,7 +8,6 @@ use JSON;
 require "./Define.pm";
 require "./Objects.pm";
 
-
 # pedir parametros de la uri
 
 # preguntar por los objetos
@@ -19,36 +18,36 @@ sub parseInput
 	my @args = @_;
 
 	my $input = {
-		object => shift @args,
-		action => shift @args,
-		id => [],
-		params => undef,
+				  object => shift @args,
+				  action => shift @args,
+				  id     => [],
+				  params => undef,
 	};
 
 	my $param_flag = 0;
-	my $index = 0;
-	for( my $ind=0; $ind <= $#args; $ind++)
+	my $index      = 0;
+	for ( my $ind = 0 ; $ind <= $#args ; $ind++ )
 	{
-		if ($args[$ind] =~ s/^\-//)
+		if ( $args[$ind] =~ s/^\-// )
 		{
-			$param_flag=1;
+			$param_flag = 1;
 			my $key = $args[$ind];
-			my $val = $args[$ind+1];
+			my $val = $args[$ind + 1];
 			$ind++;
 
-			$input->{params}->{$key}=$val;
+			$input->{ params }->{ $key } = $val;
 		}
-		elsif($param_flag)
+		elsif ( $param_flag )
 		{
 			die "Error parsing IDs and parameters";
 		}
 		else
 		{
-			push @{$input->{id}}, $args[$ind];
+			push @{ $input->{ id } }, $args[$ind];
 		}
 	}
 
-	&dev (Dumper ($input), 'input parsed', 2 );
+	&dev( Dumper( $input ), 'input parsed', 2 );
 
 	return $input;
 }
@@ -127,7 +126,7 @@ sub checkInput
 
 	# getting IDs
 	{
-		%call = %{$def};
+		%call = %{ $def };
 
 		my @ids = @{ $input->{ id } };
 
@@ -149,32 +148,33 @@ sub checkInput
 	# get PARAMS
 	if ( $call{ method } eq 'POST' or $call{ method } eq 'PUT' )
 	{
-		# decidir aqui que hacer, si quitar los parametros para que la llamada
-		# busque los parametros necesarios, o saltarse la comprobacion si la llamada tiene algun parametro predefinido
-		if (exists $def->{params} )
+# decidir aqui que hacer, si quitar los parametros para que la llamada
+# busque los parametros necesarios, o saltarse la comprobacion si la llamada tiene algun parametro predefinido
+		if ( exists $def->{ params } )
 		{
-			$call{params}=$def->{params};
+			$call{ params } = $def->{ params };
 		}
+
 		# get possible params
 		elsif ( !defined $input->{ params } )
 		{
 			my $params = &listParams( \%call, $host );
-			if (ref $params eq 'ARRAY')
+			if ( ref $params eq 'ARRAY' )
 			{
-				my $join = join (', ', @{$params});
+				my $join = join ( ', ', @{ $params } );
 				print "The list of possible parameters are: \n\t> ";
 				print $join;
 				print "\n";
-				die "\n";	# the "\n" character remove the msg "Died at ./lib.pm line 188."
-			 }
-			 else
-			 {
-				 print "Error: $params\n";
-			 }
+				die "\n";    # the "\n" character remove the msg "Died at ./lib.pm line 188."
+			}
+			else
+			{
+				print "Error: $params\n";
+			}
 		}
 		else
 		{
-			$call{params}=$input->{params};
+			$call{ params } = $input->{ params };
 		}
 	}
 
@@ -186,17 +186,17 @@ sub checkInput
 sub getIds
 {
 	my $uri = shift;
-	#~ my @ids = grep (/\<([\w -]+)\>/,$uri);
-	my @ids ;
 
-	while ($uri =~ s/\<([\w -]+)\>//)
+	#~ my @ids = grep (/\<([\w -]+)\>/,$uri);
+	my @ids;
+
+	while ( $uri =~ s/\<([\w -]+)\>// )
 	{
 		push @ids, $1;
 	}
 
 	return @ids;
 }
-
 
 # parsear posibles parametros de la peticion
 sub parseInputParams
@@ -212,17 +212,19 @@ sub listParams
 	my $resp = &zapi( $request, $host );
 	my @params;
 
-	if (exists $resp->{json}->{params})
+	if ( exists $resp->{ json }->{ params } )
 	{
-		foreach my $p (@{$resp->{json}->{params}})
+		foreach my $p ( @{ $resp->{ json }->{ params } } )
 		{
-			push @params, $p->{name};
+			push @params, $p->{ name };
 		}
 	}
-	elsif ($resp->{err})
+	elsif ( $resp->{ err } )
 	{
-		my $msg = ($resp->{json}->{message}) ? $resp->{json}->{message} :
-			"Action do not valid";
+		my $msg =
+		  ( $resp->{ json }->{ message } )
+		  ? $resp->{ json }->{ message }
+		  : "Action do not valid";
 		return $msg;
 	}
 	return \@params;
@@ -230,74 +232,69 @@ sub listParams
 
 sub getLBIdsTree
 {
-	my $host    = shift;
+	my $host = shift;
 
 	my $request = {
-		uri => "/ids",
-		method => 'GET',
+					uri    => "/ids",
+					method => 'GET',
 	};
 	my $resp = &zapi( $request, $host );
 
 	#~ &dev(Dumper($resp),"id tree", 2);
 
-	return $resp->{'json'}->{'params'};
-}
+	my $tree = $resp->{ 'json' }->{ 'params' };
+	$tree->{'monitoring'}->{'fg'} = $tree->{'farmguardians'};
 
+	return $tree;
+}
 
 sub getIdValues
 {
-	my $tree = shift;	# arbol de keys, va comprobandose recursivamente
-	my $keys_arr = shift;	# claves que estoy buscando
+	my $tree     = shift;    # arbol de keys, va comprobandose recursivamente
+	my $keys_arr = shift;    # claves que estoy buscando
 
-
-	my %hash_recursive = %{$tree};
-	my $href = \%hash_recursive;
+	my %hash_recursive = %{ $tree };
+	my $href           = \%hash_recursive;
 
 	# look for the key
-	foreach my $id (@{$keys_arr})
+	foreach my $id ( @{ $keys_arr } )
 	{
-		return undef if ! exists $href->{$id};
-		$href = $href->{$id};
+		return undef if !exists $href->{ $id };
+		$href = $href->{ $id };
 	}
 
-	my @values = keys %{$href};
+	my @values = keys %{ $href };
 	return \@values;
 }
-
-
-
-
 
 # Devuelve:
 # array ref, si encuentra el id
 # undef, si no encuentra el id
 #~ sub getIdValues
 #~ {
-	#~ my $tree = shift;	# arbol de keys, va comprobandose recursivamente
-	#~ my $key = shift;	# clave que estoy buscando
+#~ my $tree = shift;	# arbol de keys, va comprobandose recursivamente
+#~ my $key = shift;	# clave que estoy buscando
 
-	#~ # look for the key
-	#~ foreach my $id (keys %{$tree})
-	#~ {
-		#~ # found
-		#~ if ( $key eq $id )
-		#~ {
-			#~ &dev("found");
-			#~ my @params = keys ${$tree->{$id}};
-			#~ return \@paramss;
-		#~ }
-		#~ # look for recursive
-		#~ elsif (defined $tree->{$key})
-		#~ {
-			#~ my $params = &getIdValues($tree->{$id}, $key);
-			#~ return $params if (defined $params);
-		#~ }
-	#~ }
-
-	#~ return undef;
+#~ # look for the key
+#~ foreach my $id (keys %{$tree})
+#~ {
+#~ # found
+#~ if ( $key eq $id )
+#~ {
+#~ &dev("found");
+#~ my @params = keys ${$tree->{$id}};
+#~ return \@paramss;
+#~ }
+#~ # look for recursive
+#~ elsif (defined $tree->{$key})
+#~ {
+#~ my $params = &getIdValues($tree->{$id}, $key);
+#~ return $params if (defined $params);
+#~ }
 #~ }
 
-
+#~ return undef;
+#~ }
 
 my $ua = getUserAgent();
 
@@ -320,7 +317,6 @@ sub zapi
 
 	&dev( Dumper( $arg ), 'req', 2 );
 
-
 	# create URL
 	my $URL =
 	  "https://$host->{HOST}:$host->{PORT}/zapi/v$host->{ZAPI_VERSION}/zapi.cgi$arg->{uri}";
@@ -335,7 +331,7 @@ sub zapi
 	{
 		if ( !defined $arg->{ params } )
 		{
-			$arg->{ params }={};
+			$arg->{ params } = {};
 		}
 		$request->content_type( 'application/json' );
 		$request->content( JSON::encode_json( $arg->{ params } ) );
@@ -518,7 +514,7 @@ sub hostInfo
 		$host_name = $Config->{ _ }->{ default_host };
 		print "Warning, there is no default host set\n" if ( !defined $host_name );
 	}
-	$Config->{ $host_name }->{name} = $host_name;
+	$Config->{ $host_name }->{ name } = $host_name;
 
 	return $Config->{ $host_name };
 }

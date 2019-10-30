@@ -3,9 +3,7 @@
 	* farms-services, --, <granja l4>		arreglar el error
 	* cuando no hay objectos. p.e. borrando cert de l4: "The farms-certificates remove l4 command has no proc or method to call!"
 
-- hacer llamada a IDs y que autocomplete
-
-- Separar los objectos en ficheros y meterlos en un directorio
+- hacer un atajo para fg y bks en granjas l4 o datalink "farms/<>(/services/<>)?/fg/<>". Ya que no tienen servicios
 
 - crear paquete
 
@@ -16,4 +14,33 @@
 	- registrar mas balanceadores
 	- modo script
 
+- elegir el formato de los parametros
+
+- devolver error si hay parametros en el comando cuando es GET.
+
 - doc
+
+- comando "help"
+
+- AÑADIR MODULOS:
+	graficas?
+
+- implementar logica para "UriParamTag"
+
+- completar funcionalidades:
+	IPDS: bl-sources, usar "UriParamTag"
+	bonding-slaves, usar "UriParamTag"
+	farms-add/rem headers
+	farms-zones-resources
+	farms-services-backends (maintenance)
+	farms-services-backends
+	farms-services-farmguardian
+	farms-services MOVE
+	farms-certificates MOVE
+	rbac-roles SET		# puede dar problemas por como se parsean los parametros
+	# configurar scheduler de tiempo
+	# asignar y desasignar recursos de un grupo RBAC
+	# license. Debe tratarse el recibir datos en txt
+
+- copy:  (Completar buscando parametro copy_from)
+	fg
