@@ -40,29 +40,8 @@ $term->prompt( "zcli($host->{name}):" );
 $term->load_history();
 $term->run();
 
-#~ "cd" => {
-#~ desc => "Change to directory DIR",
-#~ maxargs => 1, args => sub { shift->complete_onlydirs(@_); },
-#~ proc => sub { chdir($_[0] || $ENV{HOME} || $ENV{LOGDIR}); },
-#~ },
-#~ "show" => {
-#~ desc => "An example of using subcommands",
-#~ cmds => {
-#~ "warranty" => { proc => "You have no warranty!\n" },
-#~ "args" => {
-#~ minargs => 2, maxargs => 2,
-#~ args => [ sub {qw(create delete)},
-#~ \&Term::ShellUI::complete_files ],
-#~ desc => "Demonstrate method calling",
-#~ method => sub {
-#~ my $self = shift;
-#~ my $parms = shift;
-#~ print $self->get_cname($parms->{cname}) .
-#~ ": " . join(" ",@_), "\n";
-#~ },
-#~ },
-#~ },
-#~ },
+
+
 
 sub gen_cmd_struct
 {
@@ -83,7 +62,7 @@ sub gen_obj
 	my $obj = shift;
 	my $def;
 
-	$def->{ desc } = "Apply an action about '$obj' objects";
+	#~ $def->{ desc } = "Apply an action about '$obj' objects";
 	foreach my $action ( keys %{ $objects->{ $obj } } )
 	{
 		my @ids_def = &getIds( $objects->{ $obj }->{ $action }->{ uri } );
@@ -153,8 +132,8 @@ sub add_ids
 					$id_msg .= " '$i'";
 				}
 				$id_msg =~ s/^ //;
-				$def->{ desc } = "$obj: Applying '$action'";
-				$def->{ desc } .= " about $id_msg" if ( $id_msg ne '' );
+				$def->{ desc } = "$action $obj";
+				$def->{ desc } .= ", expects the ID(s) $id_msg" if ( $id_msg ne '' );
 
 				my @id_join =
 				  $def->{ cmds }->{ $id } =
@@ -189,8 +168,8 @@ sub gen_act
 		$id_msg .= " '$i'";
 	}
 	$id_msg =~ s/^ //;
-	$def->{ desc } = "$obj: Applying '$act'";
-	$def->{ desc } .= " about $id_msg" if ( $id_msg ne '' );
+	$def->{ desc } = "$act $obj";
+	$def->{ desc } .= ", expects the ID(s) $id_msg" if ( $id_msg ne '' );
 
 	$def->{ proc } = sub {
 		eval {

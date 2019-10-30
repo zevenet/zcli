@@ -39,7 +39,9 @@ sub parseInput
 		}
 		elsif ( $param_flag )
 		{
-			die "Error parsing IDs and parameters";
+			print "Error parsing the parameters. The parameters have to have the following format:\n\n";
+			print "   -param1-name param1-value -param2-name param2-value";
+			die "\n";
 		}
 		else
 		{
@@ -187,7 +189,6 @@ sub checkInput
 				my $join = join ( ', ', @{ $params } );
 				print "The list of possible parameters are: \n\t> ";
 				print $join;
-				print "\n";
 				die "\n";    # the "\n" character remove the msg "Died at ./lib.pm line 188."
 			}
 			else
