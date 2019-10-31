@@ -341,6 +341,9 @@ sub zapi
 
 	&dev( Dumper( $arg ), 'req', 2 );
 
+	# This is a workaround to manage l4 and datalink services.
+	$arg->{uri} =~ s|/services/_/|/|m;
+
 	# create URL
 	my $URL =
 	  "https://$host->{HOST}:$host->{PORT}/zapi/v$host->{ZAPI_VERSION}/zapi.cgi$arg->{uri}";
@@ -368,7 +371,7 @@ sub zapi
 
 	my $response = $ua->request( $request );
 
-	#~ &dev( Dumper( $response ), 'HTTP response', 3 );
+	#~ &dev( Dumper( $response ), 'HTTP response', 1 );
 
 	# ???? añadir tratamiento para descargar certs, backups...
 
@@ -536,7 +539,12 @@ sub hostInfo
 	if ( !defined $host_name )
 	{
 		$host_name = $Config->{ _ }->{ default_host };
-		print "Warning, there is no default host set\n" if ( !defined $host_name );
+		if ( !defined $host_name )
+		{
+			print "Warning, there is no default host set\n";
+			return undef;
+		}
+
 	}
 	$Config->{ $host_name }->{ name } = $host_name;
 

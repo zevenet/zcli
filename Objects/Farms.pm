@@ -74,26 +74,37 @@ our $Farms = {
 		$V{ MOVE } => {
 			uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/actions",
 			method => 'POST',
-
-			# ????
 		},
 	},
 
 	'farms-services-backends' => {
 		$V{ CREATE } => {
-						  uri    => "/farms/<$K{FARM}>/services",
+						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends",
 						  method => 'POST',
 		},
 		$V{ SET } => {
-					   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
+					   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>",
 					   method => 'PUT',
 		},
 		$V{ DELETE } => {
-						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
+						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>",
 						  method => 'DELETE',
 		},
-
-		# ??? maintenance
+		$V{ MAINTENANCE } => {
+						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>/maintenance",
+						  method => 'PUT',
+						  params => {
+							  action => 'maintenance',
+							  mode => 'drain',
+						  }
+		},
+		$V{ NON_MAINTENANCE } => {
+						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>/maintenance",
+						  method => 'PUT',
+						  params => {
+							  action => 'up',
+						  }
+		},
 	},
 
 	'farms-services-farmguardian' => {
@@ -105,8 +116,6 @@ our $Farms = {
 						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg/<$K{FG}>",
 						  method => 'DELETE',
 		},
-
-		# l4*   ????????
 	},
 
 	'farms-zones' => {

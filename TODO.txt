@@ -3,8 +3,6 @@
 	* farms-services, --, <granja l4>		arreglar el error
 	* cuando no hay objectos. p.e. borrando cert de l4: "The farms-certificates remove l4 command has no proc or method to call!"
 
-- hacer un atajo para fg y bks en granjas l4 o datalink "farms/<>(/services/<>)?/fg/<>". Ya que no tienen servicios
-
 - crear paquete
 
 - añadir parametros para otras llamadas como:
@@ -20,8 +18,6 @@
 
 - doc
 
-- comando "help"
-
 - AÑADIR MODULOS:
 	graficas?
 
@@ -32,9 +28,6 @@
 	bonding-slaves, usar "UriParamTag"
 	farms-add/rem headers
 	farms-zones-resources
-	farms-services-backends (maintenance)
-	farms-services-backends
-	farms-services-farmguardian
 	farms-services MOVE
 	farms-certificates MOVE
 	rbac-roles SET		# puede dar problemas por como se parsean los parametros
@@ -46,10 +39,6 @@
 	fg
 
 - devolver mensaje de error cuando api devuelva un 500
-
-- cambiar el mensaje de error cuando no se parsean bien los parametros. Actualmente hace referencia al ID
-	farms create -farmname copy -copy_from ff 192.168.100.241 54454
-	Error parsing IDs and parameters at ./lib.pm line 42.
 
 - hacer que si falla parseando, se pueda dar al autocompletado, parseando y añadiendo los parametros a la estructura cmd y recargandola
 

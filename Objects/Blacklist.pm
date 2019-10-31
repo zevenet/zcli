@@ -49,6 +49,13 @@ our $Blacklist = {
 									'action' => 'stop',
 						},
 		},
+		$V{ UPDATE } => {
+						uri    => "/ipds/blacklists/<$K{BL}>/actions",
+						method => 'POST',
+						params => {
+									'action' => 'update',
+						},
+		},
 
 		# ADD SOURCES ??????
 	},

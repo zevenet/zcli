@@ -12,6 +12,7 @@ package Define;
 our %Keys = (
 			  FARM       => 'farm',
 			  SRV        => 'service',
+			  BK         => 'backend',
 			  FG         => 'farmguardian',
 			  ZONES      => 'zones',
 			  CERT       => 'certificate',
@@ -56,6 +57,7 @@ our %Actions = (
 	MAINTENANCE     => 'maintenance',      # Set a object in maintenance mode
 	NON_MAINTENANCE => 'non_maintenance',  # Unset the maintenance mode of a object
 	APPLY => 'apply',  # Apply an object to the system
+	UPDATE => 'update',  # Apply an object to the system
 );
 
 our $UriParamTag =
