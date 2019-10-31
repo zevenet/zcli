@@ -29,7 +29,7 @@ our $id_tree = &getLBIdsTree( $host );
 
 our $cmd_st = &gen_cmd_struct();
 
-&dev( Dumper( $cmd_st ), "dump", 3 );
+#~ &dev( Dumper( $cmd_st ), "dump", 1 );
 
 # https://metacpan.org/pod/Term::ShellUI
 use Term::ShellUI;
@@ -171,17 +171,22 @@ sub gen_act
 	$def->{ desc } = "$act $obj";
 	$def->{ desc } .= ", expects the ID(s) $id_msg" if ( $id_msg ne '' );
 
+	# check if the call is expecting a file name to upload or download
+	if (    exists $objects->{ $obj }->{ $act }->{ 'download_file' }
+		 or exists $objects->{ $obj }->{ $act }->{ 'upload_file' } )
+	{
+		$def->{ desc } .= " 'file'";
+	}
+
 	$def->{ proc } = sub {
 		eval {
-			my @args = ( $obj, $act, @{ $ids }, @_ );
-
-			$term->save_history();
-
+			my @args = ( $objects->{ $obj }->{ $act }, $obj, $act, @{ $ids }, @_ );
 			my $input = &parseInput( @args );
 
 			my $request = &checkInput( $objects, $input, $host, $id_tree );
 			my $resp    = &zapi( $request, $host );
 			&printOutput( $resp );
+			$term->save_history();
 
 			# reload structs
 			#~ $main::id_tree = &getLBIdsTree( $host );

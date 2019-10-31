@@ -66,41 +66,46 @@ our $System = {
 		},
 	},
 	'system-backups' => {
-		$V{ LIST } => {
-						uri    => "/system/backup",
-						method => 'GET',
-		},
-		$V{ CREATE } => {
-						  uri    => "/system/backup",
-						  method => 'POST',
-		},
-		$V{ DOWNLOAD } => {
-			uri    => "/system/backup/$K{BACKUP}",
-			method => 'POST',
-			download_file => undef,
-		},
-		$V{ UPLOAD } => {
-						  uri    => "/system/backup/$K{BACKUP}",
-						  method => 'PUT',
-						  content_type => 'application/gzip',
-						  upload_file => undef,
-		},
-		$V{ DELETE } => {
-						  uri    => "/system/backup/$K{BACKUP}",
-						  method => 'DELETE',
-		},
-		$V{ APPLY } => {
-						 uri    => "/system/backup/$K{BACKUP}/actions",
-						 method => 'POST',
-						 params => {
-									 action => 'apply',
-						 },
-		},
+						  $V{ LIST } => {
+										  uri    => "/system/backup",
+										  method => 'GET',
+						  },
+						  $V{ CREATE } => {
+											uri    => "/system/backup",
+											method => 'POST',
+						  },
+						  $V{ DOWNLOAD } => {
+											  uri    => "/system/backup/<$K{BACKUP}>",
+											  method => 'GET',
+											  download_file => undef,
+						  },
+						  $V{ UPLOAD } => {
+								  uri          => "/system/backup/$Define::UriParamTag",
+								  method       => 'PUT',
+								  content_type => 'application/gzip',
+								  upload_file  => undef,
+								  uri_param    => [
+										  "lines" => {
+												  desc => "Number of lines of the log file to show",
+										  },
+								  ],
+						  },
+						  $V{ DELETE } => {
+											uri    => "/system/backup/<$K{BACKUP}>",
+											method => 'DELETE',
+						  },
+						  $V{ APPLY } => {
+										   uri    => "/system/backup/<$K{BACKUP}>/actions",
+										   method => 'POST',
+										   params => {
+													   action => 'apply',
+										   },
+						  },
 	},
 	'system-supportsave' => {
 							  $V{ DOWNLOAD } => {
-												  uri    => "/system/supportsave",
-												  method => 'GET',
+												  uri           => "/system/supportsave",
+												  method        => 'GET',
 												  download_file => undef,
 							  },
 	},

@@ -15,14 +15,27 @@ require "./Objects.pm";
 # preguntar por los posibles valores
 sub parseInput
 {
+	my $def = shift;
 	my @args = @_;
 
 	my $input = {
 				  object => shift @args,
 				  action => shift @args,
 				  id     => [],
+				  download_file => undef,
+				  upload_file => undef,
 				  params => undef,
 	};
+
+	for (@{$def->{ids}})
+	{
+		my $id = shift @args;
+		push @{ $input->{ id } }, $id;
+	}
+
+	# check if the call is expecting a file name to upload or download
+	$input->{download_file} = shift @args if ( exists $def->{ 'download_file' } );
+	$input->{upload_file} = shift @args if ( exists $def->{ 'upload_file' } );
 
 	my $param_flag = 0;
 	my $index      = 0;
@@ -42,10 +55,6 @@ sub parseInput
 			print "Error parsing the parameters. The parameters have to have the following format:\n\n";
 			print "   -param1-name param1-value -param2-name param2-value";
 			die "\n";
-		}
-		else
-		{
-			push @{ $input->{ id } }, $args[$ind];
 		}
 	}
 
@@ -170,8 +179,40 @@ sub checkInput
 		}
 	}
 
+	# getting upload file
+	if (exists $call{ upload_file })
+	{
+		if ( ! defined $input->{upload_file} )
+		{
+			print "The file name to upload is not set";
+			die "\n";
+		}
+		if ( !-e $input->{upload_file})
+		{
+			print "The file '$input->{upload_file}' does not exist";
+			die "\n";
+		}
+		$call{ upload_file } = $input->{upload_file};
+	}
+
+	# getting download file
+	if (exists $call{ download_file })
+	{
+		if ( ! defined $input->{download_file} )
+		{
+			print "The file name to save the download is not set";
+			die "\n";
+		}
+		if ( -e $input->{download_file})
+		{
+			print "The file '$input->{download_file}' already exist, select another name";
+			die "\n";
+		}
+		$call{ download_file } = $input->{download_file};
+	}
+
 	# get PARAMS
-	if ( $call{ method } eq 'POST' or $call{ method } eq 'PUT' )
+	if ( ($call{ method } eq 'POST' or $call{ method } eq 'PUT') and !exists $call{download_file} or $call{upload_file})
 	{
 # decidir aqui que hacer, si quitar los parametros para que la llamada
 # busque los parametros necesarios, o saltarse la comprobacion si la llamada tiene algun parametro predefinido
@@ -248,7 +289,7 @@ sub listParams
 		my $msg =
 		  ( $resp->{ json }->{ message } )
 		  ? $resp->{ json }->{ message }
-		  : "Action do not valid";
+		  : "Action is not valid";
 		return $msg;
 	}
 	return \@params;
@@ -383,6 +424,7 @@ sub zapi
 
 	my $txt;
 	my $json_dec;
+	my $msg;
 	# tratamiento para descargar certs, backups...
 	if ( exists $arg->{ 'download_file' } )
 	{
@@ -391,6 +433,9 @@ sub zapi
 			print $download_fh $response->content();
 		}
 		close $download_fh;
+
+		$msg = "The file was properly saved in the file '$arg->{ 'download_file' }'.";
+
 	}
 	# tratamiento texto
 	elsif ($response->header('content-type') =~ 'text/plain')
@@ -400,6 +445,17 @@ sub zapi
 	else
 	{
 		eval { $json_dec = JSON::decode_json( $response->content() ); };
+		if (exists $json_dec->{message})
+		{
+			$msg = $json_dec->{message};
+			delete $json_dec->{message};
+		}
+	}
+
+	# add message for error 500
+	if ($response->code =~ /^5/)
+	{
+		$msg = "LB error. The command could not finish";
 	}
 
 	# create a enviorement variable with the body of the last zapi result.
@@ -407,16 +463,11 @@ sub zapi
 	my $out = {
 				'code' => $response->code,
 				'json' => $json_dec,
+				'msg' => $msg,
 				'err'  => ( $response->code =~ /^2/ ) ? 0 : 1,
 	};
 
 	$out->{txt} = $txt if defined $txt;
-
-	# add message for error 500
-	if ($response->code =~ /^5/)
-	{
-		$out->{json}->{message} = "LB error. The command could not finish";
-	}
 
 	return $out;
 }
@@ -436,27 +487,30 @@ sub printOutput
 	if ( $resp->{ err } )
 	{
 		print "Error!! ";
-		print "$resp->{json}->{message}";
-		print "\n\n";
-	}
-	elsif (exists $resp->{txt})
-	{
-		print "$resp->{txt}";
+		print "$resp->{msg}";
 		print "\n\n";
 	}
 	else
 	{
-		if ( exists $resp->{ json }->{ message } )
+		if (exists $resp->{ msg })
 		{
-			print "Info: $resp->{json}->{message}\n\n";
-			delete $resp->{ json }->{ message };
+			print "Info: $resp->{ msg }\n\n";
 		}
 
-		my $json_enc = "";
-		eval {
-			$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
-		};
-		print "$json_enc\n\n";
+		if (exists $resp->{txt})
+		{
+			print "$resp->{txt}";
+			print "\n\n";
+		}
+
+		if (%{$resp->{ json }})
+		{
+			my $json_enc = "";
+			eval {
+				$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
+			};
+			print "$json_enc\n\n" if ($json_enc);
+		}
 	}
 }
 
