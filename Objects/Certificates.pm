@@ -22,10 +22,7 @@ our $Certificates = {
 		$V{ DOWNLOAD } => {
 			uri    => "/certificates/<$K{CERT}>",
 			method => 'GET',
-
-			# ADD HEADERS
-			# ADD DESTINE FILE
-			# ????
+			download_file => undef,
 		},
 		$V{ GET } => {
 					   uri    => "/certificates/<$K{CERT}>/info",
@@ -38,14 +35,12 @@ our $Certificates = {
 		$V{ CREATE } => {
 			uri    => "/certificates",
 			method => 'POST',
-
-			# ADD HEADERS
-			# ADD SOURCE FILE
-			# ????
 		},
 		$V{ UPLOAD } => {
 						  uri    => "/certificates/<$K{CERT}>",
 						  method => 'POST',
+						  content_type => 'application/x-pem-file',
+						  upload_file => undef,
 		},
 	},
 	'certificates-ciphers' => {

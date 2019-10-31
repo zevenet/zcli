@@ -77,12 +77,13 @@ our $System = {
 		$V{ DOWNLOAD } => {
 			uri    => "/system/backup/$K{BACKUP}",
 			method => 'POST',
-
-			# ????? add file to download
+			download_file => undef,
 		},
 		$V{ UPLOAD } => {
 						  uri    => "/system/backup/$K{BACKUP}",
 						  method => 'PUT',
+						  content_type => 'application/gzip',
+						  upload_file => undef,
 		},
 		$V{ DELETE } => {
 						  uri    => "/system/backup/$K{BACKUP}",
@@ -100,6 +101,7 @@ our $System = {
 							  $V{ DOWNLOAD } => {
 												  uri    => "/system/supportsave",
 												  method => 'GET',
+												  download_file => undef,
 							  },
 	},
 	'system-cluster' => {

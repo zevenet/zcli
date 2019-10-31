@@ -184,7 +184,7 @@ sub gen_act
 			&printOutput( $resp );
 
 			# reload structs
-			$main::id_tree = &getLBIdsTree( $host );
+			#~ $main::id_tree = &getLBIdsTree( $host );
 			$main::cmd_st  = &gen_cmd_struct();
 			$term->commands( $main::cmd_st );
 		};

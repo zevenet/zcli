@@ -356,36 +356,68 @@ sub zapi
 	# add body
 	if ( $arg->{ method } eq 'POST' or $arg->{ method } eq 'PUT' )
 	{
-		if ( !defined $arg->{ params } )
-		{
-			$arg->{ params } = {};
-		}
-		$request->content_type( 'application/json' );
-		$request->content( JSON::encode_json( $arg->{ params } ) );
+		# add content_type header
+		$arg->{content_type} = $arg->{content_type} // 'application/json';
+		$request->content_type( $arg->{content_type} );
 
-		#???  Check others headers to upload data
-		#~ $request->content_type( 'text/plain' );
-		#~ $request->content_type( 'application/x-pem-file' );
-		#~ $request->content_type( 'application/gzip' );
+		if (exists $arg->{upload_file})
+		{
+			open ( my $upload_fh, '<', "$arg->{ upload_file }" );
+			{
+				local $/;
+				my $upload = <$upload_fh>;
+				$request->content( $upload );
+			}
+			close $upload_fh;
+		}
+		else
+		{
+			$arg->{ params } = {} if ( !defined $arg->{ params } );
+			$request->content( JSON::encode_json( $arg->{ params } ) );
+		}
 	}
 
 	my $response = $ua->request( $request );
 
 	#~ &dev( Dumper( $response ), 'HTTP response', 1 );
 
-	# ???? añadir tratamiento para descargar certs, backups...
-
+	my $txt;
 	my $json_dec;
-	eval { $json_dec = JSON::decode_json( $response->content() ); };
+	# tratamiento para descargar certs, backups...
+	if ( exists $arg->{ 'download_file' } )
+	{
+		open ( my $download_fh, '>', $arg->{ 'download_file' } );
+		{
+			print $download_fh $response->content();
+		}
+		close $download_fh;
+	}
+	# tratamiento texto
+	elsif ($response->header('content-type') =~ 'text/plain')
+	{
+		$txt = $response->content();
+	}
+	else
+	{
+		eval { $json_dec = JSON::decode_json( $response->content() ); };
+	}
 
 	# create a enviorement variable with the body of the last zapi result.
 	# if it is a error, put a blank ref.
-
 	my $out = {
 				'code' => $response->code,
 				'json' => $json_dec,
 				'err'  => ( $response->code =~ /^2/ ) ? 0 : 1,
 	};
+
+	$out->{txt} = $txt if defined $txt;
+
+	# add message for error 500
+	if ($response->code =~ /^5/)
+	{
+		$out->{json}->{message} = "LB error. The command could not finish";
+	}
+
 	return $out;
 }
 
@@ -405,6 +437,11 @@ sub printOutput
 	{
 		print "Error!! ";
 		print "$resp->{json}->{message}";
+		print "\n\n";
+	}
+	elsif (exists $resp->{txt})
+	{
+		print "$resp->{txt}";
 		print "\n\n";
 	}
 	else
