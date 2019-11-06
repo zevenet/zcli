@@ -8,6 +8,8 @@ use JSON;
 require "./Define.pm";
 require "./Objects.pm";
 
+my $HOST_FILE = 'hosts.ini';
+
 # pedir parametros de la uri
 
 # preguntar por los objetos
@@ -65,11 +67,57 @@ sub parseInput
 
 sub parseOptions
 {
+	my $args = $_[0];
+	my $opt_st = {};
 
+	# get options
+	# the options are the parameters before object
+	foreach my $o (@{$args})
+	{
+		if ( $o !~ /^-/ )
+		{
+			last;
+		}
+		else
+		{
+			my $opt = shift @{$args};
+			if ($opt eq '-help')
+			{
+				$opt_st->{'help'} = 1;
+			}
+			elsif ($opt eq '-non-interactive')
+			{
+				$opt_st->{'non-interactive'} = 1;
+			}
+			elsif ($opt eq '-host' and $args->[0] !~ /^-/)
+			{
+				$opt_st->{'host'} = shift @{$args};
+			}
+			else
+			{
+				say "The '$o' option is not recognized.";
+				say "";
+				&printHelp(1);
+				exit 1;
+			}
+		}
+	}
+
+	return $opt_st;
 }
 
 sub printHelp
 {
+	my $executed = shift // 0; # 1 when the help is printed for command line invocation
+
+	if ($executed)
+	{
+		print "\n";
+		print "ZCLI can be executed with the following options:\n";
+		say "	-help, prints this ZCLI help.";
+		say "	-host <name>, selects the 'name' load balancer as destination of the command.";
+		say "	-non-interactive, executes the action without the human interaction.";
+	}
 	print "\n";
 	print "A ZCLI command uses the following arguments:\n";
 	print "<object> <action> <id> <id2>... -param1 value [-param2 value]\n";
@@ -307,8 +355,12 @@ sub getLBIdsTree
 
 	#~ &dev(Dumper($resp),"id tree", 2);
 
-	my $tree = $resp->{ 'json' }->{ 'params' };
-	$tree->{'monitoring'}->{'fg'} = $tree->{'farmguardians'};
+	my $tree;
+	if ($resp->{ 'json' }->{ 'params' })
+	{
+		$tree = $resp->{ 'json' }->{ 'params' };
+		$tree->{'monitoring'}->{'fg'} = $tree->{'farmguardians'};
+	}
 
 	return $tree;
 }
@@ -379,6 +431,17 @@ sub zapi
 {
 	my $arg  = shift;
 	my $host = shift;
+
+	# test connectivity:
+	if (system("nmap $host->{HOST} -p $host->{PORT} | grep open 2>&1 >/dev/null"))
+	{
+		say "The '$host->{name}' host ($host->{HOST}:$host->{PORT}) cannot be reached.";
+		return {
+				#~ 'msg' => "the '$host->{name}' host ($host->{ip}:$host->{port}) cannot be reached.",
+				'err'  => 1,
+		};
+	}
+
 
 	&dev( Dumper( $arg ), 'req', 2 );
 
@@ -521,6 +584,7 @@ sub setHost
 	my $cfg;
 	my $HOSTNAME;
 	my $valid_flag = 1;
+	my $file = $HOST_FILE;
 
 	# get IP
 	do
@@ -579,7 +643,7 @@ sub setHost
 		}
 	} while ( !$valid_flag );
 
-	# get zapi key
+	# get name
 	do
 	{
 		print "Load balancer host name: ";
@@ -595,8 +659,18 @@ sub setHost
 	} while ( !$valid_flag );
 
 	# save data
-	my $Config = Config::Tiny->new;
-	$Config->{ $HOSTNAME } = $cfg;
+	my $Config;
+	if (-e $file)
+	{
+		$Config = Config::Tiny->read( $file );
+	}
+	else
+	{
+		$Config = Config::Tiny->new;
+	}
+
+	$cfg->{ name } = $HOSTNAME;
+	$Config->{$HOSTNAME} = $cfg;
 
 	# set the default
 	if ( !defined $Config->{ _ }->{ default_host } )
@@ -606,7 +680,7 @@ sub setHost
 	}
 	else
 	{
-		print "Do you wish set this host as the default one? ";
+		print "Do you wish set this host as the default one? [yes|no=default]: ";
 		my $confirmation = <STDIN>;
 		chomp $confirmation;
 		if ( $confirmation =~ /^(y|yes)$/i )
@@ -617,7 +691,43 @@ sub setHost
 	}
 	say "";
 
-	$Config->write( 'hosts.ini' );
+	$Config->write($file);
+
+	return $Config->{ $HOSTNAME };
+}
+
+sub delHost
+{
+	my $name = shift;
+	my $Config;
+	my $err = 1;
+	if (-e $HOST_FILE)
+	{
+		$Config = Config::Tiny->read( $HOST_FILE );
+		if( exists $Config->{$name})
+		{
+			delete $Config->{_}->{default_host} if $Config->{_}->{default_host} eq $name;
+
+			delete $Config->{$name};
+			$Config->write($HOST_FILE);
+			$err = 0;
+			say "The '$name' host was unregister from zcli";
+		}
+	}
+
+	say "The '$name' host was not found" if $err;
+
+	return $err;
+}
+
+sub listHost
+{
+	my $host_name = shift;
+
+	use Config::Tiny;
+	my $Config = Config::Tiny->read( $HOST_FILE );
+
+	return grep ( !/^_$/, keys %{$Config});
 }
 
 sub hostInfo
@@ -625,7 +735,7 @@ sub hostInfo
 	my $host_name = shift;
 
 	use Config::Tiny;
-	my $Config = Config::Tiny->read( 'hosts.ini' );
+	my $Config = Config::Tiny->read( $HOST_FILE );
 
 	if ( !defined $host_name )
 	{
@@ -635,9 +745,12 @@ sub hostInfo
 			print "Warning, there is no default host set\n";
 			return undef;
 		}
-
 	}
-	$Config->{ $host_name }->{ name } = $host_name;
+	elsif ( !exists $Config->{ $host_name } )
+	{
+		print "The host selected does not exist\n";
+		return undef;
+	}
 
 	return $Config->{ $host_name };
 }

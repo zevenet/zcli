@@ -5,16 +5,14 @@
 
 - crear paquete
 
-- añadir parametros para otras llamadas como:
-	- subir ficheros
-
 - añadir opciones.
-	- registrar mas balanceadores
 	- modo script
 
 - elegir el formato de los parametros
 
 - devolver error si hay parametros en el comando cuando es GET.
+
+- autocompletado de fichero para subir
 
 - doc
 
@@ -37,8 +35,6 @@
 
 - copy:  (Completar buscando parametro copy_from)
 	fg
-
-- devolver mensaje de error cuando api devuelva un 500
 
 - hacer que si falla parseando, se pueda dar al autocompletado, parseando y añadiendo los parametros a la estructura cmd y recargandola
 

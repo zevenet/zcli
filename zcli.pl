@@ -9,31 +9,69 @@ require "./Define.pm";
 require "./lib.pm";
 require "./Objects.pm";
 
+my %V = %Define::Actions;
+our $id_tree;
+our $cmd_st;
+our $term;
+
 my $zcli_history = '.zcli-history';
 
-&printHelp() if ( $ARGV[0] eq '-h' );
+my $opt = &parseOptions( \@ARGV );
 
-my $options = &parseOptions( @ARGV );
+&printHelp() if ( $opt->{'help'} );
 
-my $host = &hostInfo() or do
+my $host = &hostInfo($opt->{'host'});
+if (!$host)
+{
+	if (exists $opt->{'host'})
+	{
+		say "Not found the '$opt->{'host'}' host, selecting the default host";
+		my $host = &hostInfo($opt->{'host'});
+	}
+
+	if ($opt->{'non-interactive'})
+	{
+		say "The non-interfactive mode needs a host";
+		exit 1;
+	}
+}
+
+if (!$host)
 {
 	say "Not found the host info, try to configure the default host profile";
-	&setHost();
-	&hostInfo();
-};
+	$host = &setHost();
+}
 
+
+# Preparing Interface
 my $objects = $Objects::zcli_objects;
 
-our $id_tree = &getLBIdsTree( $host );
-&dev( Dumper( $id_tree ), "treee", 3 );
+&reload_cmd_struct();
 
-our $cmd_st = &gen_cmd_struct();
 
-#~ &dev( Dumper( $cmd_st ), "dump", 1 );
+# Launching only a cmd
+if ( $opt->{'non-interactive'})
+{
+	# ?????? tmp
+	say "This is not implemented yet";
+	exit 1;
+
+	my $resp;
+	eval {
+		my $input = &parseInput( @ARGV );
+		my $request = &checkInput( $objects, $input, $host, $id_tree );
+		$resp    = &zapi( $request, $host );
+		&printOutput( $resp );
+	};
+	say $@ if $@;
+	POSIX::_exit( $resp->{err} );
+}
+
+
 
 # https://metacpan.org/pod/Term::ShellUI
 use Term::ShellUI;
-my $term = new Term::ShellUI( commands     => $cmd_st,
+$term = new Term::ShellUI( commands     => $cmd_st,
 							  history_file => $zcli_history, );
 print "Zevenet Client Line Interface\n";
 $term->prompt( "zcli($host->{name}):" );
@@ -47,12 +85,49 @@ sub gen_cmd_struct
 {
 	my $st;
 
-	foreach my $cmd ( keys %{ $objects } )
+	# features of the lb
+	if (defined $main::id_tree)
 	{
-		$st->{ $cmd } = &gen_obj( $cmd );
+		foreach my $cmd ( keys %{ $objects } )
+		{
+			$st->{ $cmd } = &gen_obj( $cmd );
+		}
 	}
 
-	$st->{ help }->{ proc } = \&printHelp;
+	# add static functions
+	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ proc } = \&printHelp;
+
+	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ desc } = "Force a ZCLI reload to refresh the ID objects";
+	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ proc } = sub { &reload_cmd_struct(); };
+
+	my $host_st;
+	my @host_list = &listHost();
+	$host_st->{ $V{LIST} }->{ proc } = sub { say $_ for (&listHost) };
+	$host_st->{ $V{SET} }->{ proc } = \&setHost;
+	$host_st->{ $V{DELETE} } = {
+		proc => sub {
+			if ($host->{name} eq @_[0])
+			{
+				say "The '$host->{name}' host is beeing used";
+			}
+			else
+			{
+				&delHost(@_);
+			}
+		},
+		args => [sub {\@host_list}],
+	};
+	$host_st->{ $V{APPLY} } = {
+		proc => sub {
+			$host=hostInfo(@_);
+			$term->prompt( "zcli($host->{name}):" );
+			&reload_cmd_struct();
+		},
+		args => [sub {\@host_list}],
+	};
+	$st->{ hosts }->{ desc } = "apply an action about which is the destination load balancer";
+	$st->{ hosts }->{ cmds } = $host_st;
+
 
 	return $st;
 }
@@ -189,9 +264,7 @@ sub gen_act
 			$term->save_history();
 
 			# reload structs
-			#~ $main::id_tree = &getLBIdsTree( $host );
-			$main::cmd_st  = &gen_cmd_struct();
-			$term->commands( $main::cmd_st );
+			&reload_cmd_struct();
 		};
 		say $@ if $@;
 
@@ -201,3 +274,14 @@ sub gen_act
 	return $def;
 }
 
+sub reload_cmd_struct
+{
+	$main::id_tree = &getLBIdsTree( $host );
+	if (!defined $main::id_tree)
+	{
+		say "Error getting the load balancer IDs";
+	}
+	$main::cmd_st = &gen_cmd_struct();
+
+	$main::term->commands( $main::cmd_st ) if (defined $term);
+}

@@ -58,6 +58,7 @@ our %Actions = (
 	NON_MAINTENANCE => 'non_maintenance',  # Unset the maintenance mode of a object
 	APPLY => 'apply',  # Apply an object to the system
 	UPDATE => 'update',  # Apply an object to the system
+	RELOAD => 'reload',  # Refresh a item or reload an object
 );
 
 our $UriParamTag =
