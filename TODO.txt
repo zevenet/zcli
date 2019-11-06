@@ -12,18 +12,12 @@
 
 - devolver error si hay parametros en el comando cuando es GET.
 
-- autocompletado de fichero para subir
-
 - doc
 
 - AÑADIR MODULOS:
 	graficas?
 
-- implementar logica para "UriParamTag"
-
 - completar funcionalidades:
-	IPDS: bl-sources, usar "UriParamTag"
-	bonding-slaves, usar "UriParamTag"
 	farms-add/rem headers
 	farms-zones-resources
 	farms-services MOVE
@@ -38,3 +32,16 @@
 
 - hacer que si falla parseando, se pueda dar al autocompletado, parseando y añadiendo los parametros a la estructura cmd y recargandola
 
+- añadir etiqueta de ERRROR o SUCCESS
+	- cambiar color el prompt?
+
+- mejorar descripcion de error.
+# system-backups upload
+The file name to upload is not set
+	- Añadiendo como seria el comando esperado:
+	system-backups upload <file>
+
+- errores
+	subiendo tar.gz
+	IPDS: bl-sources, usar "UriParamTag"
+	bonding-slaves, usar "UriParamTag"

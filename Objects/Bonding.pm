@@ -63,8 +63,13 @@ our $Bonding = {
 					   method => 'POST',
 		},
 		$V{ REMOVE } => {
-			uri => "/interfaces/bonding/<$K{IFACE}>/actions/<$K{BOND_SLAVE}>"
-			,    # ???? pùede que falle
+			uri => "/interfaces/bonding/<$K{IFACE}>/actions/$Define::UriParamTag",
+			uri_param    => [
+					{
+						name => "slave",
+						desc => "the slave interface which will be removed",
+					},
+			  ],
 			method => 'DELETE',
 		},
 	},

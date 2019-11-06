@@ -42,9 +42,10 @@ our $Certificates = {
 								  content_type => 'application/x-pem-file',
 								  upload_file  => undef,
 								  uri_param    => [
-										  "lines" => {
-												  desc => "Number of lines of the log file to show",
-										  },
+										{
+											name => "name",
+											desc => "the name which the certificate will be saved",
+										},
 								  ],
 						  },
 				  },

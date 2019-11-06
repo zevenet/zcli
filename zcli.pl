@@ -246,12 +246,24 @@ sub gen_act
 	$def->{ desc } = "$act $obj";
 	$def->{ desc } .= ", expects the ID(s) $id_msg" if ( $id_msg ne '' );
 
+	my @in_args = ();
+	if (exists $objects->{ $obj }->{ $act }->{ 'uri_param'} )
+	{
+		foreach my $p (@{ $objects->{ $obj }->{ $act }->{ 'uri_param'} })
+		{
+			push @in_args, "<$p->{name}>";
+		}
+	}
+
 	# check if the call is expecting a file name to upload or download
 	if (    exists $objects->{ $obj }->{ $act }->{ 'download_file' }
 		 or exists $objects->{ $obj }->{ $act }->{ 'upload_file' } )
 	{
 		$def->{ desc } .= " 'file'";
+		push @in_args, sub { shift->complete_files(@_); };
 	}
+	$def->{ args } = \@in_args if (@in_args);
+
 
 	$def->{ proc } = sub {
 		eval {
@@ -267,7 +279,6 @@ sub gen_act
 			&reload_cmd_struct();
 		};
 		say $@ if $@;
-
 		#~ POSIX::_exit( $resp->{err} );
 	};
 

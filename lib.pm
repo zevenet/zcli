@@ -24,6 +24,7 @@ sub parseInput
 				  object => shift @args,
 				  action => shift @args,
 				  id     => [],
+				  uri_params   => [],
 				  download_file => undef,
 				  upload_file => undef,
 				  params => undef,
@@ -35,10 +36,30 @@ sub parseInput
 		push @{ $input->{ id } }, $id;
 	}
 
+	# adding uri parameters
+	if (exists $def->{uri_param})
+	{
+		my $uri = $def->{uri};
+		foreach my $p (@{$def->{uri_param}})
+		{
+			my $val = shift @args;
+			my $tag = $Define::UriParamTag;
+			if ($uri =~ s/$tag/$val/)
+			{
+				push @{$input->{ uri_params }}, $val;
+			}
+			else
+			{
+				die "This command expects $p->{name}, $p->{desc}\n";
+			}
+		}
+	}
+
 	# check if the call is expecting a file name to upload or download
 	$input->{download_file} = shift @args if ( exists $def->{ 'download_file' } );
 	$input->{upload_file} = shift @args if ( exists $def->{ 'upload_file' } );
 
+	# json params
 	my $param_flag = 0;
 	my $index      = 0;
 	for ( my $ind = 0 ; $ind <= $#args ; $ind++ )
@@ -182,7 +203,7 @@ sub checkInput
 		print ", please, try with: \n\t> ";
 		print $join;
 		print "\n";
-		die "";
+		die "\n";
 	}
 
 	# getting ACTION
@@ -203,7 +224,7 @@ sub checkInput
 		print ", please, try with: \n\t> ";
 		print $join;
 		print "\n";
-		die "";
+		die "\n";
 	}
 
 	# getting IDs
@@ -224,6 +245,19 @@ sub checkInput
 		if ( $call{ uri } =~ /\<([\w -]+)\>/ )
 		{
 			die "The id '$1' was not set";
+		}
+	}
+
+	# getting uri parameters
+	if (exists $def->{uri_param})
+	{
+		my $tag = $Define::UriParamTag;
+		foreach my $p (@{$input->{ uri_params }})
+		{
+			unless ($call{uri} =~ s/$tag/$p/)
+			{
+				die "Error replacing the param '$p'\n";
+			}
 		}
 	}
 
@@ -317,6 +351,27 @@ sub parseInputParams
 
 }
 
+sub checkUriParams
+{
+	my $uri_param = shift;
+	my @params = @_;
+	my @p_out;
+	if (defined $uri_param)
+	{
+		foreach my $p (@{$uri_param})
+		{
+			my $val = shift @params;
+			my $tag = $Define::UriParamTag;
+			unless ($uri_param =~ s/$tag/$val/)
+			{
+				push @p_out, undef;
+				print "This command expects $p->{name}, $p->{desc}\n";
+			}
+		}
+	}
+	return @p_out;
+}
+
 sub listParams
 {
 	my $request = shift;
@@ -384,34 +439,6 @@ sub getIdValues
 	return \@values;
 }
 
-# Devuelve:
-# array ref, si encuentra el id
-# undef, si no encuentra el id
-#~ sub getIdValues
-#~ {
-#~ my $tree = shift;	# arbol de keys, va comprobandose recursivamente
-#~ my $key = shift;	# clave que estoy buscando
-
-#~ # look for the key
-#~ foreach my $id (keys %{$tree})
-#~ {
-#~ # found
-#~ if ( $key eq $id )
-#~ {
-#~ &dev("found");
-#~ my @params = keys ${$tree->{$id}};
-#~ return \@paramss;
-#~ }
-#~ # look for recursive
-#~ elsif (defined $tree->{$key})
-#~ {
-#~ my $params = &getIdValues($tree->{$id}, $key);
-#~ return $params if (defined $params);
-#~ }
-#~ }
-
-#~ return undef;
-#~ }
 
 my $ua = getUserAgent();
 

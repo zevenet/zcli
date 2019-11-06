@@ -50,15 +50,45 @@ our $Blacklist = {
 						},
 		},
 		$V{ UPDATE } => {
-						uri    => "/ipds/blacklists/<$K{BL}>/actions",
-						method => 'POST',
-						params => {
-									'action' => 'update',
-						},
+						  uri    => "/ipds/blacklists/<$K{BL}>/actions",
+						  method => 'POST',
+						  params => {
+									  'action' => 'update',
+						  },
 		},
 
-		# ADD SOURCES ??????
+		'ipds-blacklist-sources' => {
+			$V{ LIST } => {
+							uri    => "/ipds/blacklists/<$K{BL}>/sources",
+							method => 'GET',
+			},
+			$V{ CREATE } => {
+							  uri    => "/ipds/blacklists/<$K{BL}>/sources",
+							  method => 'POST',
+			},
+			$V{ SET } => {
+				 uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
+				 method    => 'PUT',
+				 uri_param => [
+							   {
+								 name => "source",
+								 desc => "the IP address of the source which will be modified",
+							   },
+				 ],
+			},
+			$V{ DELETE } => {
+				  uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
+				  method    => 'DELETE',
+				  uri_param => [
+								{
+								  name => "source",
+								  desc => "the IP address of the source which will be removed",
+								},
+				  ],
+			},
+		},
 	},
 };
 
 1;
+

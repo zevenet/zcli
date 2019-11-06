@@ -54,10 +54,10 @@ our $System = {
 			uri       => "/system/logs/$K{LOG}/lines/$Define::UriParamTag",
 			method    => 'GET',
 			uri_param => [
-				"lines" => {
-							 desc => "Number of lines of the log file to show",
-				}
-
+				{
+						name => "lines",
+						desc => "the number of lines of the log file to show",
+				},
 			],
 		},
 		$V{ DOWNLOAD } => {
@@ -85,9 +85,10 @@ our $System = {
 								  content_type => 'application/gzip',
 								  upload_file  => undef,
 								  uri_param    => [
-										  "lines" => {
-												  desc => "Number of lines of the log file to show",
-										  },
+										{
+											name => "name",
+											desc => "the name which the backup will be saved",
+										},
 								  ],
 						  },
 						  $V{ DELETE } => {
