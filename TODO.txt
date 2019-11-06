@@ -25,7 +25,6 @@
 	rbac-roles SET		# puede dar problemas por como se parsean los parametros
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
-	# license. Debe tratarse el recibir datos en txt
 
 - copy:  (Completar buscando parametro copy_from)
 	fg
@@ -43,5 +42,4 @@ The file name to upload is not set
 
 - errores
 	subiendo tar.gz
-	IPDS: bl-sources, usar "UriParamTag"
 	bonding-slaves, usar "UriParamTag"

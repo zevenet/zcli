@@ -251,6 +251,7 @@ sub gen_act
 	{
 		foreach my $p (@{ $objects->{ $obj }->{ $act }->{ 'uri_param'} })
 		{
+			$def->{ desc } .= " '$p->{name}'";
 			push @in_args, "<$p->{name}>";
 		}
 	}

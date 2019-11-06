@@ -56,36 +56,36 @@ our $Blacklist = {
 									  'action' => 'update',
 						  },
 		},
+	},
 
-		'ipds-blacklist-sources' => {
+	'ipds-blacklist-sources' => {
 			$V{ LIST } => {
-							uri    => "/ipds/blacklists/<$K{BL}>/sources",
-							method => 'GET',
-			},
-			$V{ CREATE } => {
-							  uri    => "/ipds/blacklists/<$K{BL}>/sources",
-							  method => 'POST',
-			},
-			$V{ SET } => {
-				 uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
-				 method    => 'PUT',
-				 uri_param => [
-							   {
-								 name => "source",
-								 desc => "the IP address of the source which will be modified",
-							   },
-				 ],
-			},
-			$V{ DELETE } => {
-				  uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
-				  method    => 'DELETE',
-				  uri_param => [
-								{
-								  name => "source",
-								  desc => "the IP address of the source which will be removed",
-								},
-				  ],
-			},
+						uri    => "/ipds/blacklists/<$K{BL}>/sources",
+						method => 'GET',
+		},
+		$V{ CREATE } => {
+						  uri    => "/ipds/blacklists/<$K{BL}>/sources",
+						  method => 'POST',
+		},
+		$V{ SET } => {
+			 uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
+			 method    => 'PUT',
+			 uri_param => [
+						   {
+							 name => "source ID",
+							 desc => "the IP address of the source which will be modified",
+						   },
+			 ],
+		},
+		$V{ DELETE } => {
+			  uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
+			  method    => 'DELETE',
+			  uri_param => [
+							{
+							  name => "source ID",
+							  desc => "the IP address of the source which will be removed",
+							},
+			  ],
 		},
 	},
 };
