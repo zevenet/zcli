@@ -134,8 +134,34 @@ our $Farms = {
 	},
 
 	'farms-zones-resources' => {
-
-		# ?????
+					   $V{ LIST } => {
+										 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources",
+										 method => 'GET',
+					   },
+					   $V{ CREATE } => {
+									  uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources",
+									  method => 'POST',
+					   },
+					   $V{ SET } => {
+										 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
+										 method => 'PUT',
+										 uri_param => [
+													   {
+														 name => "resource ID",
+														 desc => "the IP address of the source which will be modified",
+													   },
+										 ],
+					   },
+					   $V{ DELETE } => {
+										 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
+										 method => 'DELETE',
+										 uri_param => [
+													   {
+														 name => "resource ID",
+														 desc => "the IP address of the source which will be removed",
+													   },
+										 ],
+					   },
 	},
 
 	'farms-certificates' => {

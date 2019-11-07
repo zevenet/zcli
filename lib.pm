@@ -392,7 +392,8 @@ sub listParams
 		my $msg =
 		  ( $resp->{ json }->{ message } )
 		  ? $resp->{ json }->{ message }
-		  : "Action is not valid";
+		  : "";
+		  #~ : "Action is not valid";
 		return $msg;
 	}
 	return \@params;
@@ -614,7 +615,7 @@ sub printOutput
 
 	if ( exists $resp->{ json }->{ description } )
 	{
-		print "Info: $resp->{json}->{description}\n\n";
+		print "Info: $resp->{json}->{description}\n";
 		delete $resp->{ json }->{ description };
 	}
 
@@ -622,19 +623,19 @@ sub printOutput
 	{
 		print "Error!! ";
 		print "$resp->{msg}";
-		print "\n\n";
+		print "\n";
 	}
 	else
 	{
-		if (exists $resp->{ msg })
+		if (exists $resp->{ msg } and defined $resp->{ msg })
 		{
-			print "Info: $resp->{ msg }\n\n";
+			print "$resp->{ msg }\n";
 		}
 
 		if (exists $resp->{txt})
 		{
 			print "$resp->{txt}";
-			print "\n\n";
+			print "\n";
 		}
 
 		if (%{$resp->{ json }})
@@ -643,9 +644,10 @@ sub printOutput
 			eval {
 				$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
 			};
-			print "$json_enc\n\n" if ($json_enc);
+			print "$json_enc" if ($json_enc);
 		}
 	}
+	print "\n";
 }
 
 sub setHost

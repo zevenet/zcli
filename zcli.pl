@@ -131,6 +131,8 @@ sub gen_cmd_struct
 
 	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ desc } = "Force a ZCLI reload to refresh the ID objects";
 	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ proc } = sub { &reload_cmd_struct(); };
+	$st->{ 'zcli' }->{ cmds }->{ $V{QUIT} }->{ dec } = "escape from the ZCLI";
+	$st->{ 'zcli' }->{ cmds }->{ $V{QUIT} }->{ method } = sub { shift->exit_requested(1); };
 
 	my $host_st;
 	my @host_list = &listHost();
@@ -274,7 +276,6 @@ sub gen_act
 		push @in_args, sub { shift->complete_files(@_); };
 	}
 	$def->{ args } = \@in_args if (@in_args);
-
 
 	$def->{ proc } = sub {
 		my $resp;

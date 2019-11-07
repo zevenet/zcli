@@ -1,11 +1,6 @@
-- errores:
-	* farms-services, delete, <granja-gslb>    no muestra descripcion
-	* farms-services, --, <granja l4>		arreglar el error
-	* cuando no hay objectos. p.e. borrando cert de l4: "The farms-certificates remove l4 command has no proc or method to call!"
-
 - crear paquete
 
-- añadir opciones.
+- añadir opciones
 	- modo script
 
 - elegir el formato de los parametros
@@ -19,18 +14,9 @@
 
 - completar funcionalidades:
 	farms-add/rem headers
-	farms-zones-resources
-	farms-services MOVE
-	farms-certificates MOVE
-	rbac-roles SET		# puede dar problemas por como se parsean los parametros
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
 
-- copy:  (Completar buscando parametro copy_from)
-	fg
-
-- hacer que si falla parseando, se pueda dar al autocompletado, parseando y añadiendo los parametros a la estructura cmd y recargandola
-	- mirar la funcion: completemsg(msg), lanza mensajes en autocompletado
-
 - errores
 	bonding-slaves, crear. Espera array
+	rbac-roles SET. problemas por como se parsean los parametros

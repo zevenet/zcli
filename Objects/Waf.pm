@@ -32,7 +32,7 @@ my $uri_param_match = [
 			  ];
 
 
-our $WAf = {
+our $Waf = {
 	'ipds-waf' => {
 					$V{ LIST } => {
 									uri    => "/ipds/waf",
