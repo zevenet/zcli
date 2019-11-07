@@ -304,7 +304,7 @@ sub checkInput
 		}
 
 		# get possible params
-		elsif ( !defined $input->{ params } )
+		elsif ( !defined $input->{ params } and ! exists $def->{content_type} )
 		{
 			my $params = &listParams( \%call, $host );
 			if ( ref $params eq 'ARRAY' )
@@ -469,7 +469,6 @@ sub zapi
 		};
 	}
 
-
 	&dev( Dumper( $arg ), 'req', 2 );
 
 	# This is a workaround to manage l4 and datalink services.
@@ -491,7 +490,20 @@ sub zapi
 		$arg->{content_type} = $arg->{content_type} // 'application/json';
 		$request->content_type( $arg->{content_type} );
 
-		if (exists $arg->{upload_file})
+		# sending data in binary
+		if ($arg->{content_type} eq 'application/gzip')
+		{
+			open ( my $upload_fh, '<', "$arg->{ upload_file }" );
+			{
+				binmode $upload_fh;
+				use MIME::Base64 qw( encode_base64 );
+				local $/;
+				$request->content( encode_base64( <$upload_fh> ) );
+			}
+			close $upload_fh;
+		}
+		# uploading file with another format
+		elsif (exists $arg->{upload_file})
 		{
 			open ( my $upload_fh, '<', "$arg->{ upload_file }" );
 			{
@@ -525,7 +537,6 @@ sub zapi
 		close $download_fh;
 
 		$msg = "The file was properly saved in the file '$arg->{ 'download_file' }'.";
-
 	}
 	# tratamiento texto
 	elsif ($response->header('content-type') =~ 'text/plain')
