@@ -24,7 +24,7 @@ sub parseInput
 				  object => shift @args,
 				  action => shift @args,
 				  id     => [],
-				  uri_params   => [],
+				  uri_param   => [],
 				  download_file => undef,
 				  upload_file => undef,
 				  params => undef,
@@ -46,7 +46,7 @@ sub parseInput
 			my $tag = $Define::UriParamTag;
 			if ($uri =~ s/$tag/$val/)
 			{
-				push @{$input->{ uri_params }}, $val;
+				push @{$input->{ uri_param }}, $val;
 			}
 			else
 			{
@@ -252,7 +252,7 @@ sub checkInput
 	if (exists $def->{uri_param})
 	{
 		my $tag = $Define::UriParamTag;
-		foreach my $p (@{$input->{ uri_params }})
+		foreach my $p (@{$input->{ uri_param }})
 		{
 			unless ($call{uri} =~ s/$tag/$p/)
 			{
@@ -439,6 +439,49 @@ sub getIdValues
 	return \@values;
 }
 
+
+sub create_description
+{
+	my $object_st = shift;
+	my $obj = shift;
+	my $act = shift;
+
+	return "$obj" if not defined $act;
+
+	my $def = $object_st->{ $obj }->{ $act };
+
+	# action object @ids @uri_param @file @params
+	my $msg = "$obj $act";
+	my $params = 1;
+
+	my @ids = &getIds($def->{uri});
+	if (@ids)
+	{
+		$msg .= " <$_>" for @ids;
+	}
+	if (exists $def->{uri_param})
+	{
+		$msg .= " <$_->{name}>" for @{$def->{uri_param}};
+	}
+	if (exists $def->{upload_file})
+	{
+		$msg .= " <file_path>";
+		$params = 0;
+	}
+	if (exists $def->{download_file})
+	{
+		$msg .= " <file_path>";
+		$params = 0;
+	}
+	if ($def->{method} =~ /^POST|PUT$/ and
+		not exists $def->{params} and
+		$params )
+	{
+		$msg .= " [-param_name param_value ...]";
+	}
+
+	return $msg;
+}
 
 my $ua = getUserAgent();
 

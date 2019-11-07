@@ -169,7 +169,6 @@ sub gen_obj
 	my $obj = shift;
 	my $def;
 
-	#~ $def->{ desc } = "Apply an action about '$obj' objects";
 	foreach my $action ( keys %{ $objects->{ $obj } } )
 	{
 		my @ids_def = &getIds( $objects->{ $obj }->{ $action }->{ uri } );
@@ -209,7 +208,7 @@ sub add_ids
 		}
 		@values = keys %{ $tree };
 
-		$def->{ desc } = "Getting '$id_list[-1]'\n";    # tmp description
+		$def->{ desc } = &create_description($objects, $obj, $action);
 
 		if ( !@values )
 		{
@@ -230,17 +229,6 @@ sub add_ids
 				{
 					die "The id '$key' could not be replaced";
 				}
-
-			   # add description. It is used when the command is executed and it is not complete
-				my $id_msg  = "";
-				my $ids_def = $objects->{ $obj }->{ $action }->{ ids };
-				foreach my $i ( @{ $ids_def } )
-				{
-					$id_msg .= " '$i'";
-				}
-				$id_msg =~ s/^ //;
-				$def->{ desc } = "$action $obj";
-				$def->{ desc } .= ", expects the ID(s) $id_msg" if ( $id_msg ne '' );
 
 				my @id_join =
 				  $def->{ cmds }->{ $id } =
@@ -268,22 +256,13 @@ sub gen_act
 	my $call;
 
 	# add description
-	my $id_msg  = "";
-	my $ids_def = $objects->{ $obj }->{ $act }->{ ids };
-	foreach my $i ( @{ $ids_def } )
-	{
-		$id_msg .= " '$i'";
-	}
-	$id_msg =~ s/^ //;
-	$def->{ desc } = "$act $obj";
-	$def->{ desc } .= ", expects the ID(s) $id_msg" if ( $id_msg ne '' );
+	$def->{ desc } = $def->{ desc } = &create_description($objects, $obj, $act);
 
 	my @in_args = ();
 	if (exists $objects->{ $obj }->{ $act }->{ 'uri_param'} )
 	{
 		foreach my $p (@{ $objects->{ $obj }->{ $act }->{ 'uri_param'} })
 		{
-			$def->{ desc } .= " '$p->{name}'";
 			push @in_args, "<$p->{name}>";
 		}
 	}
@@ -292,7 +271,6 @@ sub gen_act
 	if (    exists $objects->{ $obj }->{ $act }->{ 'download_file' }
 		 or exists $objects->{ $obj }->{ $act }->{ 'upload_file' } )
 	{
-		$def->{ desc } .= " 'file'";
 		push @in_args, sub { shift->complete_files(@_); };
 	}
 	$def->{ args } = \@in_args if (@in_args);

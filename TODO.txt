@@ -32,11 +32,5 @@
 - hacer que si falla parseando, se pueda dar al autocompletado, parseando y añadiendo los parametros a la estructura cmd y recargandola
 	- mirar la funcion: completemsg(msg), lanza mensajes en autocompletado
 
-- mejorar descripcion de error.
-# system-backups upload
-The file name to upload is not set
-	- Añadiendo como seria el comando esperado:
-	system-backups upload <file>
-
 - errores
 	bonding-slaves, crear. Espera array
