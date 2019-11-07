@@ -313,7 +313,8 @@ sub gen_act
 			&reload_cmd_struct();
 		};
 		say $@ if $@;
-		&reload_prompt($resp->{err});
+		my $err = ($@ or $resp->{err})? 1 : 0;
+		&reload_prompt($err);
 		#~ POSIX::_exit( $resp->{err} );
 	};
 

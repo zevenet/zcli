@@ -59,11 +59,11 @@ our $Bonding = {
 	},
 	'network-bonding-slaves' => {
 		$V{ ADD } => {
-					   uri    => "/interfaces/bonding/<$K{IFACE}>/actions",
+					   uri    => "/interfaces/bonding/<$K{IFACE}>/slaves",
 					   method => 'POST',
 		},
 		$V{ REMOVE } => {
-			uri => "/interfaces/bonding/<$K{IFACE}>/actions/$Define::UriParamTag",
+			uri => "/interfaces/bonding/<$K{IFACE}>/slaves/$Define::UriParamTag",
 			uri_param    => [
 					{
 						name => "slave",

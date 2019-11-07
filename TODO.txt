@@ -39,4 +39,4 @@ The file name to upload is not set
 	system-backups upload <file>
 
 - errores
-	bonding-slaves, usar "UriParamTag"
+	bonding-slaves, crear. Espera array
