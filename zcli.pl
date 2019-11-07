@@ -13,6 +13,7 @@ my %V = %Define::Actions;
 our $id_tree;
 our $cmd_st;
 our $term;
+our $CONNECTIVITY = 1; # connectivity with the lb
 
 my $zcli_history = '.zcli-history';
 
@@ -71,14 +72,45 @@ if ( $opt->{'non-interactive'})
 
 # https://metacpan.org/pod/Term::ShellUI
 use Term::ShellUI;
+
+# overriding error method
+*{Term::ShellUI::error} = sub {
+	say "$_[1]";
+	&reload_prompt(1);
+};
+
+
+
 $term = new Term::ShellUI( commands     => $cmd_st,
 							  history_file => $zcli_history, );
 print "Zevenet Client Line Interface\n";
-$term->prompt( "zcli($host->{name}):" );
+&reload_prompt();
 $term->load_history();
 $term->run();
 
 
+
+sub reload_prompt
+{
+	my $err = shift // 0;
+	my $conn = $CONNECTIVITY;
+	my $host = $host->{name} // "";
+
+
+
+	my $gray = "\033[01;90m";
+	my $red = "\033[01;31m";
+	my $green = "\033[01;32m";
+	my $no_color = "\033[0m";
+
+
+	my $color = ($err) ? $red: $green;
+	my $conn_color = (!$conn) ? $gray: "";
+
+	# zcli($host->{name}):
+	my $tag = "zcli($conn_color$host$color)";
+	$term->prompt( "$color$tag$no_color:" );
+}
 
 
 sub gen_cmd_struct
@@ -86,7 +118,7 @@ sub gen_cmd_struct
 	my $st;
 
 	# features of the lb
-	if (defined $main::id_tree)
+	if ($main::CONNECTIVITY)
 	{
 		foreach my $cmd ( keys %{ $objects } )
 		{
@@ -120,8 +152,8 @@ sub gen_cmd_struct
 	$host_st->{ $V{APPLY} } = {
 		proc => sub {
 			$host=hostInfo(@_);
-			$term->prompt( "zcli($host->{name}):" );
 			&reload_cmd_struct();
+			&reload_prompt();
 		},
 		args => [sub {\@host_list}],
 	};
@@ -267,12 +299,13 @@ sub gen_act
 
 
 	$def->{ proc } = sub {
+		my $resp;
 		eval {
 			my @args = ( $objects->{ $obj }->{ $act }, $obj, $act, @{ $ids }, @_ );
 			my $input = &parseInput( @args );
 
 			my $request = &checkInput( $objects, $input, $host, $id_tree );
-			my $resp    = &zapi( $request, $host );
+			$resp    = &zapi( $request, $host );
 			&printOutput( $resp );
 			$term->save_history();
 
@@ -280,6 +313,7 @@ sub gen_act
 			&reload_cmd_struct();
 		};
 		say $@ if $@;
+		&reload_prompt($resp->{err});
 		#~ POSIX::_exit( $resp->{err} );
 	};
 
@@ -288,10 +322,10 @@ sub gen_act
 
 sub reload_cmd_struct
 {
-	$main::id_tree = &getLBIdsTree( $host );
-	if (!defined $main::id_tree)
+	$main::CONNECTIVITY = &check_connectivity($host);
+	if ($main::CONNECTIVITY)
 	{
-		say "Error getting the load balancer IDs";
+		$main::id_tree = &getLBIdsTree( $host );
 	}
 	$main::cmd_st = &gen_cmd_struct();
 

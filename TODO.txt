@@ -30,9 +30,7 @@
 	fg
 
 - hacer que si falla parseando, se pueda dar al autocompletado, parseando y añadiendo los parametros a la estructura cmd y recargandola
-
-- añadir etiqueta de ERRROR o SUCCESS
-	- cambiar color el prompt?
+	- mirar la funcion: completemsg(msg), lanza mensajes en autocompletado
 
 - mejorar descripcion de error.
 # system-backups upload
@@ -41,5 +39,4 @@ The file name to upload is not set
 	system-backups upload <file>
 
 - errores
-	subiendo tar.gz
 	bonding-slaves, usar "UriParamTag"

@@ -459,16 +459,6 @@ sub zapi
 	my $arg  = shift;
 	my $host = shift;
 
-	# test connectivity:
-	if (system("nmap $host->{HOST} -p $host->{PORT} | grep open 2>&1 >/dev/null"))
-	{
-		say "The '$host->{name}' host ($host->{HOST}:$host->{PORT}) cannot be reached.";
-		return {
-				#~ 'msg' => "the '$host->{name}' host ($host->{ip}:$host->{port}) cannot be reached.",
-				'err'  => 1,
-		};
-	}
-
 	&dev( Dumper( $arg ), 'req', 2 );
 
 	# This is a workaround to manage l4 and datalink services.
@@ -809,6 +799,19 @@ sub dev
 	say "<<<<<<<<<<<<<<< $tag";
 	say "";
 
+}
+
+sub check_connectivity
+{
+	my $host = shift;
+
+	# test connectivity:
+	if (system("nmap $host->{HOST} -p $host->{PORT} | grep open 2>&1 >/dev/null"))
+	{
+		say "The '$host->{name}' host ($host->{HOST}:$host->{PORT}) cannot be reached.";
+		return 0;
+	}
+	return 1;
 }
 
 1;
