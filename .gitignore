@@ -1,2 +1,4 @@
 hosts.ini
 .zcli-history
+packages/
+workdir/
