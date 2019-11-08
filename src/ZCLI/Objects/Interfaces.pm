@@ -3,14 +3,14 @@
 use strict;
 use warnings;
 
-require "./Define.pm";
+use ZCLI::Define;
 
-require "./Objects/Nic.pm";
-require "./Objects/Virtual.pm";
-require "./Objects/Vlan.pm";
-require "./Objects/Bonding.pm";
-require "./Objects/Floating.pm";
-require "./Objects/Alias.pm";
+use ZCLI::Objects::Nic;
+use ZCLI::Objects::Virtual;
+use ZCLI::Objects::Vlan;
+use ZCLI::Objects::Bonding;
+use ZCLI::Objects::Floating;
+use ZCLI::Objects::Alias;
 
 # verbs
 my %V = %Define::Actions;

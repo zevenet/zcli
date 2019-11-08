@@ -32,13 +32,22 @@ function die() {
 
 #### Initial setup ####
 
+INST_PATH_LIB="workdir/usr/share/perl5"
+INST_PATH_BIN="workdir/usr/bin"
+
+
 # Setup a clean environment
 cd "$BASE_DIR"
 msg "Setting up a clean environment..."
 rm -rf workdir
 mkdir workdir
-rsync -a DEBIAN src/* workdir/
+cp -r DEBIAN workdir/
+mkdir -p "$INST_PATH_LIB"
+mkdir -p "$INST_PATH_BIN"
+cp -r src/ZCLI "$INST_PATH_LIB"
+cp -r src/zcli.pl "$INST_PATH_BIN/zcli"
 cd workdir
+
 
 # Set version and package name
 version=$(grep "Version:" DEBIAN/control | cut -d " " -f 2)

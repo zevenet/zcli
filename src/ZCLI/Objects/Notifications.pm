@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-require "./Define.pm";
-
+use ZCLI::Define;
 # verbs
 my %V = %Define::Actions;
 

@@ -3,10 +3,9 @@
 use strict;
 use warnings;
 
-require "./Define.pm";
-
-require "./Objects/Services.pm";
-require "./Objects/Notifications.pm";
+use ZCLI::Define;
+use ZCLI::Objects::Services;
+use ZCLI::Objects::Notifications;
 
 # verbs
 my %V = %Define::Actions;
@@ -25,7 +24,7 @@ our $System = {
 	},
 	'system' => {
 				  $V{ GET } => {
-								 uri    => "/system",
+								 uri    => "/system/info",
 								 method => 'GET',
 				  },
 	},
@@ -46,12 +45,12 @@ our $System = {
 					   },
 	},
 	'system-logs' => {
-		$V{ GET } => {
+		$V{ LIST } => {
 					   uri    => "/system/logs",
 					   method => 'GET',
 		},
-		$V{ SET } => {
-			uri       => "/system/logs/$K{LOG}/lines/$Define::UriParamTag",
+		$V{ GET } => {
+			uri       => "/system/logs/<$K{LOG}>/lines/$Define::UriParamTag",
 			method    => 'GET',
 			uri_param => [
 				{
@@ -61,8 +60,9 @@ our $System = {
 			],
 		},
 		$V{ DOWNLOAD } => {
-							uri    => "/system/logs/$K{LOG}",
+							uri    => "/system/logs/<$K{LOG}>",
 							method => 'GET',
+  						    download_file => undef,
 		},
 	},
 	'system-backups' => {

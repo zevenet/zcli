@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-require "./Define.pm";
+use ZCLI::Define;
 
 # verbs
 my %V = %Define::Actions;
@@ -38,7 +38,7 @@ our $Statistics = {
 															method => 'GET',
 											},
 											$V{ GET } => {
-													  uri => "/stats/farms/$K{FARM}",
+													  uri => "/stats/farms/<$K{FARM}>",
 													  method => 'GET',
 											},
 					},

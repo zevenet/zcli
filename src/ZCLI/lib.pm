@@ -5,10 +5,23 @@ use feature "say";
 use LWP::UserAgent;
 use JSON;
 
-require "./Define.pm";
-require "./Objects.pm";
+use ZCLI::Define;
+use ZCLI::Objects;
 
-my $HOST_FILE = 'hosts.ini';
+my $zcli_dir = "$ENV{HOME}/.zcli";
+my $zcli_history = "$zcli_dir/zcli-history";
+my $HOST_FILE = "$zcli_dir/hosts.ini";
+
+sub getZcliDir
+{
+	return $zcli_dir;
+}
+
+
+sub getZcliHistoryPath
+{
+	return $zcli_history;
+}
 
 # pedir parametros de la uri
 
@@ -702,19 +715,20 @@ sub setHost
 	} while ( !$valid_flag );
 
 	# get zapi version
-	do
-	{
-		print "Load balancer zapi version: ";
-		$valid_flag = 1;
-		$cfg->{ ZAPI_VERSION } = <STDIN>;
-		chomp $cfg->{ ZAPI_VERSION };
-		unless ( $cfg->{ ZAPI_VERSION } =~ /^(3.1|3.2|4.0)$/ )
-		{
-			$valid_flag = 0;
-			say
-			  "Invalid zapi version. It expects once of the following versions: 3.1, 3.2 or 4.0.";
-		}
-	} while ( !$valid_flag );
+#	do
+#	{
+#		print "Load balancer zapi version: ";
+#		$valid_flag = 1;
+#		$cfg->{ ZAPI_VERSION } = <STDIN>;
+#		chomp $cfg->{ ZAPI_VERSION };
+#		unless ( $cfg->{ ZAPI_VERSION } =~ /^(4.0)$/ )
+#		{
+#			$valid_flag = 0;
+#			say
+#			  "Invalid zapi version. It expects once of the following versions: 4.0.";
+#		}
+#	} while ( !$valid_flag );
+	$cfg->{ ZAPI_VERSION } = "4.0";
 
 	# get name
 	do

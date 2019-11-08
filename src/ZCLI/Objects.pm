@@ -6,14 +6,14 @@ use Hash::Merge;
 
 package Objects;
 
-require "./Objects/Farms.pm";
-require "./Objects/Interfaces.pm";
-require "./Objects/Certificates.pm";
-require "./Objects/Farmguardian.pm";
-require "./Objects/Statistics.pm";
-require "./Objects/Ipds.pm";
-require "./Objects/System.pm";
-require "./Objects/Rbac.pm";
+use ZCLI::Objects::Farms;
+use ZCLI::Objects::Interfaces;
+use ZCLI::Objects::Certificates;
+use ZCLI::Objects::Farmguardian;
+use ZCLI::Objects::Statistics;
+use ZCLI::Objects::Ipds;
+use ZCLI::Objects::System;
+use ZCLI::Objects::Rbac;
 
 our $zcli_objects = {};
 $Objects::zcli_objects =

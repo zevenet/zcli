@@ -1,5 +1,3 @@
-- crear paquete
-
 - añadir opciones
 	- modo script
 
@@ -20,3 +18,5 @@
 - errores
 	bonding-slaves, crear. Espera array
 	rbac-roles SET. problemas por como se parsean los parametros
+
+- estandarizar nombre funciones y variables

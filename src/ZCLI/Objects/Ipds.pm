@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
-require "./Define.pm";
+use ZCLI::Define;
 
-require "./Objects/Blacklist.pm";
-require "./Objects/Dos.pm";
-require "./Objects/Waf.pm";
-require "./Objects/Rbl.pm";
+use ZCLI::Objects::Blacklist;
+use ZCLI::Objects::Dos;
+use ZCLI::Objects::Waf;
+use ZCLI::Objects::Rbl;
 
 # verbs
 my %V = %Define::Actions;

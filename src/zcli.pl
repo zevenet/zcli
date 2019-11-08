@@ -5,9 +5,9 @@ use Data::Dumper;
 use feature "say";
 use POSIX qw(_exit);
 
-require "./Define.pm";
-require "./lib.pm";
-require "./Objects.pm";
+use ZCLI::Define;
+use ZCLI::lib;
+use ZCLI::Objects;
 
 my %V = %Define::Actions;
 our $id_tree;
@@ -15,7 +15,12 @@ our $cmd_st;
 our $term;
 our $CONNECTIVITY = 1; # connectivity with the lb
 
-my $zcli_history = '.zcli-history';
+my $zcli_dir = &getZcliDir();
+my $zcli_history = &getZcliHistoryPath();
+
+system("mkdir -p $zcli_dir") if (!-d $zcli_dir);
+
+
 
 my $opt = &parseOptions( \@ARGV );
 
@@ -26,7 +31,7 @@ if (!$host)
 {
 	if (exists $opt->{'host'})
 	{
-		say "Not found the '$opt->{'host'}' host, selecting the default host";
+		say "Not found the '$opt->{host}' host, selecting the default host";
 		my $host = &hostInfo($opt->{'host'});
 	}
 
