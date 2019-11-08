@@ -794,23 +794,20 @@ sub setHost
 	$Config->{$HOSTNAME} = $cfg;
 
 	# set the default
-	if (defined $Config->{ _ }->{ default_host } and $Config->{ _ }->{ default_host } ne $HOSTNAME)
+	if ( !defined $Config->{ _ }->{ default_host } )
 	{
-		if ( !defined $Config->{ _ }->{ default_host } )
+		$Config->{ _ }->{ default_host } = $HOSTNAME;
+		say "Saved as default profile";
+	}
+	elsif ($Config->{ _ }->{ default_host } ne $HOSTNAME)
+	{
+		print "Do you wish set this host as the default one? [yes|no=default]: ";
+		my $confirmation = <STDIN>;
+		chomp $confirmation;
+		if ( $confirmation =~ /^(y|yes)$/i )
 		{
 			$Config->{ _ }->{ default_host } = $HOSTNAME;
 			say "Saved as default profile";
-		}
-		else
-		{
-			print "Do you wish set this host as the default one? [yes|no=default]: ";
-			my $confirmation = <STDIN>;
-			chomp $confirmation;
-			if ( $confirmation =~ /^(y|yes)$/i )
-			{
-				$Config->{ _ }->{ default_host } = $HOSTNAME;
-				say "Saved as default profile";
-			}
 		}
 	}
 	say "";
