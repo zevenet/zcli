@@ -54,7 +54,6 @@ my $objects = $Objects::zcli_objects;
 
 &reload_cmd_struct();
 
-
 # Launching only a cmd
 if ( $opt->{'non-interactive'})
 {
@@ -132,6 +131,7 @@ sub gen_cmd_struct
 	}
 
 	# add static functions
+	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ desc } = "Print the ZCLI help";
 	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ proc } = \&printHelp;
 
 	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ desc } = "Force a ZCLI reload to refresh the ID objects";
@@ -142,7 +142,13 @@ sub gen_cmd_struct
 	my $host_st;
 	my @host_list = &listHost();
 	$host_st->{ $V{LIST} }->{ proc } = sub { say $_ for (&listHost) };
-	$host_st->{ $V{SET} }->{ proc } = \&setHost;
+	$host_st->{ $V{CREATE} }->{ proc } = \&setHost;
+	$host_st->{ $V{SET} } = {
+		args => [sub {\@host_list}],
+		proc => sub {
+			&setHost($_[0],0);
+		},
+	};
 	$host_st->{ $V{DELETE} } = {
 		proc => sub {
 			if ($host->{name} eq @_[0])

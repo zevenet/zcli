@@ -665,20 +665,71 @@ sub printOutput
 
 sub setHost
 {
+	my $HOSTNAME = shift;	# if there is HOSTNAME, the function will mofidy, else it will create a new one
+	my $new_flag = shift // 1;
+
+	my $set_msg = "Press 'intro' to keep the value";
 	my $ip_regex =
 	  '((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))';
-	my $cfg;
-	my $HOSTNAME;
+
 	my $valid_flag = 1;
-	my $file = $HOST_FILE;
+
+	# getting conf
+	my $Config = (-e $HOST_FILE) ? Config::Tiny->read( $HOST_FILE ) : Config::Tiny->new;
+
+	# validating
+	my $cfg;
+	if (!$new_flag )
+	{
+		if (!exists $Config->{$HOSTNAME})
+		{
+			if (!defined $HOSTNAME)
+			{
+				say "A host name is required";
+			}
+			else
+			{
+				say "The '$HOSTNAME' host does not exist";
+			}
+			return undef;
+		}
+		$cfg = $Config->{$HOSTNAME};
+	}
+
+	# get name
+	if ($new_flag)
+	{
+		do
+		{
+			print "Load balancer host name: ";
+			$valid_flag = 1;
+			$HOSTNAME   = <STDIN>;
+			chomp $HOSTNAME;
+			$cfg->{ name } = $HOSTNAME;
+			if ( $HOSTNAME !~ /\S+/ )
+			{
+				$valid_flag = 0;
+				say
+				  "Invalid name. It expects a string with the load balancer host name";
+			}
+			elsif ( exists $Config->{$HOSTNAME} )
+			{
+				$valid_flag = 0;
+				say
+				  "Invalid name. The '$HOSTNAME' host already exist";
+			}
+		} while ( !$valid_flag );
+	}
 
 	# get IP
 	do
 	{
 		print "Load balancer management IP: ";
+		print "[$set_msg: $cfg->{HOST}] " if not $new_flag;
 		$valid_flag = 1;
-		$cfg->{ HOST } = <STDIN>;
-		chomp $cfg->{ HOST };
+		my $val = <STDIN>;
+		chomp $val;
+		$cfg->{ HOST } = $val unless ($val eq "" and not $new_flag) ;
 		unless ( $cfg->{ HOST } =~ /$ip_regex/ )
 		{
 			$valid_flag = 0;
@@ -690,9 +741,11 @@ sub setHost
 	do
 	{
 		print "Load balancer management port: ";
+		print "[$set_msg: $cfg->{PORT}] " if not $new_flag;
 		$valid_flag = 1;
-		$cfg->{ PORT } = <STDIN>;
-		chomp $cfg->{ PORT };
+		my $val = <STDIN>;
+		chomp $val;
+		$cfg->{ PORT } = $val unless ($val eq "" and not $new_flag) ;
 		unless ( $cfg->{ PORT } > 0 and $cfg->{ PORT } <= 65535 )
 		{
 			$valid_flag = 0;
@@ -704,9 +757,11 @@ sub setHost
 	do
 	{
 		print "Load balancer zapi key: ";
+		print "[$set_msg: $cfg->{ZAPI_KEY}] " if not $new_flag;
 		$valid_flag = 1;
-		$cfg->{ ZAPI_KEY } = <STDIN>;
-		chomp $cfg->{ ZAPI_KEY };
+		my $val = <STDIN>;
+		chomp $val;
+		$cfg->{ ZAPI_KEY } = $val unless ($val eq "" and not $new_flag) ;
 		unless ( $cfg->{ ZAPI_KEY } =~ /\S+/ )
 		{
 			$valid_flag = 0;
@@ -730,56 +785,32 @@ sub setHost
 #	} while ( !$valid_flag );
 	$cfg->{ ZAPI_VERSION } = "4.0";
 
-	# get name
-	do
-	{
-		print "Load balancer host name: ";
-		$valid_flag = 1;
-		$HOSTNAME   = <STDIN>;
-		chomp $HOSTNAME;
-		unless ( $HOSTNAME =~ /\S+/ )
-		{
-			$valid_flag = 0;
-			say
-			  "Invalid zapi version. It expects a string with the load balancer host name";
-		}
-	} while ( !$valid_flag );
 
-	# save data
-	my $Config;
-	if (-e $file)
-	{
-		$Config = Config::Tiny->read( $file );
-	}
-	else
-	{
-		$Config = Config::Tiny->new;
-	}
-
-	$cfg->{ name } = $HOSTNAME;
 	$Config->{$HOSTNAME} = $cfg;
 
 	# set the default
-	if ( !defined $Config->{ _ }->{ default_host } )
+	if (defined $Config->{ _ }->{ default_host } and $Config->{ _ }->{ default_host } ne $HOSTNAME)
 	{
-		$Config->{ _ }->{ default_host } = $HOSTNAME;
-		say "Saved as default profile";
-	}
-	else
-	{
-		print "Do you wish set this host as the default one? [yes|no=default]: ";
-		my $confirmation = <STDIN>;
-		chomp $confirmation;
-		if ( $confirmation =~ /^(y|yes)$/i )
+		if ( !defined $Config->{ _ }->{ default_host } )
 		{
 			$Config->{ _ }->{ default_host } = $HOSTNAME;
 			say "Saved as default profile";
 		}
+		else
+		{
+			print "Do you wish set this host as the default one? [yes|no=default]: ";
+			my $confirmation = <STDIN>;
+			chomp $confirmation;
+			if ( $confirmation =~ /^(y|yes)$/i )
+			{
+				$Config->{ _ }->{ default_host } = $HOSTNAME;
+				say "Saved as default profile";
+			}
+		}
 	}
 	say "";
 
-	$Config->write($file);
-
+	$Config->write($HOST_FILE);
 	return $Config->{ $HOSTNAME };
 }
 

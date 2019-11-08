@@ -1,6 +1,3 @@
-- añadir opciones
-	- modo script
-
 - elegir el formato de los parametros
 
 - devolver error si hay parametros en el comando cuando es GET.
@@ -20,3 +17,15 @@
 	rbac-roles SET. problemas por como se parsean los parametros
 
 - estandarizar nombre funciones y variables
+
+- crear grupos de lb para a los que mandarle los comandos
+
+- En el balanceador no se puede intalar. Se ha tocado el fichero /etc/profile y no funciona el autocompletado
+
+- en buster aparece '0m' en la linea del prompt
+
+- autocompletar de parametros
+
+- añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
+
+- añadir modo silence. No entrar en el terminal

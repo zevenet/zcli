@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Global;
-our $DEBUG = 1;
+our $DEBUG = 0;
 
 package Define;
 
