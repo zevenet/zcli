@@ -12,6 +12,9 @@ my $zcli_dir = "$ENV{HOME}/.zcli";
 my $zcli_history = "$zcli_dir/zcli-history";
 my $HOST_FILE = "$zcli_dir/hosts.ini";
 
+my $DEBUG = $Define::DEBUG;
+my $FIN = $Define::FIN;
+
 sub getZcliDir
 {
 	return $zcli_dir;
@@ -24,9 +27,7 @@ sub getZcliHistoryPath
 }
 
 # pedir parametros de la uri
-
 # preguntar por los objetos
-
 # preguntar por los posibles valores
 sub parseInput
 {
@@ -63,7 +64,8 @@ sub parseInput
 			}
 			else
 			{
-				die "This command expects $p->{name}, $p->{desc}\n";
+				print "This command expects $p->{name}, $p->{desc}";
+				die $FIN;
 			}
 		}
 	}
@@ -88,9 +90,9 @@ sub parseInput
 		}
 		elsif ( $param_flag )
 		{
-			print "Error parsing the parameters. The parameters have to have the following format:\n\n";
+			print "Error parsing the parameters. The parameters have to have the following format:\n";
 			print "   -param1-name param1-value -param2-name param2-value";
-			die "\n";
+			die $FIN;
 		}
 	}
 
@@ -119,9 +121,9 @@ sub parseOptions
 			{
 				$opt_st->{'help'} = 1;
 			}
-			elsif ($opt eq '-non-interactive')
+			elsif ($opt eq '-silence' or $opt eq '-s')
 			{
-				$opt_st->{'non-interactive'} = 1;
+				$opt_st->{'silence'} = 1;
 			}
 			elsif ($opt eq '-host' and $args->[0] !~ /^-/)
 			{
@@ -148,9 +150,9 @@ sub printHelp
 	{
 		print "\n";
 		print "ZCLI can be executed with the following options:\n";
-		say "	-help, prints this ZCLI help.";
-		say "	-host <name>, selects the 'name' load balancer as destination of the command.";
-		say "	-non-interactive, executes the action without the human interaction.";
+		say "	-help: it prints this ZCLI help.";
+		say "	-host <name>: it selects the 'name' load balancer as destination of the command.";
+		say "	-silence, -s: it executes the action without the human interaction.";
 	}
 	print "\n";
 	print "A ZCLI command uses the following arguments:\n";
@@ -188,7 +190,7 @@ sub printHelp
 # -h,  host, cambia el host destinatario de la peticion. Añadir opcion para mandar a varios hosts a la vez
 # -c, conf info. modifica la conf de un host
 
-	die "\n";
+	die $FIN;
 }
 
 sub checkInput
@@ -216,7 +218,7 @@ sub checkInput
 		print ", please, try with: \n\t> ";
 		print $join;
 		print "\n";
-		die "\n";
+		die $FIN;
 	}
 
 	# getting ACTION
@@ -237,7 +239,7 @@ sub checkInput
 		print ", please, try with: \n\t> ";
 		print $join;
 		print "\n";
-		die "\n";
+		die $FIN;
 	}
 
 	# getting IDs
@@ -250,14 +252,16 @@ sub checkInput
 		{
 			unless ( $call{ uri } =~ s/\<[\w -]+\>/$id/ )
 			{
-				die "The id '$id' was not expected";
+				print "The id '$id' was not expected\n";
+				die $FIN;
 			}
 		}
 
 		# error si falta algun id por sustituir
 		if ( $call{ uri } =~ /\<([\w -]+)\>/ )
 		{
-			die "The id '$1' was not set";
+			print "The id '$1' was not set";
+			die $FIN;
 		}
 	}
 
@@ -269,7 +273,8 @@ sub checkInput
 		{
 			unless ($call{uri} =~ s/$tag/$p/)
 			{
-				die "Error replacing the param '$p'\n";
+				print "Error replacing the param '$p'";
+				die $FIN;
 			}
 		}
 	}
@@ -280,12 +285,12 @@ sub checkInput
 		if ( ! defined $input->{upload_file} )
 		{
 			print "The file name to upload is not set";
-			die "\n";
+			die $FIN;
 		}
 		if ( !-e $input->{upload_file})
 		{
 			print "The file '$input->{upload_file}' does not exist";
-			die "\n";
+			die $FIN;
 		}
 		$call{ upload_file } = $input->{upload_file};
 	}
@@ -296,12 +301,12 @@ sub checkInput
 		if ( ! defined $input->{download_file} )
 		{
 			print "The file name to save the download is not set";
-			die "\n";
+			die $FIN;
 		}
 		if ( -e $input->{download_file})
 		{
 			print "The file '$input->{download_file}' already exist, select another name";
-			die "\n";
+			die $FIN;
 		}
 		$call{ download_file } = $input->{download_file};
 	}
@@ -325,7 +330,7 @@ sub checkInput
 				my $join = join ( ', ', @{ $params } );
 				print "The list of possible parameters are: \n\t> ";
 				print $join;
-				die "\n";    # the "\n" character remove the msg "Died at ./lib.pm line 188."
+				die $FIN;
 			}
 			else
 			{

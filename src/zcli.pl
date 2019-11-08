@@ -10,6 +10,8 @@ use ZCLI::lib;
 use ZCLI::Objects;
 
 my %V = %Define::Actions;
+my $FIN = $Define::FIN;
+
 our $id_tree;
 our $cmd_st;
 our $term;
@@ -35,9 +37,9 @@ if (!$host)
 		my $host = &hostInfo($opt->{'host'});
 	}
 
-	if ($opt->{'non-interactive'})
+	if ($opt->{'silence'})
 	{
-		say "The non-interfactive mode needs a host";
+		say "The silence mode needs a host";
 		exit 1;
 	}
 }
@@ -55,21 +57,21 @@ my $objects = $Objects::zcli_objects;
 &reload_cmd_struct();
 
 # Launching only a cmd
-if ( $opt->{'non-interactive'})
+if ( $opt->{'silence'} )
 {
-	# ?????? tmp
-	say "This is not implemented yet";
-	exit 1;
-
 	my $resp;
 	eval {
-		my $input = &parseInput( @ARGV );
+		my $obj=$_[0];
+		my $act=$_[1];
+
+		my $input = &parseInput( $objects->{ $obj }->{ $act }, @ARGV );
 		my $request = &checkInput( $objects, $input, $host, $id_tree );
 		$resp    = &zapi( $request, $host );
 		&printOutput( $resp );
 	};
 	say $@ if $@;
-	POSIX::_exit( $resp->{err} );
+	my $err = ($@ or $resp->{err})? 1 : 0;
+	POSIX::_exit( $err );
 }
 
 
@@ -84,7 +86,6 @@ use Term::ShellUI;
 };
 
 
-
 $term = new Term::ShellUI( commands     => $cmd_st,
 							  history_file => $zcli_history, );
 print "Zevenet Client Line Interface\n";
@@ -93,6 +94,7 @@ $term->load_history();
 $term->run();
 
 
+### definition of functions
 
 sub reload_prompt
 {
@@ -115,7 +117,6 @@ sub reload_prompt
 	my $tag = "zcli($conn_color$host$color)";
 	$term->prompt( "$color$tag$no_color:" );
 }
-
 
 sub gen_cmd_struct
 {
@@ -240,7 +241,8 @@ sub add_ids
 
 				unless ( $sub_url =~ s/\<[\w -]+\>/$id/ )
 				{
-					die "The id '$key' could not be replaced";
+					print "The id '$key' could not be replaced";
+					my $FIN = $Define::FIN;
 				}
 
 				my @id_join =

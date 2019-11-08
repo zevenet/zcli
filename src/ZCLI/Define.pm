@@ -5,6 +5,7 @@ use warnings;
 
 package Global;
 our $DEBUG = 0;
+our $FIN = ($DEBUG) ? "": "\n";	# This will add the dying line in debug mode
 
 package Define;
 

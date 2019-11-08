@@ -3,6 +3,10 @@
 - devolver error si hay parametros en el comando cuando es GET.
 
 - doc
+	- quitar comentarios en español
+	- help, repasar
+	- funciones
+	- documentar la implementacion
 
 - AÑADIR MODULOS:
 	graficas?
@@ -27,5 +31,3 @@
 - autocompletar de parametros
 
 - añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
-
-- añadir modo silence. No entrar en el terminal
