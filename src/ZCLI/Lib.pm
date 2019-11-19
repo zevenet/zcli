@@ -20,7 +20,6 @@ sub getZcliDir
 	return $zcli_dir;
 }
 
-
 sub getZcliHistoryPath
 {
 	return $zcli_history;
@@ -710,7 +709,7 @@ sub setHost
 			$valid_flag = 1;
 			$HOSTNAME   = <STDIN>;
 			chomp $HOSTNAME;
-			$cfg->{ name } = $HOSTNAME;
+			$cfg->{ NAME } = $HOSTNAME;
 			if ( $HOSTNAME !~ /\S+/ )
 			{
 				$valid_flag = 0;
@@ -816,6 +815,39 @@ sub setHost
 	return $Config->{ $HOSTNAME };
 }
 
+sub setHostLocal
+{
+	my $localname = "localhost";
+
+	my $Config = (-e $HOST_FILE) ? Config::Tiny->read( $HOST_FILE ) : Config::Tiny->new;
+
+	# overwrite data. Maybe the http server cfg was changed
+	require Zevenet::System::HTTP;
+	my $localport = &getHttpServerPort();
+	my $localip = &getHttpServerIp();
+	$localip = "127.0.0.1" if ($localip eq '*');
+
+	my $cfg = {
+		ZAPI_VERSION => "4.0",
+		NAME => $localname,
+		HOST => $localip,
+		PORT => $localport,
+		ZAPI_KEY => '',
+	};
+	$Config->{$localname} = $cfg;
+
+	# set the default
+	if ( !defined $Config->{ _ }->{ default_host } )
+	{
+		$Config->{ _ }->{ default_host } = $localname;
+		say "Saved '$localname' profile as default";
+		say "";
+	}
+
+	$Config->write($HOST_FILE);
+	return $Config->{ $localname };
+}
+
 sub delHost
 {
 	my $name = shift;
@@ -897,13 +929,29 @@ sub check_connectivity
 {
 	my $host = shift;
 
+	require IO::Socket::INET;
 	# test connectivity:
-	if (system("nmap $host->{HOST} -p $host->{PORT} | grep open 2>&1 >/dev/null"))
-	{
+	my $sock = IO::Socket::INET->new(
+		PeerAddr => $host->{HOST},
+		PeerPort => $host->{PORT},
+		Proto    => 'tcp',
+		Timeout  => 8
+	) or do {
 		say "The '$host->{name}' host ($host->{HOST}:$host->{PORT}) cannot be reached.";
 		return 0;
-	}
+	};
+
 	return 1;
+}
+
+# comprueba que la version del lb sea compatible con zcli
+sub check_is_lb
+{
+	my $cmd = 'dpkg -l |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3';
+	my $version = `$cmd`;
+
+	# ???? cambiar la version a la que tenga Zevenet en el momento de liberar zcli
+	return ($version >= 6.0.12) ? 1: 0;
 }
 
 1;

@@ -28,6 +28,12 @@ my $opt = &parseOptions( \@ARGV );
 
 &printHelp() if ( $opt->{'help'} );
 
+# add local lb if it exists
+if (&check_is_lb())
+{
+	&setHostLocal();
+}
+
 my $host = &hostInfo($opt->{'host'});
 if (!$host)
 {
@@ -100,7 +106,7 @@ sub reload_prompt
 {
 	my $err = shift // 0;
 	my $conn = $CONNECTIVITY;
-	my $host = $host->{name} // "";
+	my $host = $host->{NAME} // "";
 
 
 
@@ -113,7 +119,7 @@ sub reload_prompt
 	my $color = ($err) ? $red: $green;
 	my $conn_color = (!$conn) ? $gray: "";
 
-	# zcli($host->{name}):
+	# zcli($host->{NAME}):
 	my $tag = "zcli($conn_color$host$color)";
 	$term->prompt( "$color$tag$no_color:" );
 }
