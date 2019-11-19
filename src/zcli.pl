@@ -6,7 +6,7 @@ use feature "say";
 use POSIX qw(_exit);
 
 use ZCLI::Define;
-use ZCLI::lib;
+use ZCLI::Lib;
 use ZCLI::Objects;
 
 my %V = %Define::Actions;
