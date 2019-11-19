@@ -135,6 +135,9 @@ sub gen_cmd_struct
 	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ desc } = "Print the ZCLI help";
 	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ proc } = \&printHelp;
 
+	$st->{ 'history' }->{ cmds }->{ $V{LIST} }->{ desc } = "Print the list of commands executed";
+	$st->{ 'history' }->{ cmds }->{ $V{LIST} }->{ method } = sub { shift->history_call(); };
+
 	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ desc } = "Force a ZCLI reload to refresh the ID objects";
 	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ proc } = sub { &reload_cmd_struct(); };
 	$st->{ 'zcli' }->{ cmds }->{ $V{QUIT} }->{ dec } = "escape from the ZCLI";
