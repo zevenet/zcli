@@ -1,0 +1,28 @@
+##############################################################################
+# Packager
+##############################################################################
+
+## CPAN deps:
+cpan install pp JSON Term::Shell Hash::Merge LWP::Protocol::Https Term::ShellUI Config::Tiny IO:Socket:Ssl
+
+
+##############################################################################
+
+## Generar paquete:
+
+# doc: https://metacpan.org/pod/pp
+
+# Desde el directorio raiz del repositorio de zcli
+pp -c -m -x -I src/ -M ZCLI::Define -M ZCLI::Lib -M ZCLI::Objects -o zcli.exe src/zcli.pl
+
+
+##############################################################################
+
+## Windows:
+
+doc:
+https://stackoverflow.com/questions/8055063/how-to-install-pp-par-packager
+
+Requisitos:
+- Install Strawberry Perl for windows (I installed strawberry-perl-5.16.3.1-64bit.msi)
+- El binario debe acabar en .exe: "zcli.exe"

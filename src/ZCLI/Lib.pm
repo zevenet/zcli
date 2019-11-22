@@ -947,11 +947,10 @@ sub check_connectivity
 # comprueba que la version del lb sea compatible con zcli
 sub check_is_lb
 {
-	my $cmd = 'dpkg -l |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3';
+	my $cmd = 'dpkg -l |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3 2>/dev/null';
 	my $version = `$cmd`;
 
-	# ???? cambiar la version a la que tenga Zevenet en el momento de liberar zcli
-	return ($version >= 6.0.12) ? 1: 0;
+	return (! $version or $version < $Define::REQUIRED_ZEVEVENET_VERSION) ? 0: 1;
 }
 
 1;
