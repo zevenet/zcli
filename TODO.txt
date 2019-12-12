@@ -41,3 +41,8 @@
 - docker para construir paquete para diferentes OS
 
 - echar un ojo a la funcion "getopt". Puede que ayude al autocompletado sin invocar zcli
+
+- añadir opción para aceptar parametros como json
+
+- añadir opción transformar la respuesta en json
+

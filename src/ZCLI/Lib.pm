@@ -78,7 +78,12 @@ sub parseInput
 	my $index      = 0;
 	for ( my $ind = 0 ; $ind <= $#args ; $ind++ )
 	{
-		if ( $args[$ind] =~ s/^\-// )
+		# The value ';' is used to finish the current zcli command
+		if ( $args[$ind] eq ';' )
+		{
+			next;
+		}
+		elsif ( $args[$ind] =~ s/^\-// )
 		{
 			$param_flag = 1;
 			my $key = $args[$ind];
@@ -320,22 +325,6 @@ sub checkInput
 			$call{ params } = $def->{ params };
 		}
 
-		# get possible params
-		elsif ( !defined $input->{ params } and ! exists $def->{content_type} )
-		{
-			my $params = &listParams( \%call, $host );
-			if ( ref $params eq 'ARRAY' )
-			{
-				my $join = join ( ', ', @{ $params } );
-				print "The list of possible parameters are: \n\t> ";
-				print $join;
-				die $FIN;
-			}
-			else
-			{
-				print "Error: $params\n";
-			}
-		}
 		else
 		{
 			$call{ params } = $input->{ params };

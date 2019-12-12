@@ -20,6 +20,10 @@ our $CONNECTIVITY = 1; # connectivity with the lb
 my $zcli_dir = &getZcliDir();
 my $zcli_history = &getZcliHistoryPath();
 
+# save the last parameter list to avoid repeat the params zapi call for each tab
+my @PARAM_LIST = ();
+my $CMD_STRING = '';
+
 system("mkdir -p $zcli_dir") if (!-d $zcli_dir);
 
 
@@ -297,7 +301,14 @@ sub gen_act
 	{
 		push @in_args, sub { shift->complete_files(@_); };
 	}
-	$def->{ args } = \@in_args if (@in_args);
+
+	elsif ( $objects->{ $obj }->{ $act }->{method} =~ /POST|PUT/)
+	{
+		# comprobar si objeto ya tiene cargado los posibles parametros.
+		$def->{ args } = sub {&complete_body_params( @_, $objects->{ $obj }->{ $act }, $obj, $act, $ids ); };
+	}
+
+	#~ $def->{ args } = \@in_args if (@in_args);
 
 	$def->{ proc } = sub {
 		my $resp;
@@ -321,6 +332,54 @@ sub gen_act
 
 	return $def;
 }
+
+
+
+
+sub complete_body_params
+{
+	my (undef, $input, $obj_def, $obj, $act, $ids) = @_;
+
+	# get list
+	if ($CMD_STRING eq '' or $CMD_STRING ne $input->{str})
+	{
+		$CMD_STRING = $input->{str};
+		my @args = ( $objects->{ $obj }->{ $act }, $obj, $act, @{ $ids });
+		my $in_parsed = &parseInput( @args );
+		my $request = &checkInput( $objects, $in_parsed, $host, $id_tree );
+		my $paramlist_ref = &listParams( $request, $host );
+		@PARAM_LIST = @{$paramlist_ref};
+	}
+
+	my $out;
+	my @params_used = @{$input->{args}};
+
+	# get last completed parameter used
+	my $previus_param = $params_used[$input->{argno} - 1];
+	$previus_param =~ s/^-//;
+	if (grep (/^$previus_param$/, @PARAM_LIST))
+	{
+		$out = "<$previus_param>";
+	}
+	else
+	{
+		# remove the parameters already exists
+		my @params = ();
+
+		foreach my $p (@PARAM_LIST)
+		{
+			push @params, "-$p" if ( !grep(/^-$p$/, @params_used) );
+		}
+		@params = (';') if (!@params);
+
+		$out = \@params;
+	}
+
+	return $out;
+}
+
+
+
 
 sub reload_cmd_struct
 {
