@@ -5,6 +5,7 @@ use Data::Dumper;
 use feature "say";
 use POSIX qw(_exit);
 
+# https://metacpan.org/pod/Term::ShellUI
 use Term::ShellUI;
 
 use ZCLI::Define;
@@ -98,8 +99,6 @@ if ( $opt->{'silence'} )
 
 
 
-# https://metacpan.org/pod/Term::ShellUI
-
 # overriding error method
 *{Term::ShellUI::error} = sub {
 	say "$_[1]";
@@ -154,22 +153,30 @@ sub gen_cmd_struct
 	# add static functions
 	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ desc } = "Print the ZCLI help";
 	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ proc } = sub { &printHelp(); &reload_prompt(0); };
+	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ maxargs } = 0;
 
 	$st->{ 'history' }->{ cmds }->{ $V{LIST} }->{ desc } = "Print the list of commands executed";
 	$st->{ 'history' }->{ cmds }->{ $V{LIST} }->{ method } = sub { shift->history_call(); };
+	$st->{ 'history' }->{ cmds }->{ $V{LIST} }->{ maxargs } = 0;
 
 	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ desc } = "Force a ZCLI reload to refresh the ID objects";
 	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ proc } = sub { &reload_cmd_struct(); };
-	$st->{ 'zcli' }->{ cmds }->{ $V{QUIT} }->{ dec } = "escape from the ZCLI";
+	$st->{ 'zcli' }->{ cmds }->{ $V{RELOAD} }->{ maxargs } = 0;
+	$st->{ 'zcli' }->{ cmds }->{ $V{QUIT} }->{ dec } = "Escape from the ZCLI";
 	$st->{ 'zcli' }->{ cmds }->{ $V{QUIT} }->{ method } = sub { shift->exit_requested(1); };
+	$st->{ 'zcli' }->{ cmds }->{ $V{QUIT} }->{ exclude_from_history } = 1;
+	$st->{ 'zcli' }->{ cmds }->{ $V{QUIT} }->{ maxargs } = 0;
+
 
 	my $host_st;
 	my @host_list = &listHost();
 	$host_st->{ $V{LIST} }->{ proc } = sub { say $_ for (&listHost) };
+	$host_st->{ $V{LIST} }->{ maxargs } = 1;
 	$host_st->{ $V{CREATE} }->{ proc } = \&setHost;
+	$host_st->{ $V{LIST} }->{ maxargs } = 1;
 	$host_st->{ $V{SET} } = {
 		args => [sub {\@host_list}],
-		argmax => 1,
+		maxargs => 1,
 		proc => sub {
 			my $new_host = &setHost($_[0],0);
 			my $err = (defined $new_host) ? 0 : 1;
@@ -193,7 +200,7 @@ sub gen_cmd_struct
 			}
 		},
 		args => [sub {\@host_list}],
-		argmax => 1,
+		maxargs => 1,
 	};
 	$host_st->{ $V{APPLY} } = {
 		proc => sub {
@@ -203,7 +210,7 @@ sub gen_cmd_struct
 			&reload_cmd_struct();
 		},
 		args => [sub {\@host_list}],
-		argmax => 1,
+		maxargs => 1,
 	};
 	$st->{ hosts }->{ desc } = "apply an action about which is the destination load balancer";
 	$st->{ hosts }->{ cmds } = $host_st;
@@ -314,6 +321,8 @@ sub gen_act
 		{
 			push @in_args, "<$p->{name}>";
 		}
+		$def->{ args } = \@in_args;
+		$def->{ maxargs } = scalar @in_args;
 	}
 
 	# check if the call is expecting a file name to upload or download
@@ -321,15 +330,17 @@ sub gen_act
 		 or exists $objects->{ $obj }->{ $act }->{ 'upload_file' } )
 	{
 		push @in_args, sub { shift->complete_files(@_); };
+		$def->{ args } = \@in_args;
+		$def->{ maxargs } = scalar @in_args;
 	}
 
 	elsif ( $objects->{ $obj }->{ $act }->{method} =~ /POST|PUT/)
 	{
 		# comprobar si objeto ya tiene cargado los posibles parametros.
+		#  ???? pueden faltar parametros de uri
 		$def->{ args } = sub {&complete_body_params( @_, $objects->{ $obj }->{ $act }, $obj, $act, $ids ); };
 	}
 
-	#~ $def->{ args } = \@in_args if (@in_args);
 
 	$def->{ proc } = sub {
 		my $resp;
@@ -388,7 +399,7 @@ sub complete_body_params
 		{
 			push @params, "-$p" if ( !grep(/^-$p$/, @params_used) );
 		}
-		@params = (';') if (!@params);
+		@params = () if (!@params);
 
 		$out = \@params;
 	}

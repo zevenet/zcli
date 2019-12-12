@@ -41,3 +41,5 @@
 - Pedir la zapikey al arrancar en localhost
 
 - mensaje de aviso de que la api podria estar deshabilitada y que compruebe credenciales zapikey y comando cuando api devuelve 403
+
+- sacar constantes a module defines
