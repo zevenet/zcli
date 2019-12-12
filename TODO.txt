@@ -24,12 +24,6 @@
 
 - crear grupos de lb para a los que mandarle los comandos
 
-- En el balanceador no autocompleta. Se ha tocado el fichero /etc/profile y no funciona el autocompletado
-
-- en buster aparece '0m' en la linea del prompt
-
-- autocompletar de parametros
-
 - añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
 
 - pedir la zapi key a la hora de arrancar zcli. Añadir mensaje de como cambiarla posteriormente
@@ -38,11 +32,12 @@
 	* crear rutas de archivos en funcion del sistema operativo (historial, conf, ...)
 	* en windows no acepta colores
 
-- docker para construir paquete para diferentes OS
-
 - echar un ojo a la funcion "getopt". Puede que ayude al autocompletado sin invocar zcli
 
 - añadir opción para aceptar parametros como json
 
-- añadir opción transformar la respuesta en json
+- transformar la respuesta en json
 
+- Pedir la zapikey al arrancar en localhost
+
+- mensaje de aviso de que la api podria estar deshabilitada y que compruebe credenciales zapikey y comando cuando api devuelve 403

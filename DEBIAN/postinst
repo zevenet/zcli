@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+use ZCLI::Lib;
+my $dir = &getZcliDir();
+if (-d $dir)
+{
+	print "Reseting the ZCLI configuration\n";
+	system ("rm $dir/*");
+}

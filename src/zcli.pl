@@ -5,6 +5,8 @@ use Data::Dumper;
 use feature "say";
 use POSIX qw(_exit);
 
+use Term::ShellUI;
+
 use ZCLI::Define;
 use ZCLI::Lib;
 use ZCLI::Objects;
@@ -87,7 +89,6 @@ if ( $opt->{'silence'} )
 
 
 # https://metacpan.org/pod/Term::ShellUI
-use Term::ShellUI;
 
 # overriding error method
 *{Term::ShellUI::error} = sub {
@@ -111,7 +112,6 @@ sub reload_prompt
 	my $err = shift // 0;
 	my $conn = $CONNECTIVITY;
 	my $host = $host->{NAME} // "";
-
 
 
 	my $gray = "\033[01;90m";
