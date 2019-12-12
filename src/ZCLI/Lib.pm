@@ -194,7 +194,7 @@ sub printHelp
 # -h,  host, cambia el host destinatario de la peticion. Añadir opcion para mandar a varios hosts a la vez
 # -c, conf info. modifica la conf de un host
 
-	die $FIN;
+	die $FIN if $executed;
 }
 
 sub checkInput
@@ -596,7 +596,13 @@ sub zapi
 	# add message for error 500
 	if ($response->code =~ /^5/)
 	{
-		$msg = "LB error. The command could not finish";
+		$msg = "Load Bbalancer error. The command could not finish";
+	}
+	elsif ($response->code == 401)
+	{
+		$msg = "The authentication failed. Please, review the following settings
+	*) The zapi user is enabled: clicking on Zevenet Webgui 'System > User'.
+	*) The ZCLI zapikey is valid: using the ZCLI command with the arguments 'hosts set $host->{NAME}' to modify it.";
 	}
 
 	# create a enviorement variable with the body of the last zapi result.
@@ -660,19 +666,38 @@ sub setHost
 {
 	my $HOSTNAME = shift;	# if there is HOSTNAME, the function will mofidy, else it will create a new one
 	my $new_flag = shift // 1;
+	my $localname = "localhost"; 	# it is the reserve word to modify the localhost host settings
+	my $cfg;
+	my $valid_flag = 1;
 
 	my $set_msg = "Press 'intro' to keep the value";
 	my $ip_regex =
 	  '((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))';
 
-	my $valid_flag = 1;
 
 	# getting conf
 	my $Config = (-e $HOST_FILE) ? Config::Tiny->read( $HOST_FILE ) : Config::Tiny->new;
 
+
+	# set values if the host is localhost
+	if ($HOSTNAME eq $localname)
+	{
+		# overwrite data. Maybe the http server cfg was changed
+		require Zevenet::System::HTTP;
+		my $localport = &getHttpServerPort();
+		my $localip = &getHttpServerIp();
+		$localip = "127.0.0.1" if ($localip eq '*');
+
+		$cfg = {
+			ZAPI_VERSION => "4.0",
+			NAME => $localname,
+			HOST => $localip,
+			PORT => $localport,
+			ZAPI_KEY => $Config->{$localname}->{ZAPI_KEY} // '',
+		};
+	}
 	# validating
-	my $cfg;
-	if (!$new_flag )
+	elsif (!$new_flag )
 	{
 		if (!exists $Config->{$HOSTNAME})
 		{
@@ -689,8 +714,10 @@ sub setHost
 		$cfg = $Config->{$HOSTNAME};
 	}
 
+
+	## Get parameters
 	# get name
-	if ($new_flag)
+	if ($new_flag and $HOSTNAME ne $localname)
 	{
 		do
 		{
@@ -715,36 +742,42 @@ sub setHost
 	}
 
 	# get IP
-	do
+	if ($HOSTNAME ne $localname)
 	{
-		print "Load balancer management IP: ";
-		print "[$set_msg: $cfg->{HOST}] " if not $new_flag;
-		$valid_flag = 1;
-		my $val = <STDIN>;
-		chomp $val;
-		$cfg->{ HOST } = $val unless ($val eq "" and not $new_flag) ;
-		unless ( $cfg->{ HOST } =~ /$ip_regex/ )
+		do
 		{
-			$valid_flag = 0;
-			say "Invalid IP for load balancer. It expects an IP v4 or v6";
-		}
-	} while ( !$valid_flag );
+			print "Load balancer management IP: ";
+			print "[$set_msg: $cfg->{HOST}] " if not $new_flag;
+			$valid_flag = 1;
+			my $val = <STDIN>;
+			chomp $val;
+			$cfg->{ HOST } = $val unless ($val eq "" and not $new_flag) ;
+			unless ( $cfg->{ HOST } =~ /$ip_regex/ )
+			{
+				$valid_flag = 0;
+				say "Invalid IP for load balancer. It expects an IP v4 or v6";
+			}
+		} while ( !$valid_flag );
+	}
 
 	# get port
-	do
+	if ($HOSTNAME ne $localname)
 	{
-		print "Load balancer management port: ";
-		print "[$set_msg: $cfg->{PORT}] " if not $new_flag;
-		$valid_flag = 1;
-		my $val = <STDIN>;
-		chomp $val;
-		$cfg->{ PORT } = $val unless ($val eq "" and not $new_flag) ;
-		unless ( $cfg->{ PORT } > 0 and $cfg->{ PORT } <= 65535 )
+		do
 		{
-			$valid_flag = 0;
-			say "Invalid PORT for load balancer. It expects a port between 1 and 65535";
-		}
-	} while ( !$valid_flag );
+			print "Load balancer management port: ";
+			print "[$set_msg: $cfg->{PORT}] " if not $new_flag;
+			$valid_flag = 1;
+			my $val = <STDIN>;
+			chomp $val;
+			$cfg->{ PORT } = $val unless ($val eq "" and not $new_flag) ;
+			unless ( $cfg->{ PORT } > 0 and $cfg->{ PORT } <= 65535 )
+			{
+				$valid_flag = 0;
+				say "Invalid PORT for load balancer. It expects a port between 1 and 65535";
+			}
+		} while ( !$valid_flag );
+	}
 
 	# get zapi key
 	do
@@ -787,7 +820,7 @@ sub setHost
 		$Config->{ _ }->{ default_host } = $HOSTNAME;
 		say "Saved as default profile";
 	}
-	elsif ($Config->{ _ }->{ default_host } ne $HOSTNAME)
+	elsif ($Config->{ _ }->{ default_host } ne $HOSTNAME )
 	{
 		print "Do you wish set this host as the default one? [yes|no=default]: ";
 		my $confirmation = <STDIN>;
@@ -804,11 +837,10 @@ sub setHost
 	return $Config->{ $HOSTNAME };
 }
 
-sub setHostLocal
+sub refreshLocalHost
 {
 	my $localname = "localhost";
-
-	my $Config = (-e $HOST_FILE) ? Config::Tiny->read( $HOST_FILE ) : Config::Tiny->new;
+	my $Config = (-e $HOST_FILE) ? Config::Tiny->read( $HOST_FILE ) : die $FIN;
 
 	# overwrite data. Maybe the http server cfg was changed
 	require Zevenet::System::HTTP;
@@ -816,25 +848,10 @@ sub setHostLocal
 	my $localip = &getHttpServerIp();
 	$localip = "127.0.0.1" if ($localip eq '*');
 
-	my $cfg = {
-		ZAPI_VERSION => "4.0",
-		NAME => $localname,
-		HOST => $localip,
-		PORT => $localport,
-		ZAPI_KEY => '',
-	};
-	$Config->{$localname} = $cfg;
-
-	# set the default
-	if ( !defined $Config->{ _ }->{ default_host } )
-	{
-		$Config->{ _ }->{ default_host } = $localname;
-		say "Saved '$localname' profile as default";
-		say "";
-	}
+	$Config->{$localname}->{HOST} = $localip;
+	$Config->{$localname}->{PORT} = $localport;
 
 	$Config->write($HOST_FILE);
-	return $Config->{ $localname };
 }
 
 sub delHost
@@ -883,7 +900,7 @@ sub hostInfo
 		$host_name = $Config->{ _ }->{ default_host };
 		if ( !defined $host_name )
 		{
-			print "Warning, there is no default host set\n";
+			&dev ( "Warning, there is no default host set\n" );
 			return undef;
 		}
 	}
@@ -907,9 +924,9 @@ sub dev
 	return if ( $lvl > $Global::DEBUG );
 
 	say "";
-	say ">>>> Debug >>>> $tag";
+	say ">>>> Debug >>>> $tag" if $tag;
 	print "$st\n";
-	say "<<<<<<<<<<<<<<< $tag";
+	say "<<<<<<<<<<<<<<< $tag" if $tag;
 	say "";
 
 }

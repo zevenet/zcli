@@ -35,9 +35,19 @@ my $opt = &parseOptions( \@ARGV );
 &printHelp() if ( $opt->{'help'} );
 
 # add local lb if it exists
+my $localhost = &hostInfo($opt->{'host'});
 if (&check_is_lb())
 {
-	&setHostLocal();
+	if (!defined $localhost)
+	{
+		print "Type the zapi key for the current load balancer\n";
+		&setHost("localhost",1);
+	}
+	# refresh ip and port. Maybe they were modified
+	else
+	{
+		&refreshLocalHost();
+	}
 }
 
 my $host = &hostInfo($opt->{'host'});
@@ -46,12 +56,12 @@ if (!$host)
 	if (exists $opt->{'host'})
 	{
 		say "Not found the '$opt->{host}' host, selecting the default host";
-		my $host = &hostInfo($opt->{'host'});
+		$host = &hostInfo($opt->{'host'});
 	}
 
 	if ($opt->{'silence'})
 	{
-		say "The silence mode needs a host";
+		say "The silence mode needs a host profile";
 		exit 1;
 	}
 }
@@ -125,7 +135,7 @@ sub reload_prompt
 
 	# zcli($host->{NAME}):
 	my $tag = "zcli($conn_color$host$color)";
-	$term->prompt( "$color$tag$no_color:" );
+	$term->prompt( "$color$tag$no_color: " );
 }
 
 sub gen_cmd_struct
@@ -143,7 +153,7 @@ sub gen_cmd_struct
 
 	# add static functions
 	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ desc } = "Print the ZCLI help";
-	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ proc } = \&printHelp;
+	$st->{ 'help' }->{ cmds }->{ $V{LIST} }->{ proc } = sub { &printHelp(); &reload_prompt(0); };
 
 	$st->{ 'history' }->{ cmds }->{ $V{LIST} }->{ desc } = "Print the list of commands executed";
 	$st->{ 'history' }->{ cmds }->{ $V{LIST} }->{ method } = sub { shift->history_call(); };
@@ -159,8 +169,16 @@ sub gen_cmd_struct
 	$host_st->{ $V{CREATE} }->{ proc } = \&setHost;
 	$host_st->{ $V{SET} } = {
 		args => [sub {\@host_list}],
+		argmax => 1,
 		proc => sub {
-			&setHost($_[0],0);
+			my $new_host = &setHost($_[0],0);
+			my $err = (defined $new_host) ? 0 : 1;
+			if (!$err)
+			{
+				# reload the host configuration
+				$host = $new_host if ($host->{NAME} eq $new_host->{NAME});
+			}
+			&reload_prompt($err);
 		},
 	};
 	$host_st->{ $V{DELETE} } = {
@@ -175,14 +193,17 @@ sub gen_cmd_struct
 			}
 		},
 		args => [sub {\@host_list}],
+		argmax => 1,
 	};
 	$host_st->{ $V{APPLY} } = {
 		proc => sub {
 			$host=hostInfo(@_);
+			my $err = (defined $host) ? 0 : 1;
+			&reload_prompt($err);
 			&reload_cmd_struct();
-			&reload_prompt();
 		},
 		args => [sub {\@host_list}],
+		argmax => 1,
 	};
 	$st->{ hosts }->{ desc } = "apply an action about which is the destination load balancer";
 	$st->{ hosts }->{ cmds } = $host_st;
@@ -333,9 +354,6 @@ sub gen_act
 	return $def;
 }
 
-
-
-
 sub complete_body_params
 {
 	my (undef, $input, $obj_def, $obj, $act, $ids) = @_;
@@ -377,9 +395,6 @@ sub complete_body_params
 
 	return $out;
 }
-
-
-
 
 sub reload_cmd_struct
 {
