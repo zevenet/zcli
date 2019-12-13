@@ -662,6 +662,42 @@ sub printOutput
 	print "\n";
 }
 
+sub getHttpServerConf
+{
+	my $confhttp = "/usr/local/zevenet/app/cherokee/etc/cherokee/cherokee.conf";
+
+	# read line matching 'server!bind!1!port = 444'
+	my $ip_directive = 'server!bind!1!interface';
+	my $port_directive = 'server!bind!1!port';
+
+	my $port = 444;
+	my $ip = "127.0.0.1";
+
+	my $params = 0; # when 2 params have been found
+	open my $fh, "<", "$confhttp";
+	while ( my $line = <$fh> )
+	{
+		if ( $line =~ /^\s*$ip_directive/ )
+		{
+			$params++;
+			my ( undef, $ip ) = split ( "=", $line );
+			$ip =~ s/\s//g;
+			chomp ( $ip );
+		}
+		elsif ( $line =~ /^\s*$port_directive/ )
+		{
+			$params++;
+			( undef, $port ) = split ( "=", $line );
+			$port =~ s/\s//g;
+			chomp ( $port );
+		}
+		last if $params == 2;
+	}
+	close $fh;
+
+	return ( $ip, $port );
+}
+
 sub setHost
 {
 	my $HOSTNAME = shift;	# if there is HOSTNAME, the function will mofidy, else it will create a new one
@@ -684,9 +720,7 @@ sub setHost
 	{
 		# overwrite data. Maybe the http server cfg was changed
 		require Zevenet::System::HTTP;
-		my $localport = &getHttpServerPort();
-		my $localip = &getHttpServerIp();
-		$localip = "127.0.0.1" if ($localip eq '*');
+		my ( $localip, $localport ) = &getHttpServerConf();
 
 		$cfg = {
 			ZAPI_VERSION => "4.0",
@@ -843,11 +877,7 @@ sub refreshLocalHost
 	my $Config = (-e $HOST_FILE) ? Config::Tiny->read( $HOST_FILE ) : die $FIN;
 
 	# overwrite data. Maybe the http server cfg was changed
-	require Zevenet::System::HTTP;
-	my $localport = &getHttpServerPort();
-	my $localip = &getHttpServerIp();
-	$localip = "127.0.0.1" if ($localip eq '*');
-
+	my ( $localip, $localport ) = &getHttpServerConf();
 	$Config->{$localname}->{HOST} = $localip;
 	$Config->{$localname}->{PORT} = $localport;
 
