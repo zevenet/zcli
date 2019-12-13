@@ -59,3 +59,5 @@
 - añadir un comando para subir el certificado de activacion
 
 - crear paquete para arch
+
+- cambiar el nombre del servicio por defecto en L4
