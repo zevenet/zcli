@@ -7,6 +7,7 @@
 	- help, repasar
 	- funciones
 	- documentar la implementacion
+	- quitar comentarios debug ????
 
 - AÑADIR MODULOS:
 	graficas?
@@ -43,3 +44,18 @@
 - mensaje de aviso de que la api podria estar deshabilitada y que compruebe credenciales zapikey y comando cuando api devuelve 403
 
 - sacar constantes a module defines
+
+- funcion para que compruebe que la version de zapi del lb es minimo 4.0.1
+
+- ??? separar los modulos de system? p.e.: system-cluster, system-backups... en cluster, backups...
+
+- recargar prompt tras modificar un host.
+
+- por defecto que arranque modo no interactivo
+	- (podria arreglarse solo tras mod lo de antes) al ejecutar la ayuda esta entrando en modo interfactivo
+
+- cambiar objetos por singular
+
+- añadir un comando para subir el certificado de activacion
+
+- crear paquete para arch
