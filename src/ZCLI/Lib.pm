@@ -719,7 +719,6 @@ sub setHost
 	if ($HOSTNAME eq $localname)
 	{
 		# overwrite data. Maybe the http server cfg was changed
-		require Zevenet::System::HTTP;
 		my ( $localip, $localport ) = &getHttpServerConf();
 
 		$cfg = {
