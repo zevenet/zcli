@@ -49,12 +49,13 @@ our $Certificates = {
 								  ],
 						  },
 				  },
-				  'certificates-ciphers' => {
-											  $V{ LIST } => {
-															  uri    => "/ciphers",
-															  method => 'GET',
-											  },
-				  },
+# It is not useful for a ZCLI
+# 				  'certificates-ciphers' => {
+# 											  $V{ LIST } => {
+# 															  uri    => "/ciphers",
+# 															  method => 'GET',
+# 											  },
+# 				  },
 };
 
 1;
