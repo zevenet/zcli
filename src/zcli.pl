@@ -173,7 +173,7 @@ sub gen_cmd_struct
 	$host_st->{ $V{LIST} }->{ proc } = sub { say $_ for (&listHost) };
 	$host_st->{ $V{LIST} }->{ maxargs } = 1;
 	$host_st->{ $V{CREATE} }->{ proc } = \&setHost;
-	$host_st->{ $V{LIST} }->{ maxargs } = 1;
+	$host_st->{ $V{CREATE} }->{ maxargs } = 1;
 	$host_st->{ $V{SET} } = {
 		args => [sub {\@host_list}],
 		maxargs => 1,
@@ -185,6 +185,7 @@ sub gen_cmd_struct
 				# reload the host configuration
 				$host = $new_host if ($host->{NAME} eq $new_host->{NAME});
 			}
+			$main::CONNECTIVITY = &check_connectivity($host);
 			&reload_prompt($err);
 		},
 	};
@@ -192,7 +193,7 @@ sub gen_cmd_struct
 		proc => sub {
 			if ($host->{name} eq @_[0])
 			{
-				say "The '$host->{name}' host is beeing used";
+				say "The '$host->{NAME}' host is being used";
 			}
 			else
 			{

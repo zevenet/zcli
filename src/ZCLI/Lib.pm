@@ -596,7 +596,7 @@ sub zapi
 	# add message for error 500
 	if ($response->code =~ /^5/)
 	{
-		$msg = "Load Bbalancer error. The command could not finish";
+		$msg = "Load balancer error. The command could not finish";
 	}
 	elsif ($response->code == 401)
 	{
@@ -972,7 +972,7 @@ sub check_connectivity
 		Proto    => 'tcp',
 		Timeout  => 8
 	) or do {
-		say "The '$host->{name}' host ($host->{HOST}:$host->{PORT}) cannot be reached.";
+		say "The '$host->{NAME}' host ($host->{HOST}:$host->{PORT}) cannot be reached.";
 		return 0;
 	};
 

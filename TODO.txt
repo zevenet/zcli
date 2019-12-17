@@ -8,26 +8,25 @@
 	- funciones
 	- documentar la implementacion
 	- quitar comentarios debug ????
-
-- AÑADIR MODULOS:
-	graficas?
+	- Crear un script con comandos para usar en la documentación como ejemplos de llamadas
 
 - completar funcionalidades:
 	farms-add/rem headers
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
 
-- errores
-	bonding-slaves, crear. Espera array
-	rbac-roles SET. problemas por como se parsean los parametros
+- No implementado
+	bonding-slaves, crear. Espera array. (Forzar uso de json como entrada)
+	rbac-roles SET. problemas por como se parsean los parametros. (Forzar uso de json como entrada)
+	gestionar licencia
+	graficas.
+
 
 - estandarizar nombre funciones y variables
 
 - crear grupos de lb para a los que mandarle los comandos
 
 - añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
-
-- pedir la zapi key a la hora de arrancar zcli. Añadir mensaje de como cambiarla posteriormente
 
 - soporte windows
 	* crear rutas de archivos en funcion del sistema operativo (historial, conf, ...)
@@ -39,25 +38,40 @@
 
 - transformar la respuesta en json
 
-- Pedir la zapikey al arrancar en localhost
-
-- mensaje de aviso de que la api podria estar deshabilitada y que compruebe credenciales zapikey y comando cuando api devuelve 403
-
 - sacar constantes a module defines
 
 - funcion para que compruebe que la version de zapi del lb es minimo 4.0.1
 
 - ??? separar los modulos de system? p.e.: system-cluster, system-backups... en cluster, backups...
 
-- recargar prompt tras modificar un host.
-
 - por defecto que arranque modo no interactivo
 	- (podria arreglarse solo tras mod lo de antes) al ejecutar la ayuda esta entrando en modo interfactivo
 
 - cambiar objetos por singular
 
-- añadir un comando para subir el certificado de activacion
-
 - crear paquete para arch
 
 - cambiar el nombre del servicio por defecto en L4
+
+- Añadir un "help" por cada módulo
+
+- si arranca el comando con parámetros, enviarlos sin entrar en modo interactivo
+
+- A veces aparece al usar autocompletado: system-backups apply old Can't use string ("") as an ARRAY ref while "strict refs" in use at /usr/bin/zcli line 380
+
+- Cuando el parametro esta en la definicion y la api pide uno mas, no se esta mandando
+system-backups apply old -force true
+Info: Apply a backup to the system
+Error!! The backup version (5.2.17) is different to the Zevenet version (_VERSION_). The parameter 'force' must be used to force the backup applying.
+
+- Para los comandos que llevan algunos parametros preseleccionados, listar los posibles comandos y quitar de la lista los que ya esten preseleccionados
+
+- Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
+
+- En el autocompletado poner un mensaje si el comando no puede completarse. E.j. se quiere modificar un srv de una granja que no tiene srv.
+
+- Autocompletar posibles valores de un parametro.
+	* Añadir cadena vacia si el parametro acepta valor ""
+
+- quitar subrayado
+
