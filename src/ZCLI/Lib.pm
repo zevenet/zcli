@@ -8,12 +8,12 @@ use JSON;
 use ZCLI::Define;
 use ZCLI::Objects;
 
-my $zcli_dir = "$ENV{HOME}/.zcli";
+my $zcli_dir     = "$ENV{HOME}/.zcli";
 my $zcli_history = "$zcli_dir/zcli-history";
-my $HOST_FILE = "$zcli_dir/hosts.ini";
+my $HOST_FILE    = "$zcli_dir/hosts.ini";
 
 my $DEBUG = $Define::DEBUG;
-my $FIN = $Define::FIN;
+my $FIN   = $Define::FIN;
 
 sub getZcliDir
 {
@@ -30,36 +30,36 @@ sub getZcliHistoryPath
 # preguntar por los posibles valores
 sub parseInput
 {
-	my $def = shift;
+	my $def  = shift;
 	my @args = @_;
 
 	my $input = {
-				  object => shift @args,
-				  action => shift @args,
-				  id     => [],
-				  uri_param   => [],
+				  object        => shift @args,
+				  action        => shift @args,
+				  id            => [],
+				  uri_param     => [],
 				  download_file => undef,
-				  upload_file => undef,
-				  params => undef,
+				  upload_file   => undef,
+				  params        => undef,
 	};
 
-	for (@{$def->{ids}})
+	for ( @{ $def->{ ids } } )
 	{
 		my $id = shift @args;
 		push @{ $input->{ id } }, $id;
 	}
 
 	# adding uri parameters
-	if (exists $def->{uri_param})
+	if ( exists $def->{ uri_param } )
 	{
-		my $uri = $def->{uri};
-		foreach my $p (@{$def->{uri_param}})
+		my $uri = $def->{ uri };
+		foreach my $p ( @{ $def->{ uri_param } } )
 		{
 			my $val = shift @args;
 			my $tag = $Define::UriParamTag;
-			if ($uri =~ s/$tag/$val/)
+			if ( $uri =~ s/$tag/$val/ )
 			{
-				push @{$input->{ uri_param }}, $val;
+				push @{ $input->{ uri_param } }, $val;
 			}
 			else
 			{
@@ -70,8 +70,8 @@ sub parseInput
 	}
 
 	# check if the call is expecting a file name to upload or download
-	$input->{download_file} = shift @args if ( exists $def->{ 'download_file' } );
-	$input->{upload_file} = shift @args if ( exists $def->{ 'upload_file' } );
+	$input->{ download_file } = shift @args if ( exists $def->{ 'download_file' } );
+	$input->{ upload_file }   = shift @args if ( exists $def->{ 'upload_file' } );
 
 	# json params
 	my $param_flag = 0;
@@ -94,7 +94,8 @@ sub parseInput
 		}
 		elsif ( $param_flag )
 		{
-			print "Error parsing the parameters. The parameters have to have the following format:\n";
+			print
+			  "Error parsing the parameters. The parameters have to have the following format:\n";
 			print "   -param1-name param1-value -param2-name param2-value";
 			die $FIN;
 		}
@@ -107,12 +108,12 @@ sub parseInput
 
 sub parseOptions
 {
-	my $args = $_[0];
+	my $args   = $_[0];
 	my $opt_st = {};
 
 	# get options
 	# the options are the parameters before object
-	foreach my $o (@{$args})
+	foreach my $o ( @{ $args } )
 	{
 		if ( $o !~ /^-/ )
 		{
@@ -120,24 +121,24 @@ sub parseOptions
 		}
 		else
 		{
-			my $opt = shift @{$args};
-			if ($opt eq '-help')
+			my $opt = shift @{ $args };
+			if ( $opt eq '-help' )
 			{
-				$opt_st->{'help'} = 1;
+				$opt_st->{ 'help' } = 1;
 			}
-			elsif ($opt eq '-silence' or $opt eq '-s')
+			elsif ( $opt eq '-silence' or $opt eq '-s' )
 			{
-				$opt_st->{'silence'} = 1;
+				$opt_st->{ 'silence' } = 1;
 			}
-			elsif ($opt eq '-host' and $args->[0] !~ /^-/)
+			elsif ( $opt eq '-host' and $args->[0] !~ /^-/ )
 			{
-				$opt_st->{'host'} = shift @{$args};
+				$opt_st->{ 'host' } = shift @{ $args };
 			}
 			else
 			{
 				say "The '$o' option is not recognized.";
 				say "";
-				&printHelp(1);
+				&printHelp( 1 );
 				exit 1;
 			}
 		}
@@ -148,43 +149,54 @@ sub parseOptions
 
 sub printHelp
 {
-	my $executed = shift // 0; # 1 when the help is printed for command line invocation
+	my $executed = shift
+	  // 0;    # 1 when the help is printed for command line invocation
 
-	if ($executed)
+	if ( $executed )
 	{
 		print "\n";
 		print "ZCLI can be executed with the following options:\n";
 		say "	-help: it prints this ZCLI help.";
-		say "	-host <name>: it selects the 'name' load balancer as destination of the command.";
+		say
+		  "	-host <name>: it selects the 'name' load balancer as destination of the command.";
 		say "	-silence, -s: it executes the action without the human interaction.";
 	}
 	print "\n";
 	print "A ZCLI command uses the following arguments:\n";
 	print "<object> <action> <id> <id2>... -param1 value [-param2 value]\n";
-	print "    'object' is the load balancer module over the command is going to be executed\n";
-	print "    'action' is the verb is going to be used. Each object has itself actions\n";
-	print "    'id' specify a object name inside of a module. For example a farm name, an interface name or blacklist name.\n";
-	print "         To execute some commands, it is necessary use more than one 'ids', to refer several objects that take part in the command.\n";
-	print "    'param value' some command need parameters. Theese parameters are indicated using the hyphen symbol '-' following with the param name, a black space and the param value.\n";
+	print
+	  "    'object' is the load balancer module over the command is going to be executed\n";
+	print
+	  "    'action' is the verb is going to be used. Each object has itself actions\n";
+	print
+	  "    'id' specify a object name inside of a module. For example a farm name, an interface name or blacklist name.\n";
+	print
+	  "         To execute some commands, it is necessary use more than one 'ids', to refer several objects that take part in the command.\n";
+	print
+	  "    'param value' some command need parameters. Theese parameters are indicated using the hyphen symbol '-' following with the param name, a black space and the param value.\n";
 	print "\n";
 
-	print "ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command\n";
-	print "If the autocomplete does not list more options, press <intro> to get further information\n";
+	print
+	  "ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command\n";
+	print
+	  "If the autocomplete does not list more options, press <intro> to get further information\n";
 	print "\n";
 
-	print "ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation: \n";
+	print
+	  "ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation: \n";
 	print "https://www.zevenet.com/zapidocv4.0/\n";
 	print "\n";
 
 	print "\n";
 	print "Examples:\n";
 	print "farms set gslbfarm -vport 53 -vip 10.0.0.20\n";
-	print "  This command is setting the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm\n";
+	print
+	  "  This command is setting the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm\n";
 	print "\n";
 	print "network-virtual create -name eth0:srv -ip 192.168.100.32\n";
-	print "  This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32\n";
+	print
+	  "  This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32\n";
 	print "\n";
-
 
 # 	print "$0 [-opt1 <val1> [..]] object order <id> -param1 value [-param2 value]";
 # añadir:
@@ -270,12 +282,12 @@ sub checkInput
 	}
 
 	# getting uri parameters
-	if (exists $def->{uri_param})
+	if ( exists $def->{ uri_param } )
 	{
 		my $tag = $Define::UriParamTag;
-		foreach my $p (@{$input->{ uri_param }})
+		foreach my $p ( @{ $input->{ uri_param } } )
 		{
-			unless ($call{uri} =~ s/$tag/$p/)
+			unless ( $call{ uri } =~ s/$tag/$p/ )
 			{
 				print "Error replacing the param '$p'";
 				die $FIN;
@@ -284,39 +296,41 @@ sub checkInput
 	}
 
 	# getting upload file
-	if (exists $call{ upload_file })
+	if ( exists $call{ upload_file } )
 	{
-		if ( ! defined $input->{upload_file} )
+		if ( !defined $input->{ upload_file } )
 		{
 			print "The file name to upload is not set";
 			die $FIN;
 		}
-		if ( !-e $input->{upload_file})
+		if ( !-e $input->{ upload_file } )
 		{
 			print "The file '$input->{upload_file}' does not exist";
 			die $FIN;
 		}
-		$call{ upload_file } = $input->{upload_file};
+		$call{ upload_file } = $input->{ upload_file };
 	}
 
 	# getting download file
-	if (exists $call{ download_file })
+	if ( exists $call{ download_file } )
 	{
-		if ( ! defined $input->{download_file} )
+		if ( !defined $input->{ download_file } )
 		{
 			print "The file name to save the download is not set";
 			die $FIN;
 		}
-		if ( -e $input->{download_file})
+		if ( -e $input->{ download_file } )
 		{
 			print "The file '$input->{download_file}' already exist, select another name";
 			die $FIN;
 		}
-		$call{ download_file } = $input->{download_file};
+		$call{ download_file } = $input->{ download_file };
 	}
 
 	# get PARAMS
-	if ( ($call{ method } eq 'POST' or $call{ method } eq 'PUT') and !exists $call{download_file} or $call{upload_file})
+	if ( ( $call{ method } eq 'POST' or $call{ method } eq 'PUT' )
+		 and !exists $call{ download_file }
+		 or $call{ upload_file } )
 	{
 # decidir aqui que hacer, si quitar los parametros para que la llamada
 # busque los parametros necesarios, o saltarse la comprobacion si la llamada tiene algun parametro predefinido
@@ -360,15 +374,15 @@ sub parseInputParams
 sub checkUriParams
 {
 	my $uri_param = shift;
-	my @params = @_;
+	my @params    = @_;
 	my @p_out;
-	if (defined $uri_param)
+	if ( defined $uri_param )
 	{
-		foreach my $p (@{$uri_param})
+		foreach my $p ( @{ $uri_param } )
 		{
 			my $val = shift @params;
 			my $tag = $Define::UriParamTag;
-			unless ($uri_param =~ s/$tag/$val/)
+			unless ( $uri_param =~ s/$tag/$val/ )
 			{
 				push @p_out, undef;
 				print "This command expects $p->{name}, $p->{desc}\n";
@@ -399,7 +413,8 @@ sub listParams
 		  ( $resp->{ json }->{ message } )
 		  ? $resp->{ json }->{ message }
 		  : "";
-		  #~ : "Action is not valid";
+
+		#~ : "Action is not valid";
 		return $msg;
 	}
 	return \@params;
@@ -418,10 +433,10 @@ sub getLBIdsTree
 	#~ &dev(Dumper($resp),"id tree", 2);
 
 	my $tree;
-	if ($resp->{ 'json' }->{ 'params' })
+	if ( $resp->{ 'json' }->{ 'params' } )
 	{
 		$tree = $resp->{ 'json' }->{ 'params' };
-		$tree->{'monitoring'}->{'fg'} = $tree->{'farmguardians'};
+		$tree->{ 'monitoring' }->{ 'fg' } = $tree->{ 'farmguardians' };
 	}
 
 	return $tree;
@@ -446,43 +461,42 @@ sub getIdValues
 	return \@values;
 }
 
-
 sub create_description
 {
 	my $object_st = shift;
-	my $obj = shift;
-	my $act = shift;
+	my $obj       = shift;
+	my $act       = shift;
 
 	return "$obj" if not defined $act;
 
 	my $def = $object_st->{ $obj }->{ $act };
 
 	# action object @ids @uri_param @file @params
-	my $msg = "$obj $act";
+	my $msg    = "$obj $act";
 	my $params = 1;
 
-	my @ids = &getIds($def->{uri});
-	if (@ids)
+	my @ids = &getIds( $def->{ uri } );
+	if ( @ids )
 	{
 		$msg .= " <$_>" for @ids;
 	}
-	if (exists $def->{uri_param})
+	if ( exists $def->{ uri_param } )
 	{
-		$msg .= " <$_->{name}>" for @{$def->{uri_param}};
+		$msg .= " <$_->{name}>" for @{ $def->{ uri_param } };
 	}
-	if (exists $def->{upload_file})
-	{
-		$msg .= " <file_path>";
-		$params = 0;
-	}
-	if (exists $def->{download_file})
+	if ( exists $def->{ upload_file } )
 	{
 		$msg .= " <file_path>";
 		$params = 0;
 	}
-	if ($def->{method} =~ /^POST|PUT$/ and
-		not exists $def->{params} and
-		$params )
+	if ( exists $def->{ download_file } )
+	{
+		$msg .= " <file_path>";
+		$params = 0;
+	}
+	if (     $def->{ method } =~ /^POST|PUT$/
+		 and not exists $def->{ params }
+		 and $params )
 	{
 		$msg .= " [-param_name param_value ...]";
 	}
@@ -512,7 +526,7 @@ sub zapi
 	&dev( Dumper( $arg ), 'req', 2 );
 
 	# This is a workaround to manage l4 and datalink services.
-	$arg->{uri} =~ s|/services/_/|/|m;
+	$arg->{ uri } =~ s|/services/_/|/|m;
 
 	# create URL
 	my $URL =
@@ -527,11 +541,11 @@ sub zapi
 	if ( $arg->{ method } eq 'POST' or $arg->{ method } eq 'PUT' )
 	{
 		# add content_type header
-		$arg->{content_type} = $arg->{content_type} // 'application/json';
-		$request->content_type( $arg->{content_type} );
+		$arg->{ content_type } = $arg->{ content_type } // 'application/json';
+		$request->content_type( $arg->{ content_type } );
 
 		# sending data in binary
-		if ($arg->{content_type} eq 'application/gzip')
+		if ( $arg->{ content_type } eq 'application/gzip' )
 		{
 			open ( my $upload_fh, '<', "$arg->{ upload_file }" );
 			{
@@ -542,8 +556,9 @@ sub zapi
 			}
 			close $upload_fh;
 		}
+
 		# uploading file with another format
-		elsif (exists $arg->{upload_file})
+		elsif ( exists $arg->{ upload_file } )
 		{
 			open ( my $upload_fh, '<', "$arg->{ upload_file }" );
 			{
@@ -567,6 +582,7 @@ sub zapi
 	my $txt;
 	my $json_dec;
 	my $msg;
+
 	# tratamiento para descargar certs, backups...
 	if ( exists $arg->{ 'download_file' } )
 	{
@@ -578,27 +594,28 @@ sub zapi
 
 		$msg = "The file was properly saved in the file '$arg->{ 'download_file' }'.";
 	}
+
 	# tratamiento texto
-	elsif ($response->header('content-type') =~ 'text/plain')
+	elsif ( $response->header( 'content-type' ) =~ 'text/plain' )
 	{
 		$txt = $response->content();
 	}
 	else
 	{
 		eval { $json_dec = JSON::decode_json( $response->content() ); };
-		if (exists $json_dec->{message})
+		if ( exists $json_dec->{ message } )
 		{
-			$msg = $json_dec->{message};
-			delete $json_dec->{message};
+			$msg = $json_dec->{ message };
+			delete $json_dec->{ message };
 		}
 	}
 
 	# add message for error 500
-	if ($response->code =~ /^5/)
+	if ( $response->code =~ /^5/ )
 	{
 		$msg = "There was an error in the load balancer. The command could not finish";
 	}
-	elsif ($response->code == 401)
+	elsif ( $response->code == 401 )
 	{
 		$msg = "The authentication failed. Please, review the following settings
 	*) The zapi user is enabled: clicking on Zevenet Webgui 'System > User'.
@@ -610,11 +627,11 @@ sub zapi
 	my $out = {
 				'code' => $response->code,
 				'json' => $json_dec,
-				'msg' => $msg,
+				'msg'  => $msg,
 				'err'  => ( $response->code =~ /^2/ ) ? 0 : 1,
 	};
 
-	$out->{txt} = $txt if defined $txt;
+	$out->{ txt } = $txt if defined $txt;
 
 	return $out;
 }
@@ -639,24 +656,24 @@ sub printOutput
 	}
 	else
 	{
-		if (exists $resp->{ msg } and defined $resp->{ msg })
+		if ( exists $resp->{ msg } and defined $resp->{ msg } )
 		{
 			print "$resp->{ msg }\n";
 		}
 
-		if (exists $resp->{txt})
+		if ( exists $resp->{ txt } )
 		{
 			print "$resp->{txt}";
 			print "\n";
 		}
 
-		if (%{$resp->{ json }})
+		if ( %{ $resp->{ json } } )
 		{
 			my $json_enc = "";
 			eval {
 				$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
 			};
-			print "$json_enc" if ($json_enc);
+			print "$json_enc" if ( $json_enc );
 		}
 	}
 	print "\n";
@@ -667,13 +684,13 @@ sub getHttpServerConf
 	my $confhttp = "/usr/local/zevenet/app/cherokee/etc/cherokee/cherokee.conf";
 
 	# read line matching 'server!bind!1!port = 444'
-	my $ip_directive = 'server!bind!1!interface';
+	my $ip_directive   = 'server!bind!1!interface';
 	my $port_directive = 'server!bind!1!port';
 
 	my $port = 444;
-	my $ip = "127.0.0.1";
+	my $ip   = "127.0.0.1";
 
-	my $params = 0; # when 2 params have been found
+	my $params = 0;    # when 2 params have been found
 	open my $fh, "<", "$confhttp";
 	while ( my $line = <$fh> )
 	{
@@ -700,9 +717,11 @@ sub getHttpServerConf
 
 sub setHost
 {
-	my $hostname = shift;	# if there is HOSTNAME, the function will mofidy, else it will create a new one
+	my $hostname = shift
+	  ; # if there is HOSTNAME, the function will mofidy, else it will create a new one
 	my $new_flag = shift // 1;
-	my $localname = "localhost"; 	# it is the reserve word to modify the localhost host settings
+	my $localname =
+	  "localhost";    # it is the reserve word to modify the localhost host settings
 	my $cfg;
 	my $valid_flag = 1;
 
@@ -710,31 +729,31 @@ sub setHost
 	my $ip_regex =
 	  '((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))';
 
-
 	# getting conf
-	my $Config = (-e $HOST_FILE) ? Config::Tiny->read( $HOST_FILE ) : Config::Tiny->new;
-
+	my $Config =
+	  ( -e $HOST_FILE ) ? Config::Tiny->read( $HOST_FILE ) : Config::Tiny->new;
 
 	# set values if the host is localhost
-	if ($hostname eq $localname)
+	if ( $hostname eq $localname )
 	{
 		# overwrite data. Maybe the http server cfg was changed
 		my ( $localip, $localport ) = &getHttpServerConf();
 
 		$cfg = {
-			ZAPI_VERSION => "4.0",
-			NAME => $localname,
-			HOST => $localip,
-			PORT => $localport,
-			ZAPI_KEY => $Config->{$localname}->{ZAPI_KEY} // '',
+				 ZAPI_VERSION => "4.0",
+				 NAME         => $localname,
+				 HOST         => $localip,
+				 PORT         => $localport,
+				 ZAPI_KEY     => $Config->{ $localname }->{ ZAPI_KEY } // '',
 		};
 	}
+
 	# validating
-	elsif (!$new_flag )
+	elsif ( !$new_flag )
 	{
-		if (!exists $Config->{$hostname})
+		if ( !exists $Config->{ $hostname } )
 		{
-			if (!defined $hostname)
+			if ( !defined $hostname )
 			{
 				say "A host name is required";
 			}
@@ -744,13 +763,12 @@ sub setHost
 			}
 			return undef;
 		}
-		$cfg = $Config->{$hostname};
+		$cfg = $Config->{ $hostname };
 	}
-
 
 	## Get parameters
 	# get name
-	if ($new_flag and $hostname ne $localname)
+	if ( $new_flag and $hostname ne $localname )
 	{
 		do
 		{
@@ -762,20 +780,18 @@ sub setHost
 			if ( $hostname !~ /\S+/ )
 			{
 				$valid_flag = 0;
-				say
-				  "Invalid name. It expects a string with the load balancer host name";
+				say "Invalid name. It expects a string with the load balancer host name";
 			}
-			elsif ( exists $Config->{$hostname} )
+			elsif ( exists $Config->{ $hostname } )
 			{
 				$valid_flag = 0;
-				say
-				  "Invalid name. The '$hostname' host already exist";
+				say "Invalid name. The '$hostname' host already exist";
 			}
 		} while ( !$valid_flag );
 	}
 
 	# get IP
-	if ($hostname ne $localname)
+	if ( $hostname ne $localname )
 	{
 		do
 		{
@@ -784,7 +800,7 @@ sub setHost
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
-			$cfg->{ HOST } = $val unless ($val eq "" and not $new_flag) ;
+			$cfg->{ HOST } = $val unless ( $val eq "" and not $new_flag );
 			unless ( $cfg->{ HOST } =~ /$ip_regex/ )
 			{
 				$valid_flag = 0;
@@ -794,7 +810,7 @@ sub setHost
 	}
 
 	# get port
-	if ($hostname ne $localname)
+	if ( $hostname ne $localname )
 	{
 		do
 		{
@@ -803,7 +819,7 @@ sub setHost
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
-			$cfg->{ PORT } = $val unless ($val eq "" and not $new_flag) ;
+			$cfg->{ PORT } = $val unless ( $val eq "" and not $new_flag );
 			unless ( $cfg->{ PORT } > 0 and $cfg->{ PORT } <= 65535 )
 			{
 				$valid_flag = 0;
@@ -820,7 +836,7 @@ sub setHost
 		$valid_flag = 1;
 		my $val = <STDIN>;
 		chomp $val;
-		$cfg->{ ZAPI_KEY } = $val unless ($val eq "" and not $new_flag) ;
+		$cfg->{ ZAPI_KEY } = $val unless ( $val eq "" and not $new_flag );
 		unless ( $cfg->{ ZAPI_KEY } =~ /\S+/ )
 		{
 			$valid_flag = 0;
@@ -829,23 +845,22 @@ sub setHost
 	} while ( !$valid_flag );
 
 	# get zapi version
-#	do
-#	{
-#		print "Load balancer zapi version: ";
-#		$valid_flag = 1;
-#		$cfg->{ ZAPI_VERSION } = <STDIN>;
-#		chomp $cfg->{ ZAPI_VERSION };
-#		unless ( $cfg->{ ZAPI_VERSION } =~ /^(4.0)$/ )
-#		{
-#			$valid_flag = 0;
-#			say
-#			  "Invalid zapi version. It expects once of the following versions: 4.0.";
-#		}
-#	} while ( !$valid_flag );
+	#	do
+	#	{
+	#		print "Load balancer zapi version: ";
+	#		$valid_flag = 1;
+	#		$cfg->{ ZAPI_VERSION } = <STDIN>;
+	#		chomp $cfg->{ ZAPI_VERSION };
+	#		unless ( $cfg->{ ZAPI_VERSION } =~ /^(4.0)$/ )
+	#		{
+	#			$valid_flag = 0;
+	#			say
+	#			  "Invalid zapi version. It expects once of the following versions: 4.0.";
+	#		}
+	#	} while ( !$valid_flag );
 	$cfg->{ ZAPI_VERSION } = "4.0";
 
-
-	$Config->{$hostname} = $cfg;
+	$Config->{ $hostname } = $cfg;
 
 	# set the default
 	if ( !defined $Config->{ _ }->{ default_host } )
@@ -853,7 +868,7 @@ sub setHost
 		$Config->{ _ }->{ default_host } = $hostname;
 		say "Saved as default profile";
 	}
-	elsif ($Config->{ _ }->{ default_host } ne $hostname )
+	elsif ( $Config->{ _ }->{ default_host } ne $hostname )
 	{
 		print "Do you wish set this host as the default one? [yes|no=default]: ";
 		my $confirmation = <STDIN>;
@@ -866,21 +881,21 @@ sub setHost
 	}
 	say "";
 
-	$Config->write($HOST_FILE);
+	$Config->write( $HOST_FILE );
 	return $Config->{ $hostname };
 }
 
 sub refreshLocalHost
 {
 	my $localname = "localhost";
-	my $Config = (-e $HOST_FILE) ? Config::Tiny->read( $HOST_FILE ) : die $FIN;
+	my $Config    = ( -e $HOST_FILE ) ? Config::Tiny->read( $HOST_FILE ) : die $FIN;
 
 	# overwrite data. Maybe the http server cfg was changed
 	my ( $localip, $localport ) = &getHttpServerConf();
-	$Config->{$localname}->{HOST} = $localip;
-	$Config->{$localname}->{PORT} = $localport;
+	$Config->{ $localname }->{ HOST } = $localip;
+	$Config->{ $localname }->{ PORT } = $localport;
 
-	$Config->write($HOST_FILE);
+	$Config->write( $HOST_FILE );
 }
 
 sub delHost
@@ -888,15 +903,16 @@ sub delHost
 	my $name = shift;
 	my $Config;
 	my $err = 1;
-	if (-e $HOST_FILE)
+	if ( -e $HOST_FILE )
 	{
 		$Config = Config::Tiny->read( $HOST_FILE );
-		if( exists $Config->{$name})
+		if ( exists $Config->{ $name } )
 		{
-			delete $Config->{_}->{default_host} if $Config->{_}->{default_host} eq $name;
+			delete $Config->{ _ }->{ default_host }
+			  if $Config->{ _ }->{ default_host } eq $name;
 
-			delete $Config->{$name};
-			$Config->write($HOST_FILE);
+			delete $Config->{ $name };
+			$Config->write( $HOST_FILE );
 			$err = 0;
 			say "The '$name' host was unregistered from zcli";
 		}
@@ -914,7 +930,7 @@ sub listHost
 	use Config::Tiny;
 	my $Config = Config::Tiny->read( $HOST_FILE );
 
-	return grep ( !/^_$/, keys %{$Config});
+	return grep ( !/^_$/, keys %{ $Config } );
 }
 
 sub hostInfo
@@ -929,7 +945,7 @@ sub hostInfo
 		$host_name = $Config->{ _ }->{ default_host };
 		if ( !defined $host_name )
 		{
-			&dev ( "Warning, there is no default host set\n" );
+			&dev( "Warning, there is no default host set\n" );
 			return undef;
 		}
 	}
@@ -983,13 +999,16 @@ sub check_connectivity
 	my $host = shift;
 
 	require IO::Socket::INET;
+
 	# test connectivity:
 	my $sock = IO::Socket::INET->new(
-		PeerAddr => $host->{HOST},
-		PeerPort => $host->{PORT},
-		Proto    => 'tcp',
-		Timeout  => 8
-	) or do {
+									  PeerAddr => $host->{ HOST },
+									  PeerPort => $host->{ PORT },
+									  Proto    => 'tcp',
+									  Timeout  => 8
+	  )
+	  or do
+	{
 		say "The '$host->{NAME}' host ($host->{HOST}:$host->{PORT}) cannot be reached.";
 		return 0;
 	};
@@ -1014,10 +1033,11 @@ Returns:
 
 sub check_is_lb
 {
-	my $cmd = 'dpkg -l |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3 2>/dev/null';
+	my $cmd =
+	  'dpkg -l |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3 2>/dev/null';
 	my $version = `$cmd`;
 
-	return (! $version or $version < $Define::REQUIRED_ZEVEVENET_VERSION) ? 0: 1;
+	return ( !$version or $version < $Define::REQUIRED_ZEVEVENET_VERSION ) ? 0 : 1;
 }
 
 1;

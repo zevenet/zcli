@@ -1,80 +1,75 @@
-- elegir el formato de los parametros
+--- TAREAS DE PARAMETROS ---
 
+- Cambiar formato parametros: key=value
+- Autocompletar posibles valores de un parametro.
+	* Añadir cadena vacia si el parametro acepta valor ""
+- Para los comandos que llevan algunos parametros preseleccionados, listar los posibles comandos y quitar de la lista los que ya esten preseleccionados
+	- Hay comandos (como backup apply) que son macros que contienen algunos parametros predefinidos, y al enviarse la llamada para obtener los posibles valores, se esta ejecutando la acción
+	- Cuando el parametro esta en la definicion y la api pide uno mas, no se esta mandando
+		system-backups apply old -force true
+		Info: Apply a backup to the system
+		Error!! The backup version (5.2.17) is different to the Zevenet version (_VERSION_). The parameter 'force' must be used to force the backup applying.
+- A veces aparece al usar autocompletado: system-backups apply old Can't use string ("") as an ARRAY ref while "strict refs" in use at /usr/bin/zcli line 380
+
+
+
+
+--- NUEVAS PROPIEDADES O MEJORAS ---
+
+- si arranca el comando con parámetros, enviarlos sin entrar en modo interactivo
+- por defecto que arranque modo no interactivo
+	- (podria arreglarse solo tras mod lo de antes) al ejecutar la ayuda esta entrando en modo interfactivo
+- añadir opción para aceptar parametros como json
+- Soportar ZCLI en la CE
+- atajo a comando HELP
+- Añadir un "help" por cada módulo
+- funcion para que compruebe que la version de zapi del lb es minimo 4.0.1
 - devolver error si hay parametros en el comando cuando es GET.
-
-- doc
-	- quitar comentarios en español
-	- help, repasar
-	- funciones
-	- documentar la implementacion
-	- quitar comentarios debug ????
-	- Crear un script con comandos para usar en la documentación como ejemplos de llamadas
-
 - completar funcionalidades:
 	farms-add/rem headers
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
+	routing
 
+
+
+
+--- TAREAS DE FORMATO ---
+
+- quitar subrayado
+- cambiar el nombre del servicio por defecto en L4
+- transformar la respuesta en json
+- Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
+- En el autocompletado poner un mensaje si el comando no puede completarse. E.j. se quiere modificar un srv de una granja que no tiene srv.
+- estandarizar nombre funciones y variables
+- añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
+
+
+
+
+--- DOC ---
+
+- quitar comentarios en español
+- cambiar objetos por singular
+- help, repasar
+- funciones
+- documentar la implementacion
+- quitar comentarios debug ????
+- Crear un script con comandos para usar en la documentación como ejemplos de llamadas
+
+
+
+
+--- OTRAS O MENOS IMPORTANTES ---
+
+- crear paquete para arch
 - No implementado
 	bonding-slaves, crear. Espera array. (Forzar uso de json como entrada)
 	rbac-roles SET. problemas por como se parsean los parametros. (Forzar uso de json como entrada)
 	gestionar licencia
 	graficas.
-
-
-- estandarizar nombre funciones y variables
-
+- echar un ojo a la funcion "getopt". Puede que ayude al autocompletado sin invocar zcli
 - crear grupos de lb para a los que mandarle los comandos
-
-- añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
-
 - soporte windows
 	* crear rutas de archivos en funcion del sistema operativo (historial, conf, ...)
 	* en windows no acepta colores
-
-- echar un ojo a la funcion "getopt". Puede que ayude al autocompletado sin invocar zcli
-
-- añadir opción para aceptar parametros como json
-
-- transformar la respuesta en json
-
-- funcion para que compruebe que la version de zapi del lb es minimo 4.0.1
-
-- ??? separar los modulos de system? p.e.: system-cluster, system-backups... en cluster, backups...
-
-- por defecto que arranque modo no interactivo
-	- (podria arreglarse solo tras mod lo de antes) al ejecutar la ayuda esta entrando en modo interfactivo
-
-- cambiar objetos por singular
-
-- crear paquete para arch
-
-- cambiar el nombre del servicio por defecto en L4
-
-- Añadir un "help" por cada módulo
-
-- si arranca el comando con parámetros, enviarlos sin entrar en modo interactivo
-
-- A veces aparece al usar autocompletado: system-backups apply old Can't use string ("") as an ARRAY ref while "strict refs" in use at /usr/bin/zcli line 380
-
-- Cuando el parametro esta en la definicion y la api pide uno mas, no se esta mandando
-system-backups apply old -force true
-Info: Apply a backup to the system
-Error!! The backup version (5.2.17) is different to the Zevenet version (_VERSION_). The parameter 'force' must be used to force the backup applying.
-
-- Para los comandos que llevan algunos parametros preseleccionados, listar los posibles comandos y quitar de la lista los que ya esten preseleccionados
-
-- Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
-
-- En el autocompletado poner un mensaje si el comando no puede completarse. E.j. se quiere modificar un srv de una granja que no tiene srv.
-
-- Autocompletar posibles valores de un parametro.
-	* Añadir cadena vacia si el parametro acepta valor ""
-
-- quitar subrayado
-
-- añadir formato perltidy
-
-- atajo a comando HELP
-
-- Soportar ZCLI en la CE
