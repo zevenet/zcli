@@ -596,7 +596,7 @@ sub zapi
 	# add message for error 500
 	if ($response->code =~ /^5/)
 	{
-		$msg = "Load balancer error. The command could not finish";
+		$msg = "There was an error in the load balancer. The command could not finish";
 	}
 	elsif ($response->code == 401)
 	{
@@ -700,7 +700,7 @@ sub getHttpServerConf
 
 sub setHost
 {
-	my $HOSTNAME = shift;	# if there is HOSTNAME, the function will mofidy, else it will create a new one
+	my $hostname = shift;	# if there is HOSTNAME, the function will mofidy, else it will create a new one
 	my $new_flag = shift // 1;
 	my $localname = "localhost"; 	# it is the reserve word to modify the localhost host settings
 	my $cfg;
@@ -716,7 +716,7 @@ sub setHost
 
 
 	# set values if the host is localhost
-	if ($HOSTNAME eq $localname)
+	if ($hostname eq $localname)
 	{
 		# overwrite data. Maybe the http server cfg was changed
 		my ( $localip, $localport ) = &getHttpServerConf();
@@ -732,50 +732,50 @@ sub setHost
 	# validating
 	elsif (!$new_flag )
 	{
-		if (!exists $Config->{$HOSTNAME})
+		if (!exists $Config->{$hostname})
 		{
-			if (!defined $HOSTNAME)
+			if (!defined $hostname)
 			{
 				say "A host name is required";
 			}
 			else
 			{
-				say "The '$HOSTNAME' host does not exist";
+				say "The '$hostname' host does not exist";
 			}
 			return undef;
 		}
-		$cfg = $Config->{$HOSTNAME};
+		$cfg = $Config->{$hostname};
 	}
 
 
 	## Get parameters
 	# get name
-	if ($new_flag and $HOSTNAME ne $localname)
+	if ($new_flag and $hostname ne $localname)
 	{
 		do
 		{
 			print "Load balancer host name: ";
 			$valid_flag = 1;
-			$HOSTNAME   = <STDIN>;
-			chomp $HOSTNAME;
-			$cfg->{ NAME } = $HOSTNAME;
-			if ( $HOSTNAME !~ /\S+/ )
+			$hostname   = <STDIN>;
+			chomp $hostname;
+			$cfg->{ NAME } = $hostname;
+			if ( $hostname !~ /\S+/ )
 			{
 				$valid_flag = 0;
 				say
 				  "Invalid name. It expects a string with the load balancer host name";
 			}
-			elsif ( exists $Config->{$HOSTNAME} )
+			elsif ( exists $Config->{$hostname} )
 			{
 				$valid_flag = 0;
 				say
-				  "Invalid name. The '$HOSTNAME' host already exist";
+				  "Invalid name. The '$hostname' host already exist";
 			}
 		} while ( !$valid_flag );
 	}
 
 	# get IP
-	if ($HOSTNAME ne $localname)
+	if ($hostname ne $localname)
 	{
 		do
 		{
@@ -794,7 +794,7 @@ sub setHost
 	}
 
 	# get port
-	if ($HOSTNAME ne $localname)
+	if ($hostname ne $localname)
 	{
 		do
 		{
@@ -845,29 +845,29 @@ sub setHost
 	$cfg->{ ZAPI_VERSION } = "4.0";
 
 
-	$Config->{$HOSTNAME} = $cfg;
+	$Config->{$hostname} = $cfg;
 
 	# set the default
 	if ( !defined $Config->{ _ }->{ default_host } )
 	{
-		$Config->{ _ }->{ default_host } = $HOSTNAME;
+		$Config->{ _ }->{ default_host } = $hostname;
 		say "Saved as default profile";
 	}
-	elsif ($Config->{ _ }->{ default_host } ne $HOSTNAME )
+	elsif ($Config->{ _ }->{ default_host } ne $hostname )
 	{
 		print "Do you wish set this host as the default one? [yes|no=default]: ";
 		my $confirmation = <STDIN>;
 		chomp $confirmation;
 		if ( $confirmation =~ /^(y|yes)$/i )
 		{
-			$Config->{ _ }->{ default_host } = $HOSTNAME;
+			$Config->{ _ }->{ default_host } = $hostname;
 			say "Saved as default profile";
 		}
 	}
 	say "";
 
 	$Config->write($HOST_FILE);
-	return $Config->{ $HOSTNAME };
+	return $Config->{ $hostname };
 }
 
 sub refreshLocalHost
@@ -898,7 +898,7 @@ sub delHost
 			delete $Config->{$name};
 			$Config->write($HOST_FILE);
 			$err = 0;
-			say "The '$name' host was unregister from zcli";
+			say "The '$name' host was unregistered from zcli";
 		}
 	}
 
@@ -960,6 +960,24 @@ sub dev
 
 }
 
+=begin nd
+Function: check_connectivity
+
+	It checks if the host where is running ZCLI is a Zevenet load balancer.
+	It looks at in the system if the zevenet package is installed.
+	The Zevenet version must be upper than 'REQUIRED_ZEVEVENET_VERSION'.
+
+Parametes:
+	Host - Host reference. The host struct must contains the following keys:
+		NAME - Nick name of the load balancer.
+		HOST - It is the management IP used to connect with the load balancer.
+		PORT - It is the management port used to connect with the load balancer.
+
+Returns:
+	Integer - It returns: 1 if ZCLI has connectivity with the load balancer or 0 if it doesn't.
+
+=cut
+
 sub check_connectivity
 {
 	my $host = shift;
@@ -979,7 +997,21 @@ sub check_connectivity
 	return 1;
 }
 
-# comprueba que la version del lb sea compatible con zcli
+=begin nd
+Function: check_is_lb
+
+	It checks if the host where is running ZCLI is a Zevenet load balancer.
+	It looks at in the system if the zevenet package is installed.
+	The Zevenet version must be upper than 'REQUIRED_ZEVEVENET_VERSION'.
+
+Parametes:
+	none - .
+
+Returns:
+	Integer - It returns: 1 if the host is a Zevenet load balancer, 0 if it doesn't.
+
+=cut
+
 sub check_is_lb
 {
 	my $cmd = 'dpkg -l |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3 2>/dev/null';

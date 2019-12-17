@@ -15,17 +15,9 @@ use ZCLI::Objects;
 my %V = %Define::Actions;
 my $FIN = $Define::FIN;
 
-our $id_tree;
-our $cmd_st;
-our $term;
-our $CONNECTIVITY = 1; # connectivity with the lb
-
 my $zcli_dir = &getZcliDir();
 my $zcli_history = &getZcliHistoryPath();
 
-# save the last parameter list to avoid repeat the params zapi call for each tab
-my @PARAM_LIST = ();
-my $CMD_STRING = '';
 
 system("mkdir -p $zcli_dir") if (!-d $zcli_dir);
 
@@ -51,13 +43,13 @@ if (&check_is_lb())
 	}
 }
 
-my $host = &hostInfo($opt->{'host'});
-if (!$host)
+$Env::HOST = &hostInfo($opt->{'host'});
+if (!$Env::HOST)
 {
 	if (exists $opt->{'host'})
 	{
 		say "Not found the '$opt->{host}' host, selecting the default host";
-		$host = &hostInfo($opt->{'host'});
+		$Env::HOST = &hostInfo($opt->{'host'});
 	}
 
 	if ($opt->{'silence'})
@@ -67,10 +59,10 @@ if (!$host)
 	}
 }
 
-if (!$host)
+if (!$Env::HOST)
 {
 	say "Not found the host info, try to configure the default host profile";
-	$host = &setHost();
+	$Env::HOST = &setHost();
 }
 
 
@@ -88,8 +80,8 @@ if ( $opt->{'silence'} )
 		my $act=$_[1];
 
 		my $input = &parseInput( $objects->{ $obj }->{ $act }, @ARGV );
-		my $request = &checkInput( $objects, $input, $host, $id_tree );
-		$resp    = &zapi( $request, $host );
+		my $request = &checkInput( $objects, $input, $Env::HOST, $Env::HOST_IDS_TREE );
+		$resp    = &zapi( $request, $Env::HOST );
 		&printOutput( $resp );
 	};
 	say $@ if $@;
@@ -106,12 +98,12 @@ if ( $opt->{'silence'} )
 };
 
 
-$term = new Term::ShellUI( commands     => $cmd_st,
+$Env::ZCLI = new Term::ShellUI( commands     => $Env::ZCLI_CMD_ST,
 							  history_file => $zcli_history, );
 print "Zevenet Client Line Interface\n";
 &reload_prompt();
-$term->load_history();
-$term->run();
+$Env::ZCLI->load_history();
+$Env::ZCLI->run();
 
 
 ### definition of functions
@@ -119,8 +111,8 @@ $term->run();
 sub reload_prompt
 {
 	my $err = shift // 0;
-	my $conn = $CONNECTIVITY;
-	my $host = $host->{NAME} // "";
+	my $conn = $Env::CONNECTIVITY;
+	my $host = $Env::HOST->{NAME} // "";
 
 
 	my $gray = "\033[01;90m";
@@ -132,9 +124,8 @@ sub reload_prompt
 	my $color = ($err) ? $red: $green;
 	my $conn_color = (!$conn) ? $gray: "";
 
-	# zcli($host->{NAME}):
 	my $tag = "zcli($conn_color$host$color)";
-	$term->prompt( "$color$tag$no_color: " );
+	$Env::ZCLI->prompt( "$color$tag$no_color: " );
 }
 
 sub gen_cmd_struct
@@ -142,7 +133,7 @@ sub gen_cmd_struct
 	my $st;
 
 	# features of the lb
-	if ($main::CONNECTIVITY)
+	if ($Env::CONNECTIVITY)
 	{
 		foreach my $cmd ( keys %{ $objects } )
 		{
@@ -183,17 +174,17 @@ sub gen_cmd_struct
 			if (!$err)
 			{
 				# reload the host configuration
-				$host = $new_host if ($host->{NAME} eq $new_host->{NAME});
+				$Env::HOST = $new_host if ($Env::HOST->{NAME} eq $new_host->{NAME});
 			}
-			$main::CONNECTIVITY = &check_connectivity($host);
+			$Env::CONNECTIVITY = &check_connectivity($Env::HOST);
 			&reload_prompt($err);
 		},
 	};
 	$host_st->{ $V{DELETE} } = {
 		proc => sub {
-			if ($host->{name} eq @_[0])
+			if ($Env::HOST->{name} eq @_[0])
 			{
-				say "The '$host->{NAME}' host is being used";
+				say "The '$Env::HOST->{NAME}' host is being used";
 			}
 			else
 			{
@@ -205,8 +196,8 @@ sub gen_cmd_struct
 	};
 	$host_st->{ $V{APPLY} } = {
 		proc => sub {
-			$host=hostInfo(@_);
-			my $err = (defined $host) ? 0 : 1;
+			$Env::HOST=hostInfo(@_);
+			my $err = (defined $Env::HOST) ? 0 : 1;
 			&reload_prompt($err);
 			&reload_cmd_struct();
 		},
@@ -230,7 +221,7 @@ sub gen_obj
 		my @ids_def = &getIds( $objects->{ $obj }->{ $action }->{ uri } );
 		$objects->{ $obj }->{ $action }->{ ids } = \@ids_def;
 		$def->{ cmds }->{ $action } =
-		  &add_ids( $obj, $action, $objects->{ $obj }->{ $action }->{ uri }, $id_tree );
+		  &add_ids( $obj, $action, $objects->{ $obj }->{ $action }->{ uri }, $Env::HOST_IDS_TREE );
 	}
 
 	return $def;
@@ -349,10 +340,10 @@ sub gen_act
 			my @args = ( $objects->{ $obj }->{ $act }, $obj, $act, @{ $ids }, @_ );
 			my $input = &parseInput( @args );
 
-			my $request = &checkInput( $objects, $input, $host, $id_tree );
-			$resp    = &zapi( $request, $host );
+			my $request = &checkInput( $objects, $input, $Env::HOST, $Env::HOST_IDS_TREE );
+			$resp    = &zapi( $request, $Env::HOST );
 			&printOutput( $resp );
-			$term->save_history();
+			$Env::ZCLI->save_history();
 
 			# reload structs
 			&reload_cmd_struct();
@@ -371,14 +362,14 @@ sub complete_body_params
 	my (undef, $input, $obj_def, $obj, $act, $ids) = @_;
 
 	# get list
-	if ($CMD_STRING eq '' or $CMD_STRING ne $input->{str})
+	if ($Env::CMD_STRING eq '' or $Env::CMD_STRING ne $input->{str})
 	{
-		$CMD_STRING = $input->{str};
+		$Env::CMD_STRING = $input->{str};
 		my @args = ( $objects->{ $obj }->{ $act }, $obj, $act, @{ $ids });
 		my $in_parsed = &parseInput( @args );
-		my $request = &checkInput( $objects, $in_parsed, $host, $id_tree );
-		my $paramlist_ref = &listParams( $request, $host );
-		@PARAM_LIST = @{$paramlist_ref};
+		my $request = &checkInput( $objects, $in_parsed, $Env::HOST, $Env::HOST_IDS_TREE );
+		my $paramlist_ref = &listParams( $request, $Env::HOST );
+		@Env::PARAM_LIST = @{$paramlist_ref};
 	}
 
 	my $out;
@@ -387,7 +378,7 @@ sub complete_body_params
 	# get last completed parameter used
 	my $previus_param = $params_used[$input->{argno} - 1];
 	$previus_param =~ s/^-//;
-	if (grep (/^$previus_param$/, @PARAM_LIST))
+	if (grep (/^$previus_param$/, @Env::PARAM_LIST))
 	{
 		$out = "<$previus_param>";
 	}
@@ -396,7 +387,7 @@ sub complete_body_params
 		# remove the parameters already exists
 		my @params = ();
 
-		foreach my $p (@PARAM_LIST)
+		foreach my $p (@Env::PARAM_LIST)
 		{
 			push @params, "-$p" if ( !grep(/^-$p$/, @params_used) );
 		}
@@ -410,12 +401,12 @@ sub complete_body_params
 
 sub reload_cmd_struct
 {
-	$main::CONNECTIVITY = &check_connectivity($host);
-	if ($main::CONNECTIVITY)
+	$Env::CONNECTIVITY = &check_connectivity($Env::HOST);
+	if ($Env::CONNECTIVITY)
 	{
-		$main::id_tree = &getLBIdsTree( $host );
+		$Env::HOST_IDS_TREE = &getLBIdsTree( $Env::HOST );
 	}
-	$main::cmd_st = &gen_cmd_struct();
+	$Env::ZCLI_CMD_ST = &gen_cmd_struct();
 
-	$main::term->commands( $main::cmd_st ) if (defined $term);
+	$Env::ZCLI->commands( $Env::ZCLI_CMD_ST ) if (defined $Env::ZCLI);
 }

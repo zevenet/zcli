@@ -38,8 +38,6 @@
 
 - transformar la respuesta en json
 
-- sacar constantes a module defines
-
 - funcion para que compruebe que la version de zapi del lb es minimo 4.0.1
 
 - ??? separar los modulos de system? p.e.: system-cluster, system-backups... en cluster, backups...
@@ -75,3 +73,8 @@ Error!! The backup version (5.2.17) is different to the Zevenet version (_VERSIO
 
 - quitar subrayado
 
+- añadir formato perltidy
+
+- atajo a comando HELP
+
+- Soportar ZCLI en la CE

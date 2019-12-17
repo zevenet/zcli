@@ -6,7 +6,20 @@ use warnings;
 package Global;
 our $DEBUG = 0;
 our $FIN = ($DEBUG) ? "": "\n";	# This will add the dying line in debug mode
-our $REQ_ZEVEVENET_VERSION = "6.0.12";
+our $REQ_ZEVEVENET_VERSION = "6.1";
+
+
+package Env;
+our $CONNECTIVITY = 1; 	# It is the result of a connectivity test with the lb
+our $HOST;				# It is the host struct with info to connect with the load balancer
+our $HOST_IDS_TREE;		# It is the tree with the IDs that the load balancer contains
+our $ZCLI;				# It is the object TERM used to implement the autocompletation
+our $ZCLI_CMD_ST;		# It is the ZCLI commands struct used for the TERM module
+# save the last parameter list to avoid repeat the params zapi call for each tab
+my @CMD_PARAMS_DEF = ();
+#~ my $CMD_PARAMS_DEF;		# It is the last parameter object returned by the ZAPI. It is used to autocomplete the command
+my $CMD_STRING = '';	# It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded
+
 
 package Define;
 
