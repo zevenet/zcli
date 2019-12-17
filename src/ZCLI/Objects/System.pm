@@ -41,7 +41,7 @@ our $System = {
 					   },
 					   $V{ SET } => {
 									  uri    => "/system/users",
-									  method => 'GET',
+									  method => 'POST',
 					   },
 	},
 	'system-logs' => {
