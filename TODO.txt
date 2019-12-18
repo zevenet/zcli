@@ -16,6 +16,7 @@
 
 --- NUEVAS PROPIEDADES O MEJORAS ---
 
+- Al cambia valores de escucha de cherokee se pierde la conectividad con la API, ejemplo, cambiar el puerto.
 - si arranca el comando con parámetros, enviarlos sin entrar en modo interactivo
 - por defecto que arranque modo no interactivo
 	- (podria arreglarse solo tras mod lo de antes) al ejecutar la ayuda esta entrando en modo interfactivo
@@ -30,7 +31,16 @@
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
 	routing
-
+- Guardar el history: add_eof_exit_hook(subroutine_reference)
+- Hay llamadas que tienen parametros dependientes de otros, como poner en mantenimiento un backend.
+	Hacer que buscar un metodo para que se añadan y los compruebe la API. P.e. definirlos undef en la plantilla de definiciones de llamadas
+		if ( $json_obj->{ action } eq 'maintenance' )
+		{
+			$params->{ "mode" } = {
+									'non_blank' => 'true',
+									'values'    => ["drain", "cut"],
+			};
+		}
 
 
 
@@ -49,6 +59,7 @@
 
 --- DOC ---
 
+- Licencia
 - quitar comentarios en español
 - cambiar objetos por singular
 - help, repasar

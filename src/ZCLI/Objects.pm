@@ -15,22 +15,14 @@ use ZCLI::Objects::Ipds;
 use ZCLI::Objects::System;
 use ZCLI::Objects::Rbac;
 
-our $zcli_objects = {};
-$Objects::zcli_objects =
-  &Hash::Merge::merge( $Objects::zcli_objects, $Objects::Farms );
-$Objects::zcli_objects =
-  &Hash::Merge::merge( $Objects::zcli_objects, $Objects::Interfaces );
-$Objects::zcli_objects =
-  &Hash::Merge::merge( $Objects::zcli_objects, $Objects::Certificates );
-$Objects::zcli_objects =
-  &Hash::Merge::merge( $Objects::zcli_objects, $Objects::Farmguardian );
-$Objects::zcli_objects =
-  &Hash::Merge::merge( $Objects::zcli_objects, $Objects::Statistics );
-$Objects::zcli_objects =
-  &Hash::Merge::merge( $Objects::zcli_objects, $Objects::Ipds );
-$Objects::zcli_objects =
-  &Hash::Merge::merge( $Objects::zcli_objects, $Objects::System );
-$Objects::zcli_objects =
-  &Hash::Merge::merge( $Objects::zcli_objects, $Objects::Rbac );
+our $Zcli = {};
+$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Farms );
+$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Interfaces );
+$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Certificates );
+$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Farmguardian );
+$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Statistics );
+$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Ipds );
+$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::System );
+$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Rbac );
 
 1;

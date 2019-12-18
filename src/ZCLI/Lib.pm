@@ -5,25 +5,122 @@ use feature "say";
 use LWP::UserAgent;
 use JSON;
 
+use Storable qw(dclone);
+
 use ZCLI::Define;
 use ZCLI::Objects;
-
-my $zcli_dir     = "$ENV{HOME}/.zcli";
-my $zcli_history = "$zcli_dir/zcli-history";
-my $HOST_FILE    = "$zcli_dir/hosts.ini";
 
 my $DEBUG = $Define::DEBUG;
 my $FIN   = $Define::FIN;
 
-sub getZcliDir
+## Global functions
+
+=begin nd
+Function: dev
+
+	Function to print debug messages.
+
+Parametes:
+	String - String to print. Use 'Dumper($ref)' to print the value of a reference
+	Tag - Short message to wrap the message
+	lvl - The minimum log level to print the message
+
+Returns:
+	none - .
+
+=cut
+
+sub dev
 {
-	return $zcli_dir;
+	my $st  = shift;
+	my $tag = shift;
+	my $lvl = shift // 1;
+
+	chomp ( $st );
+
+	return if ( $lvl > $Global::DEBUG );
+
+	say "";
+	say ">>>> Debug >>>> $tag" if $tag;
+	print "$st\n";
+	say "<<<<<<<<<<<<<<< $tag" if $tag;
+	say "";
 }
 
-sub getZcliHistoryPath
+=begin nd
+Function: dev
+
+	Function to print debug messages.
+
+Parametes:
+	String - String to print. Use 'Dumper($ref)' to print the value of a reference
+	Tag - Short message to wrap the message
+	lvl - The minimum log level to print the message
+
+Returns:
+	none - .
+
+=cut
+
+sub printHelp
 {
-	return $zcli_history;
+	my $executed = shift
+	  // 0;    # 1 when the help is printed for command line invocation
+
+	print "\n";
+	print
+	  "ZCLI can be executed with the following options (the options are available at the moment of the invocation):\n";
+	say "	-help: it prints this ZCLI help.";
+	say
+	  "	-host <name>: it selects the 'name' as destination load balancer of the command.";
+	say "	-silence, -s: it executes the action without the human interaction.";
+
+	print "\n";
+	print "A ZCLI command uses the following arguments:\n";
+	print "<object> <action> <id> <id2>... -param1 value [-param2 value]\n";
+	print
+	  "    'object' is the load balancer module over the command is going to be executed\n";
+	print
+	  "    'action' is the verb is going to be used. Each object has itself actions\n";
+	print
+	  "    'id' specify a object name inside of a module. For example a farm name, an interface name or blacklist name.\n";
+	print
+	  "         To execute some commands, it is necessary use more than one 'ids', to refer several objects that take part in the command.\n";
+	print
+	  "    'param value' some command need parameters. Theese parameters are indicated using the hyphen symbol '-' following with the param name, a black space and the param value.\n";
+	print "\n";
+
+	print
+	  "ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command\n";
+	print
+	  "If the autocomplete does not list more options, press <intro> to get further information\n";
+	print "\n";
+
+	print
+	  "ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation: \n";
+	print "https://www.zevenet.com/zapidocv4.0/\n";
+	print "\n";
+
+	print "\n";
+	print "Examples:\n";
+	print "farms set gslbfarm -vport 53 -vip 10.0.0.20\n";
+	print
+	  "  This command is setting the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm\n";
+	print "\n";
+	print "network-virtual create -name eth0:srv -ip 192.168.100.32\n";
+	print
+	  "  This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32\n";
+	print "\n";
+
+# 	print "$0 [-opt1 <val1> [..]] object order <id> -param1 value [-param2 value]";
+# añadir:
+# -js, js output, borrar todos los mensajes que no sean el json de respuesta
+# -h,  host, cambia el host destinatario de la peticion. Añadir opcion para mandar a varios hosts a la vez
 }
+
+## Objects definitions
+
+## Parse args
 
 # pedir parametros de la uri
 # preguntar por los objetos
@@ -147,67 +244,7 @@ sub parseOptions
 	return $opt_st;
 }
 
-sub printHelp
-{
-	my $executed = shift
-	  // 0;    # 1 when the help is printed for command line invocation
-
-	if ( $executed )
-	{
-		print "\n";
-		print "ZCLI can be executed with the following options:\n";
-		say "	-help: it prints this ZCLI help.";
-		say
-		  "	-host <name>: it selects the 'name' load balancer as destination of the command.";
-		say "	-silence, -s: it executes the action without the human interaction.";
-	}
-	print "\n";
-	print "A ZCLI command uses the following arguments:\n";
-	print "<object> <action> <id> <id2>... -param1 value [-param2 value]\n";
-	print
-	  "    'object' is the load balancer module over the command is going to be executed\n";
-	print
-	  "    'action' is the verb is going to be used. Each object has itself actions\n";
-	print
-	  "    'id' specify a object name inside of a module. For example a farm name, an interface name or blacklist name.\n";
-	print
-	  "         To execute some commands, it is necessary use more than one 'ids', to refer several objects that take part in the command.\n";
-	print
-	  "    'param value' some command need parameters. Theese parameters are indicated using the hyphen symbol '-' following with the param name, a black space and the param value.\n";
-	print "\n";
-
-	print
-	  "ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command\n";
-	print
-	  "If the autocomplete does not list more options, press <intro> to get further information\n";
-	print "\n";
-
-	print
-	  "ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation: \n";
-	print "https://www.zevenet.com/zapidocv4.0/\n";
-	print "\n";
-
-	print "\n";
-	print "Examples:\n";
-	print "farms set gslbfarm -vport 53 -vip 10.0.0.20\n";
-	print
-	  "  This command is setting the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm\n";
-	print "\n";
-	print "network-virtual create -name eth0:srv -ip 192.168.100.32\n";
-	print
-	  "  This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32\n";
-	print "\n";
-
-# 	print "$0 [-opt1 <val1> [..]] object order <id> -param1 value [-param2 value]";
-# añadir:
-# -h, help
-# -js, js output, borrar todos los mensajes que no sean el json de respuesta
-# -o, output, mandar la salida a un fichero. util para descargar backups, certs...
-# -h,  host, cambia el host destinatario de la peticion. Añadir opcion para mandar a varios hosts a la vez
-# -c, conf info. modifica la conf de un host
-
-	die $FIN if $executed;
-}
+## Validate args
 
 sub checkInput
 {
@@ -332,8 +369,8 @@ sub checkInput
 		 and !exists $call{ download_file }
 		 or $call{ upload_file } )
 	{
-# decidir aqui que hacer, si quitar los parametros para que la llamada
-# busque los parametros necesarios, o saltarse la comprobacion si la llamada tiene algun parametro predefinido
+		say "?????? montando params";
+
 		if ( exists $def->{ params } )
 		{
 			$call{ params } = $def->{ params };
@@ -348,27 +385,6 @@ sub checkInput
 	&dev( Dumper( \%call ), "request sumary", 2 );
 
 	return \%call;
-}
-
-sub getIds
-{
-	my $uri = shift;
-
-	#~ my @ids = grep (/\<([\w -]+)\>/,$uri);
-	my @ids;
-
-	while ( $uri =~ s/\<([\w -]+)\>// )
-	{
-		push @ids, $1;
-	}
-
-	return @ids;
-}
-
-# parsear posibles parametros de la peticion
-sub parseInputParams
-{
-
 }
 
 sub checkUriParams
@@ -392,33 +408,18 @@ sub checkUriParams
 	return @p_out;
 }
 
-sub listParams
-{
-	my $request = shift;
-	my $host    = shift;
+=begin nd
+Function: getLBIdsTree
 
-	my $resp = &zapi( $request, $host );
-	my @params;
+	Gets and modify te load balancer IDs tree to adapt it to ZCLI.
 
-	if ( exists $resp->{ json }->{ params } )
-	{
-		foreach my $p ( @{ $resp->{ json }->{ params } } )
-		{
-			push @params, $p->{ name };
-		}
-	}
-	elsif ( $resp->{ err } )
-	{
-		my $msg =
-		  ( $resp->{ json }->{ message } )
-		  ? $resp->{ json }->{ message }
-		  : "";
+Parametes:
+	Host - It is a reference to a host object that contains the information about connecting with the load balancer
 
-		#~ : "Action is not valid";
-		return $msg;
-	}
-	return \@params;
-}
+Returns:
+	Hash ref - It is a hash with the IDs tree
+
+=cut
 
 sub getLBIdsTree
 {
@@ -461,59 +462,29 @@ sub getIdValues
 	return \@values;
 }
 
-sub create_description
-{
-	my $object_st = shift;
-	my $obj       = shift;
-	my $act       = shift;
+## ZAPI requests
 
-	return "$obj" if not defined $act;
+=begin nd
+Function: getUserAgent
 
-	my $def = $object_st->{ $obj }->{ $act };
+	Initializate the HTTP client used to do action using the ZAPI
 
-	# action object @ids @uri_param @file @params
-	my $msg    = "$obj $act";
-	my $params = 1;
+Parametes:
+	none - .
 
-	my @ids = &getIds( $def->{ uri } );
-	if ( @ids )
-	{
-		$msg .= " <$_>" for @ids;
-	}
-	if ( exists $def->{ uri_param } )
-	{
-		$msg .= " <$_->{name}>" for @{ $def->{ uri_param } };
-	}
-	if ( exists $def->{ upload_file } )
-	{
-		$msg .= " <file_path>";
-		$params = 0;
-	}
-	if ( exists $def->{ download_file } )
-	{
-		$msg .= " <file_path>";
-		$params = 0;
-	}
-	if (     $def->{ method } =~ /^POST|PUT$/
-		 and not exists $def->{ params }
-		 and $params )
-	{
-		$msg .= " [-param_name param_value ...]";
-	}
+Returns:
+	Hash ref - It is a UserAgent object
 
-	return $msg;
-}
-
-my $ua = getUserAgent();
+=cut
 
 sub getUserAgent
 {
-	$ua = LWP::UserAgent->new(
-							   agent    => '',
-							   ssl_opts => {
-											 verify_hostname => 0,
-											 SSL_verify_mode => 0x00
-							   }
+	my $ua = LWP::UserAgent->new(
+								  agent    => '',
+								  ssl_opts => {
+												verify_hostname => 0,
+												SSL_verify_mode => 0x00
+								  }
 	);
 	return $ua;
 }
@@ -575,6 +546,7 @@ sub zapi
 		}
 	}
 
+	my $ua       = &getUserAgent();
 	my $response = $ua->request( $request );
 
 	#~ &dev( Dumper( $response ), 'HTTP response', 1 );
@@ -636,6 +608,141 @@ sub zapi
 	return $out;
 }
 
+=begin nd
+Function: getIds
+
+	Get an URI and look for the parameters which expects.
+
+Parametes:
+	Uri - It is a string with the URI. An URI contains tag as "<TAG_NAME>" (/interfaces/virtual/<virtual>) that is related to the name of the parameter expected.
+
+Returns:
+	Array - It is the list of tags that needed for creating the URI.
+
+=cut
+
+sub getIds
+{
+	my $uri = shift;
+
+	#~ my @ids = grep (/\<([\w -]+)\>/,$uri);
+	my @ids;
+
+	while ( $uri =~ s/\<([\w -]+)\>// )
+	{
+		push @ids, $1;
+	}
+
+	return @ids;
+}
+
+=begin nd
+Function: listParams
+
+	It does a ZAPI call to get the parameters that that call needs.
+	If the definition of the call has some predefined parameter, it is removed before doing de call.
+
+Parametes:
+	Request - It is an request object that need the "zapi" function.
+	Host - It is a host object with the information about connecting with the load balancer
+
+Returns:
+	Hash array - The response is an object like the following:
+		{
+			vip : {
+				possible_values : [
+					11.12.52.2,
+					5.22.98.2
+				],
+			},
+			session : {
+				possible_values : [
+					ip,
+					hash_port
+				],
+				blank : 1
+			}
+		}
+
+=cut
+
+sub listParams
+{
+	my ( $obj_def, $obj, $act, $ids, $host ) = @_;
+
+	my @args = ( $obj, $act, @{ $ids } );
+
+	# remove predefined values
+	my $predef_params = $Objects::Zcli->{ $obj }->{ $act }->{ params };
+	delete $Objects::Zcli->{ $obj }->{ $act }->{ params };
+
+	my $in_parsed = &parseInput( $Objects::Zcli->{ $obj }->{ $act }, @args );
+	my $request =
+	  &checkInput( $Objects::Zcli, $in_parsed, $host, $Env::HOST_IDS_TREE );
+
+	my $params_ref = &zapi( $request, $host )->{ json }->{ params };
+
+	# 		Example:
+	#		$params_ref =  [
+	#			  {
+	#				 "format" : "farm_name",
+	#				 "name" : "copy_from",
+	#				 "options" : [
+	#					"non_blank"
+	#				 ]
+	#			  },
+	#			  {
+	#				 "name" : "vip",
+	#				 "options" : [
+	#					"required"
+	#				 ],
+	#				 "possible_values" : [
+	#					"192.168.101.189",
+	#					"192.168.100.241"
+	#				 ]
+	#			  },
+	#		 ]
+
+	# set again the predefined parameters
+	$Objects::Zcli->{ $obj }->{ $act }->{ params } = $predef_params;
+
+	$Env::CMD_PARAMS_DEF = {};
+	foreach my $p ( @{ $params_ref } )
+	{
+		$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ possible_values } =
+		  $p->{ possible_values }
+		  if ( exists $p->{ possible_values } );
+
+		my $blank = ( !( exists $p->{ regex } and exists $p->{ format } ) ) ? 1 : 0;
+		$blank = 1
+		  if (
+			   $blank
+			   and ( !exists $p->{ non_blank }
+					 or ( exists $p->{ non_blank } and $p->{ non_blank } eq 'false' ) )
+		  );
+		$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ blank } = 1 if ( $blank );
+	}
+
+	return $Env::CMD_PARAMS_DEF;
+}
+
+=begin nd
+Function: printOutput
+
+	This function will print the output of the zapi, previously, giving it format
+
+Parametes:
+	Response - It is a hash ref with the response of the zapi. The keys of the has are:
+		$resp->{ json }, it is the json responded by the zapi.
+		$resp->{ err }, it is a flag to indicate if the zapi returned an error.
+		$resp->{msg}, it is an message, this field can appear if there was an error of if there wasn't.
+		$resp->{ txt }, it is the body of the response when the zapi returns a txt message.
+
+Returns:
+	none - .
+
+=cut
+
 sub printOutput
 {
 	my $resp = shift;
@@ -679,47 +786,14 @@ sub printOutput
 	print "\n";
 }
 
-sub getHttpServerConf
-{
-	my $confhttp = "/usr/local/zevenet/app/cherokee/etc/cherokee/cherokee.conf";
-
-	# read line matching 'server!bind!1!port = 444'
-	my $ip_directive   = 'server!bind!1!interface';
-	my $port_directive = 'server!bind!1!port';
-
-	my $port = 444;
-	my $ip   = "127.0.0.1";
-
-	my $params = 0;    # when 2 params have been found
-	open my $fh, "<", "$confhttp";
-	while ( my $line = <$fh> )
-	{
-		if ( $line =~ /^\s*$ip_directive/ )
-		{
-			$params++;
-			my ( undef, $ip ) = split ( "=", $line );
-			$ip =~ s/\s//g;
-			chomp ( $ip );
-		}
-		elsif ( $line =~ /^\s*$port_directive/ )
-		{
-			$params++;
-			( undef, $port ) = split ( "=", $line );
-			$port =~ s/\s//g;
-			chomp ( $port );
-		}
-		last if $params == 2;
-	}
-	close $fh;
-
-	return ( $ip, $port );
-}
+## host
 
 sub setHost
 {
 	my $hostname = shift
 	  ; # if there is HOSTNAME, the function will mofidy, else it will create a new one
 	my $new_flag = shift // 1;
+	my $hostfile = $Global::hosts_path;
 	my $localname =
 	  "localhost";    # it is the reserve word to modify the localhost host settings
 	my $cfg;
@@ -731,7 +805,7 @@ sub setHost
 
 	# getting conf
 	my $Config =
-	  ( -e $HOST_FILE ) ? Config::Tiny->read( $HOST_FILE ) : Config::Tiny->new;
+	  ( -e $hostfile ) ? Config::Tiny->read( $hostfile ) : Config::Tiny->new;
 
 	# set values if the host is localhost
 	if ( $hostname eq $localname )
@@ -881,38 +955,40 @@ sub setHost
 	}
 	say "";
 
-	$Config->write( $HOST_FILE );
+	$Config->write( $hostfile );
 	return $Config->{ $hostname };
 }
 
 sub refreshLocalHost
 {
 	my $localname = "localhost";
-	my $Config    = ( -e $HOST_FILE ) ? Config::Tiny->read( $HOST_FILE ) : die $FIN;
+	my $hostfile  = $Global::hosts_path;
+	my $Config    = ( -e $hostfile ) ? Config::Tiny->read( $hostfile ) : die $FIN;
 
 	# overwrite data. Maybe the http server cfg was changed
 	my ( $localip, $localport ) = &getHttpServerConf();
 	$Config->{ $localname }->{ HOST } = $localip;
 	$Config->{ $localname }->{ PORT } = $localport;
 
-	$Config->write( $HOST_FILE );
+	$Config->write( $hostfile );
 }
 
 sub delHost
 {
 	my $name = shift;
 	my $Config;
-	my $err = 1;
-	if ( -e $HOST_FILE )
+	my $hostfile = $Global::hosts_path;
+	my $err      = 1;
+	if ( -e $hostfile )
 	{
-		$Config = Config::Tiny->read( $HOST_FILE );
+		$Config = Config::Tiny->read( $hostfile );
 		if ( exists $Config->{ $name } )
 		{
 			delete $Config->{ _ }->{ default_host }
 			  if $Config->{ _ }->{ default_host } eq $name;
 
 			delete $Config->{ $name };
-			$Config->write( $HOST_FILE );
+			$Config->write( $hostfile );
 			$err = 0;
 			say "The '$name' host was unregistered from zcli";
 		}
@@ -926,19 +1002,41 @@ sub delHost
 sub listHost
 {
 	my $host_name = shift;
+	my $hostfile  = $Global::hosts_path;
 
 	use Config::Tiny;
-	my $Config = Config::Tiny->read( $HOST_FILE );
+	my $Config = Config::Tiny->read( $hostfile );
 
 	return grep ( !/^_$/, keys %{ $Config } );
 }
 
+=begin nd
+Function: hostInfo
+
+	It returns an object with information about the host
+
+Parametes:
+	Host name - It is the name used to identify the host
+
+Returns:
+	Hash ref - Struct with the host info. If the host does not exist, the function will return undef
+		{
+			HOST => 192.168.100.241
+			NAME => devcano
+			PORT => 444
+			ZAPI_KEY => root
+			ZAPI_VERSION => 4.0
+		}
+
+=cut
+
 sub hostInfo
 {
 	my $host_name = shift;
+	my $hostfile  = $Global::hosts_path;
 
 	use Config::Tiny;
-	my $Config = Config::Tiny->read( $HOST_FILE );
+	my $Config = Config::Tiny->read( $hostfile );
 
 	if ( !defined $host_name )
 	{
@@ -958,22 +1056,54 @@ sub hostInfo
 	return $Config->{ $host_name };
 }
 
-sub dev
+=begin nd
+Function: getHttpServerConf
+
+	Looks for in the cherokee configuration file the IP and PORT directives. This is only useful
+	if ZCLI is being executing in the load balancer.
+
+Parametes:
+	none - .
+
+Returns:
+	Array - The array contains two values: 1- the IP for the ZAPI HTTP service, 2- the port for the ZAPI HTTP service
+
+=cut
+
+sub getHttpServerConf
 {
-	my $st  = shift;
-	my $tag = shift;
-	my $lvl = shift // 1;
+	my $confhttp = "/usr/local/zevenet/app/cherokee/etc/cherokee/cherokee.conf";
 
-	chomp ( $st );
+	# read line matching 'server!bind!1!port = 444'
+	my $ip_directive   = 'server!bind!1!interface';
+	my $port_directive = 'server!bind!1!port';
 
-	return if ( $lvl > $Global::DEBUG );
+	my $port = 444;
+	my $ip   = "127.0.0.1";
 
-	say "";
-	say ">>>> Debug >>>> $tag" if $tag;
-	print "$st\n";
-	say "<<<<<<<<<<<<<<< $tag" if $tag;
-	say "";
+	my $params = 0;    # when 2 params have been found
+	open my $fh, "<", "$confhttp";
+	while ( my $line = <$fh> )
+	{
+		if ( $line =~ /^\s*$ip_directive/ )
+		{
+			$params++;
+			my ( undef, $ip ) = split ( "=", $line );
+			$ip =~ s/\s//g;
+			chomp ( $ip );
+		}
+		elsif ( $line =~ /^\s*$port_directive/ )
+		{
+			$params++;
+			( undef, $port ) = split ( "=", $line );
+			$port =~ s/\s//g;
+			chomp ( $port );
+		}
+		last if $params == 2;
+	}
+	close $fh;
 
+	return ( $ip, $port );
 }
 
 =begin nd

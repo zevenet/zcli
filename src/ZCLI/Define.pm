@@ -4,22 +4,30 @@ use strict;
 use warnings;
 
 package Global;
-our $DEBUG = 0;
-our $FIN = ($DEBUG) ? "": "\n";	# This will add the dying line in debug mode
+our $DEBUG = 1;
+our $FIN = ( $DEBUG ) ? "" : "\n";  # This will add the dying line in debug mode
 our $REQ_ZEVEVENET_VERSION = "6.1";
 
+our $config_dir   = "$ENV{HOME}/.zcli";
+our $history_path = "$config_dir/zcli-history";
+our $hosts_path   = "$config_dir/hosts.ini";
 
 package Env;
-our $CONNECTIVITY = 1; 	# It is the result of a connectivity test with the lb
-our $HOST;				# It is the host struct with info to connect with the load balancer
-our $HOST_IDS_TREE;		# It is the tree with the IDs that the load balancer contains
-our $ZCLI;				# It is the object TERM used to implement the autocompletation
-our $ZCLI_CMD_ST;		# It is the ZCLI commands struct used for the TERM module
-# save the last parameter list to avoid repeat the params zapi call for each tab
-my @CMD_PARAMS_DEF = ();
-#~ my $CMD_PARAMS_DEF;		# It is the last parameter object returned by the ZAPI. It is used to autocomplete the command
-my $CMD_STRING = '';	# It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded
+our $CONNECTIVITY = 1;    # It is the result of a connectivity test with the lb
+our $HOST;   # It is the host struct with info to connect with the load balancer
+our
+  $HOST_IDS_TREE;  # It is the tree with the IDs that the load balancer contains
+our $ZCLI_OBJECTS_DEF
+  ;    # It is the the hash with the definition for all the possible commands
+our $ZCLI;        # It is the object TERM used to implement the autocompletation
+our $ZCLI_CMD_ST; # It is the ZCLI commands struct used for the TERM module
+our $ZCLI_OPTIONS;    #
 
+# save the last parameter list to avoid repeat the params zapi call for each tab
+our $CMD_PARAMS_DEF
+  ; # It is the last parameter object returned by the ZAPI. It is used to autocomplete the command
+our $CMD_STRING = ''
+  ; # It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded
 
 package Define;
 
@@ -71,11 +79,11 @@ our %Actions = (
 	TEST            => 'test',             # do a action with a testing purpose
 	MAINTENANCE     => 'maintenance',      # Set a object in maintenance mode
 	NON_MAINTENANCE => 'non_maintenance',  # Unset the maintenance mode of a object
-	APPLY => 'apply',  # Apply an object to the system
-	UPDATE => 'update',  # Apply an object to the system
+	APPLY           => 'apply',            # Apply an object to the system
+	UPDATE          => 'update',           # Apply an object to the system
 
-	RELOAD => 'reload',  # Refresh a item or reload an object
-	QUIT => 'quit',  	# exit from program
+	RELOAD => 'reload',                    # Refresh a item or reload an object
+	QUIT   => 'quit',                      # exit from program
 );
 
 our $UriParamTag =
