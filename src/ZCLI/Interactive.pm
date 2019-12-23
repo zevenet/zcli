@@ -4,6 +4,7 @@ use strict;
 use Data::Dumper;
 use feature "say";
 use POSIX qw(_exit);
+use Storable qw(dclone);
 
 # https://metacpan.org/pod/Term::ShellUI
 use Term::ShellUI;
@@ -52,8 +53,21 @@ sub reload_prompt
 	$Env::ZCLI->prompt( "$color$tag$no_color: " );
 }
 
+sub reload_cmd_struct
+{
+	$Env::CONNECTIVITY = &check_connectivity( $Env::HOST );
+	if ( $Env::CONNECTIVITY )
+	{
+		$Env::HOST_IDS_TREE = &getLBIdsTree( $Env::HOST );
+	}
+	$Env::ZCLI_CMD_ST = &gen_cmd_struct( $Env::HOST_IDS_TREE );
+
+	$Env::ZCLI->commands( $Env::ZCLI_CMD_ST ) if ( defined $Env::ZCLI );
+}
+
 sub gen_cmd_struct
 {
+	my $ids_tree = shift;
 	my $st;
 
 	# features of the lb
@@ -61,7 +75,7 @@ sub gen_cmd_struct
 	{
 		foreach my $cmd ( keys %{ $Objects::Zcli } )
 		{
-			$st->{ $cmd } = &gen_obj( $cmd );
+			$st->{ $cmd } = &gen_obj( $cmd, $ids_tree );
 		}
 	}
 
@@ -85,8 +99,8 @@ sub gen_cmd_struct
 	$st->{ 'zcli' }->{ cmds }->{ $V{ QUIT } }->{ dec } = "Escape from the ZCLI";
 	$st->{ 'zcli' }->{ cmds }->{ $V{ QUIT } }->{ method } =
 	  sub { shift->exit_requested( 1 ); };
-	$st->{ 'zcli' }->{ cmds }->{ $V{ QUIT } }->{ exclude_from_history } = 1;
-	$st->{ 'zcli' }->{ cmds }->{ $V{ QUIT } }->{ maxargs }              = 0;
+	$st->{ 'zcli' }->{ cmds }->{ $V{ 'QUIT' } }->{ exclude_from_history } = 1;
+	$st->{ 'zcli' }->{ cmds }->{ $V{ QUIT } }->{ maxargs } = 0;
 
 	my $host_st;
 	my @host_list = &listHost();
@@ -111,7 +125,7 @@ sub gen_cmd_struct
 	};
 	$host_st->{ $V{ DELETE } } = {
 		proc => sub {
-			if ( $Env::HOST->{ name } eq @_[0] )
+			if ( $Env::HOST->{ name } eq $_[0] )
 			{
 				say "The '$Env::HOST->{NAME}' host is being used";
 			}
@@ -140,273 +154,59 @@ sub gen_cmd_struct
 	return $st;
 }
 
+=begin nd
+Function: gen_obj
+
+	It creates the command tree of an object. Modify the Object::Zcli adding it the required IDs.
+	This function uses add_ids to implement the IDs autocompletation.
+
+Parametes:
+	object - Object name is being implemented
+
+Returns:
+	Hash string - It returns the command struct used for Term for all actions of an 'object'
+
+=cut
+
 sub gen_obj
 {
-	my $obj = shift;
-	my $def;
+	my $obj_name = shift;
+	my $id_tree  = shift;
 
-	foreach my $action ( keys %{ $Objects::Zcli->{ $obj } } )
+	# copy the Zcli object.
+	# $Objects::Zcli will be used as template and it won't be modified
+	# the object_struct will be expanded.
+	my $object_struct = dclone( $Objects::Zcli );
+
+	foreach my $action ( keys %{ $object_struct->{ $obj_name } } )
 	{
-		my @ids_def = &getIds( $Objects::Zcli->{ $obj }->{ $action }->{ uri } );
-		$Objects::Zcli->{ $obj }->{ $action }->{ ids } = \@ids_def;
-		$def->{ cmds }->{ $action } =
-		  &add_ids( $obj, $action, $Objects::Zcli->{ $obj }->{ $action }->{ uri },
-					$Env::HOST_IDS_TREE );
+		my $cmd;
+		my $obj_def = $object_struct->{ $obj_name }->{ $action };
+		my @ids_def = &getIds( $obj_def->{ uri } );
+
+		# complete the definition
+		$obj_def->{ ids }    = \@ids_def;
+		$obj_def->{ object } = $obj_name;
+		$obj_def->{ action } = $action;
+
+		# create the Term struct
+		$cmd->{ desc } = &desc_cb( $obj_def );
+		$cmd->{ proc } = sub { &proc_cb( $obj_def, @_ ); };
+		$cmd->{ args } = sub { &args_cb( @_, $obj_def, $id_tree ); };
+
+		$object_struct->{ cmds }->{ $action } = $cmd;
 	}
 
-	return $def;
+	return $object_struct;
 }
 
-# recursive
-sub add_ids
+sub desc_cb
 {
-	my $obj         = shift;
-	my $action      = shift;
-	my $url         = shift;
-	my $id_tree     = shift;
-	my $id_list_ref = shift // [];
-	my @id_list     = @{ $id_list_ref };
-
-	my $def;
-
-	# replaceUrl
-	if ( $url =~ /([^\<]+)\<([\w -]+)\>/ )
-	{
-		my $first_url = $1;    # obtiene hasta la primera key
-		my $key       = $2;
-
-		my @keys_list = split ( '/', $first_url );
-		shift @keys_list;      # elimina el primer elemento, ya que empieza por /
-
-		my @values;
-		my $tree = $id_tree;
-		foreach my $k ( @keys_list )
-		{
-			$tree = $tree->{ $k };
-		}
-		@values = keys %{ $tree };
-
-		$def->{ desc } = &create_description( $Objects::Zcli, $obj, $action );
-
-		if ( !@values )
-		{
-			my $msg = "This object '$id_list[-1]' is not using the feature '$key'\n";
-			$def->{ proc } = sub {
-				print ( "$msg" );
-			};
-		}
-		else
-		{
-			foreach my $id ( @values )
-			{
-				my $sub_url = $url;
-
-				my @id_join = @id_list;
-				push @id_join, $id;
-
-				unless ( $sub_url =~ s/\<[\w -]+\>/$id/ )
-				{
-					print "The id '$key' could not be replaced";
-					my $FIN = $Define::FIN;
-				}
-
-				my @id_join = $def->{ cmds }->{ $id } =
-				  &add_ids( $obj, $action, $sub_url, $id_tree, \@id_join );
-			}
-		}
-	}
-
-	# apply
-	else
-	{
-		$def = &gen_act( $obj, $action, \@id_list );
-	}
-
-	return $def;
-}
-
-sub gen_act
-{
-	my $obj     = shift;
-	my $act     = shift;
-	my $ids     = shift;
-	my $ids_def = $Objects::Zcli->{ $obj }->{ $act }->{ ids };
-	my $def;
-	my $call;
-
-	# add description
-	$def->{ desc } = $def->{ desc } =
-	  &create_description( $Objects::Zcli, $obj, $act );
-
-	my @in_args = ();
-	if ( exists $Objects::Zcli->{ $obj }->{ $act }->{ 'uri_param' } )
-	{
-		foreach my $p ( @{ $Objects::Zcli->{ $obj }->{ $act }->{ 'uri_param' } } )
-		{
-			push @in_args, "<$p->{name}>";
-		}
-		$def->{ args }    = \@in_args;
-		$def->{ maxargs } = scalar @in_args;
-	}
-
-	# check if the call is expecting a file name to upload or download
-	if (    exists $Objects::Zcli->{ $obj }->{ $act }->{ 'download_file' }
-		 or exists $Objects::Zcli->{ $obj }->{ $act }->{ 'upload_file' } )
-	{
-		push @in_args, sub { shift->complete_files( @_ ); };
-		$def->{ args }    = \@in_args;
-		$def->{ maxargs } = scalar @in_args;
-	}
-
-	elsif ( $Objects::Zcli->{ $obj }->{ $act }->{ method } =~ /POST|PUT/ )
-	{
-		# comprobar si objeto ya tiene cargado los posibles parametros.
-		#  ???? pueden faltar parametros de uri
-		$def->{ args } = sub {
-			&complete_body_params( @_, $Objects::Zcli->{ $obj }->{ $act },
-								   $obj, $act, $ids );
-		};
-	}
-
-	$def->{ proc } = sub {
-		my $resp;
-		eval {
-
-			$Env::CMD_STRING = "";    # clean string
-
-			my @args = ( $Objects::Zcli->{ $obj }->{ $act }, $obj, $act, @{ $ids }, @_ );
-
-			say "args";
-			print Dumper \@args;
-
-			my $input = &parseInput( @args );
-
-			say "parsed";
-			print Dumper $input;
-
-			my $request =
-			  &checkInput( $Objects::Zcli, $input, $Env::HOST, $Env::HOST_IDS_TREE );
-
-			say "request";
-			print Dumper $request;
-
-			$resp = &zapi( $request, $Env::HOST );
-			&printOutput( $resp );
-			$Env::ZCLI->save_history();
-
-			# reload structs
-			&reload_cmd_struct();
-		};
-		say $@ if $@;
-		my $err = ( $@ or $resp->{ err } ) ? 1 : 0;
-		&reload_prompt( $err );
-
-		# ???? $self->exit_requested($opt->{silence});
-		#~ POSIX::_exit( $resp->{err} );
-	};
-
-	return $def;
-}
-
-sub complete_body_params
-{
-	my ( undef, $input, $obj_def, $obj, $act, $ids ) = @_;
-
-	my $clean_tag = "''";
-	my $out;
-
-	# Get the last parameter struct
-	my $p_obj = $Env::CMD_PARAMS_DEF;
-
-	# command that is being executing
-	my $cmd_string = "$obj $act";
-
-	# list of used arguments
-	my @params_used = @{ $input->{ args } };
-
-	# get the previous completed parameter that was used
-	my $previus_param = $params_used[$input->{ argno } - 1];
-	$previus_param =~ s/^-//;
-
-	# get list or refreshing the parameters list
-	if ( $Env::CMD_STRING eq '' or $Env::CMD_STRING ne $cmd_string )
-	{
-		$Env::ZCLI->completemsg( "  ## Refreshing params\n" ) if ( $Global::DEBUG );
-		$p_obj = &listParams( $obj_def, $obj, $act, $ids, $Env::HOST );
-
-		# refresh values
-		$Env::CMD_STRING     = $cmd_string;
-		$Env::CMD_PARAMS_DEF = $p_obj;
-	}
-
-	# manage the 'value' of the parameter
-	if ( exists $p_obj->{ $previus_param } )
-	{
-		my $p_def = $p_obj->{ $previus_param };
-
-		# list the possible values
-		if ( exists $p_def->{ possible_values } )
-		{
-			$out = $p_def->{ possible_values };
-			push @{ $out }, "<$clean_tag>" if ( exists $p_def->{ blank } );
-		}
-		else
-		{
-			$out =
-			  ( exists $p_def->{ blank } )
-			  ? "<$previus_param|$clean_tag>"
-			  : "<$previus_param>";
-		}
-	}
-
-	# manage the 'key' of the parameter
-	else
-	{
-		# remove the parameters already exists
-		my @params = ();
-		foreach my $p ( keys %{ $p_obj } )
-		{
-			# not show the parameters that are predefined
-			next if ( exists $Objects::Zcli->{ $obj }->{ $act }->{ params }->{ $p } );
-
-			push @params, "-$p" if ( !grep ( /^-$p$/, @params_used ) );
-		}
-
-		# all parameters has been used
-		if ( !@params )
-		{
-			@params = ();
-			$Env::ZCLI->completemsg( "  ## This command does not expect more parameters\n" )
-			  if ( $Global::DEBUG );
-		}
-
-		$out = \@params;
-	}
-
-	return $out;
-}
-
-sub reload_cmd_struct
-{
-	$Env::CONNECTIVITY = &check_connectivity( $Env::HOST );
-	if ( $Env::CONNECTIVITY )
-	{
-		$Env::HOST_IDS_TREE = &getLBIdsTree( $Env::HOST );
-	}
-	$Env::ZCLI_CMD_ST = &gen_cmd_struct();
-
-	$Env::ZCLI->commands( $Env::ZCLI_CMD_ST ) if ( defined $Env::ZCLI );
-}
-
-sub create_description
-{
-	my $object_st = shift;
-	my $obj       = shift;
-	my $act       = shift;
+	my $def = shift;
+	my $obj = $def->{ object };
+	my $act = $def->{ action };
 
 	return "$obj" if not defined $act;
-
-	my $def = $object_st->{ $obj }->{ $act };
 
 	# action object @ids @uri_param @file @params
 	my $msg    = "$obj $act";
@@ -431,7 +231,7 @@ sub create_description
 		$msg .= " <file_path>";
 		$params = 0;
 	}
-	if (     $def->{ method } =~ /^POST|PUT$/
+	if (     $def->{ method } =~ /^(POST|PUT)$/
 		 and not exists $def->{ params }
 		 and $params )
 	{
@@ -439,6 +239,209 @@ sub create_description
 	}
 
 	return $msg;
+}
+
+sub proc_cb
+{
+	my $obj_def = shift;
+
+	my $resp;
+	eval {
+		$Env::CMD_STRING = "";    # clean string
+
+		# puede que haya que añadirle mensajes de error si hay errores en el parsing
+		my ( $input_parsed, $next_arg, $success ) =
+		  &parseInput( $obj_def, 0, $obj_def->{ object }, $obj_def->{ action }, @_ );
+
+		unless ( $success )
+		{
+			say "Some parameters are missing";
+			die $FIN;
+		}
+
+		my $request =
+		  &createZapiRequest( $obj_def, $input_parsed, $Env::HOST,
+							  $Env::HOST_IDS_TREE );
+
+		$resp = &zapi( $request, $Env::HOST );
+		&printOutput( $resp );
+		$Env::ZCLI->save_history();
+
+		# reload structs
+		&reload_cmd_struct();
+	};
+	say $@ if $@;
+	my $err = ( $@ or $resp->{ err } ) ? 1 : 0;
+	&reload_prompt( $err );
+}
+
+# [ids list] [ids_params list] [file_upload|download] [body_params list]
+sub args_cb
+{
+	my ( undef, $input, $obj_def, $id_tree ) = @_;
+	my $possible_values = [];
+
+	# 'args' is the list of arguments used
+	# 'argno' is the number of arguments used
+
+	# list of used arguments
+	my @args_used = @{ $input->{ args } };
+
+	# get the previous completed parameter that was used
+	my $arg_previus = $args_used[$input->{ argno } - 1];
+
+	my ( $args_parsed, $next_arg ) =
+	  &parseInput( $obj_def, 1,
+				   $obj_def->{ object },
+				   $obj_def->{ action }, @args_used );
+
+	$Env::ZCLI->completemsg( "  ## getting '$next_arg'\n" ) if ( $Global::DEBUG );
+
+	if ( $next_arg eq 'id' )
+	{
+		$possible_values = &get_next_id( $obj_def, $id_tree, $args_parsed->{ id } );
+	}
+	elsif ( $next_arg eq 'uri_params' )
+	{
+		my $uri_index = scalar @{ $args_parsed->{ uri_param } };
+		$possible_values = "<$obj_def->{uri_param}->[$uri_index]->{name}>";
+
+		# say "$obj_def->{uri_param}->[$uri_index]->{desc}";
+	}
+	elsif ( $next_arg =~ /file/ )
+	{
+		$possible_values = shift->complete_files( $input );
+	}
+
+	elsif ( $next_arg eq 'body_params' )
+	{
+		$possible_values =
+		  &complete_body_params( $obj_def, $args_parsed, \@args_used, $arg_previus );
+	}
+
+	# fin
+	else
+	{
+		$possible_values = [];
+	}
+
+	return $possible_values;
+}
+
+sub complete_body_params
+{
+	my ( $obj_def, $args_parsed, $args_used, $arg_previus ) = @_;
+	my $out;
+
+	# Get the last parameter struct
+	my $p_obj = $Env::CMD_PARAMS_DEF;
+
+	# command that is being executing
+	my $cmd_string = "$obj_def->{object} $obj_def->{action}";
+
+	# get the previous completed parameter that was used
+	my $previus_param = $arg_previus;
+	$previus_param =~ s/^-//;
+
+	# get list or refreshing the parameters list
+	if ( $Env::CMD_STRING eq '' or $Env::CMD_STRING ne $cmd_string )
+	{
+		$Env::ZCLI->completemsg( "  ## Refreshing params\n" ) if ( $Global::DEBUG );
+		$p_obj = &listParams( $obj_def, $args_parsed, $Env::HOST );
+
+		# refresh values
+		$Env::CMD_STRING     = $cmd_string;
+		$Env::CMD_PARAMS_DEF = $p_obj;
+	}
+
+	$Env::ZCLI->completemsg( "  ## prev: $p_obj->{ $previus_param }\n" )
+	  if ( $Global::DEBUG );
+
+	# manage the 'value' of the parameter
+	if ( exists $p_obj->{ $previus_param } )
+	{
+		$Env::ZCLI->completemsg( "  ## getting value\n" ) if ( $Global::DEBUG );
+		my $p_def = $p_obj->{ $previus_param };
+
+		# list the possible values
+		if ( exists $p_def->{ possible_values } )
+		{
+			$out = $p_def->{ possible_values };
+		}
+		else
+		{
+			$out = "<$previus_param>";
+		}
+	}
+
+	# manage the 'key' of the parameter
+	else
+	{
+		$Env::ZCLI->completemsg( "  ## getting key\n" ) if ( $Global::DEBUG );
+
+		# remove the parameters already exists
+		my @params = ();
+		foreach my $p ( keys %{ $p_obj } )
+		{
+			# not show the parameters that are predefined
+			next if ( exists $obj_def->{ params }->{ $p } );
+
+			push @params, "-$p" if ( !grep ( /^-$p$/, @{ $args_used } ) );
+		}
+
+		# all parameters has been used
+		if ( !@params )
+		{
+			@params = ();
+			$Env::ZCLI->completemsg( "  ## This command does not expect more parameters\n" )
+			  if ( $Global::DEBUG );
+		}
+
+		$out = \@params;
+	}
+
+	return $out;
+}
+
+sub get_next_id
+{
+	my $obj_def = shift;
+	my $id_tree = shift;
+	my $args    = shift;    # input arguments
+
+	my @possible_values = ();
+	my $url             = $obj_def->{ uri };    # copy data from def
+
+	# replace the obtained ids untill getting the next arg key
+	$url = &replaceUrl( $url, $args );
+
+	# getting next args
+	if ( $url =~ /([^\<]+)\<([\w -]+)\>/ )
+	{
+		my $sub_url = $1;    # Getting the url keys to be used in the IDs tree
+		my $key     = $2;
+
+		my @keys_list = split ( '/', $sub_url );
+		shift
+		  @keys_list; # Remove the first item, because url begins with the character '/'
+
+		my $nav_tree = $id_tree;
+		foreach my $k ( @keys_list )
+		{
+			$nav_tree = $nav_tree->{ $k };
+		}
+
+		my @values = keys %{ $nav_tree };
+		if ( !@values )
+		{
+			my $msg = "This object is not using the feature '$key'\n";
+			$Env::ZCLI->completemsg( "  ## $msg\n" ) if ( $Global::DEBUG );
+		}
+
+		return \@values;
+	}
+
+	return [];
 }
 
 1;

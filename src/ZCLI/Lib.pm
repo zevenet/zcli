@@ -10,8 +10,7 @@ use Storable qw(dclone);
 use ZCLI::Define;
 use ZCLI::Objects;
 
-my $DEBUG = $Define::DEBUG;
-my $FIN   = $Define::FIN;
+my $FIN = $Define::FIN;
 
 ## Global functions
 
@@ -46,21 +45,6 @@ sub dev
 	say "<<<<<<<<<<<<<<< $tag" if $tag;
 	say "";
 }
-
-=begin nd
-Function: dev
-
-	Function to print debug messages.
-
-Parametes:
-	String - String to print. Use 'Dumper($ref)' to print the value of a reference
-	Tag - Short message to wrap the message
-	lvl - The minimum log level to print the message
-
-Returns:
-	none - .
-
-=cut
 
 sub printHelp
 {
@@ -118,17 +102,79 @@ sub printHelp
 # -h,  host, cambia el host destinatario de la peticion. Añadir opcion para mandar a varios hosts a la vez
 }
 
+=begin nd
+Function: replaceUrl
+
+	It replaces the url id for the url of a definition objects that contains the tags "<keys>".
+	If the number of arguments is minor than the tags, the returned url won't be totally replaced.
+
+Parametes:
+	Url - It is an string with the tags "<tag_name>". For example: "/farms/<farmname>/services/<service>/backends"
+	Arguments - It is an array reference with a list of sorted values to replace in the original URL.
+
+Returns:
+	String - It returns a string with the url replaced
+
+=cut
+
+sub replaceUrl
+{
+	my $url  = shift;
+	my $args = shift;
+
+	my $index = -1;
+	foreach my $arg ( @{ $args } )
+	{
+		$index++;
+		unless ( $url =~ s/\<[\w -]+\>/$arg/ )
+		{
+			print "The id '$index' could not be replaced";
+			die $Define::FIN;
+		}
+	}
+
+	return $url;
+}
+
 ## Objects definitions
 
-## Parse args
+=begin nd
+Function: parseInput
 
-# pedir parametros de la uri
-# preguntar por los objetos
-# preguntar por los posibles valores
+	It receives a ZCLI command line and parse the arguments creating a hash
+	with the obtained information.
+
+Parametes:
+	Object definition - It is a object hash with the parameters that defines a zapi call
+	Arguments - It is an array wih the command line arguments
+
+Returns:
+	Array - The first position is a hash with the arguments grouped by type.
+			The second position is an string with the folloing kind of required argument.
+
+=cut
+
 sub parseInput
 {
-	my $def  = shift;
-	my @args = @_;
+	my $def          = shift;
+	my $autocomplete = shift;    # 'autocomplete' = 1, 'check' = 0
+	my @args         = @_;
+
+	die "The variable 'autocomplete' in the function 'parseInput is invalid"
+	  if ( $autocomplete != 0 and $autocomplete != 1 );
+
+	my $steps = {
+				  uri_id        => 'id',
+				  uri_param     => 'uri_params',
+				  download_file => 'download_file',
+				  upload_file   => 'upload_file',
+				  body_params   => 'body_params',
+				  end           => 'end',
+	};
+	my $parsed_completed = 0;
+
+	# remove the last item if it is blank
+	pop @args if ( $autocomplete );
 
 	my $input = {
 				  object        => shift @args,
@@ -140,67 +186,110 @@ sub parseInput
 				  params        => undef,
 	};
 
+	# adding uri ids
 	for ( @{ $def->{ ids } } )
 	{
 		my $id = shift @args;
-		push @{ $input->{ id } }, $id;
+		if ( defined $id )
+		{
+			push @{ $input->{ id } }, $id;
+		}
+		else
+		{
+			return ( $input, $steps->{ uri_id }, $parsed_completed );
+		}
 	}
 
 	# adding uri parameters
 	if ( exists $def->{ uri_param } )
 	{
+		my $tag = $Define::UriParamTag;
 		my $uri = $def->{ uri };
 		foreach my $p ( @{ $def->{ uri_param } } )
 		{
 			my $val = shift @args;
-			my $tag = $Define::UriParamTag;
-			if ( $uri =~ s/$tag/$val/ )
+			if ( defined $val )
 			{
-				push @{ $input->{ uri_param } }, $val;
+				if ( $uri =~ s/$tag/$val/ )
+				{
+					push @{ $input->{ uri_param } }, $val;
+				}
+				else
+				{
+					die $FIN;
+				}
 			}
 			else
 			{
-				print "This command expects $p->{name}, $p->{desc}";
-				die $FIN;
+				#print "This command expects $p->{name}, $p->{desc}\n";
+				return ( $input, $steps->{ uri_param }, $parsed_completed );
 			}
 		}
 	}
 
 	# check if the call is expecting a file name to upload or download
-	$input->{ download_file } = shift @args if ( exists $def->{ 'download_file' } );
-	$input->{ upload_file }   = shift @args if ( exists $def->{ 'upload_file' } );
-
-	# json params
-	my $param_flag = 0;
-	my $index      = 0;
-	for ( my $ind = 0 ; $ind <= $#args ; $ind++ )
+	if ( exists $def->{ 'download_file' } )
 	{
-		# The value ';' is used to finish the current zcli command
-		if ( $args[$ind] eq ';' )
+		my $val = shift @args;
+		if ( defined $val )
 		{
-			next;
+			$input->{ download_file } = $val;
 		}
-		elsif ( $args[$ind] =~ s/^\-// )
+		else
 		{
-			$param_flag = 1;
-			my $key = $args[$ind];
-			my $val = $args[$ind + 1];
-			$ind++;
+			return ( $input, $steps->{ download_file }, $parsed_completed );
+		}
+	}
+	elsif ( exists $def->{ 'upload_file' } )
+	{
+		my $val = shift @args;
+		if ( defined $val )
+		{
+			$input->{ upload_file } = $val;
+		}
+		else
+		{
+			return ( $input, $steps->{ upload_file }, $parsed_completed );
+		}
+	}
 
-			$input->{ params }->{ $key } = $val;
-		}
-		elsif ( $param_flag )
+	$parsed_completed = 1;
+	my $final_step = $steps->{ end };
+
+	if (     !exists $def->{ 'upload_file' }
+		 and !exists $def->{ 'download_file' }
+		 and $def->{ method } =~ /POST|PUT/ )
+	{
+		$parsed_completed = 1;
+		$final_step       = $steps->{ body_params };
+
+		# json params
+		my $param_flag = 0;
+		my $index      = 0;
+		for ( my $ind = 0 ; $ind <= $#args ; $ind++ )
 		{
-			print
-			  "Error parsing the parameters. The parameters have to have the following format:\n";
-			print "   -param1-name param1-value -param2-name param2-value";
-			die $FIN;
+			if ( $args[$ind] =~ s/^\-// )
+			{
+				$param_flag = 1;
+				my $key = $args[$ind];
+				my $val = $args[$ind + 1];
+				$ind++;
+
+				$input->{ params }->{ $key } = $val;
+			}
+			elsif ( $param_flag )
+			{
+				$parsed_completed = 0;
+				print
+				  "Error parsing the parameters. The parameters have to have the following format:\n";
+				print "   -param1-name param1-value -param2-name param2-value";
+				return ( $input, $final_step, $parsed_completed );
+			}
 		}
 	}
 
 	&dev( Dumper( $input ), 'input parsed', 2 );
-
-	return $input;
+	return ( $input, $final_step, $parsed_completed );
 }
 
 sub parseOptions
@@ -244,79 +333,32 @@ sub parseOptions
 	return $opt_st;
 }
 
-## Validate args
+=begin nd
+Function: createZapiRequest
 
-sub checkInput
+	It creates an zapi definition object from a ZCLI definition object.
+	First it copies de object and next replace some values from the input.
+	It uses the parameters that were previously parsed
+
+Parametes:
+	Object definition - It is a object hash with the parameters that defines a zapi call
+	Argument parsed - It is a hash with the information parsed and gruped by type
+
+Returns:
+	Hash ref - Is the zcli object updated with the info to do the zapi request
+
+=cut
+
+sub createZapiRequest
 {
-	my $obj   = shift;
+	my $def   = shift;
 	my $input = shift;
-	my $host  = shift;
-	my $def;
-	my %call;
 
-	# getting OBJECT
-	$def = $obj->{ $input->{ object } };
-	if ( !defined $def )
-	{
-		my @keys = keys %{ $obj };
-		my $join = join ( ', ', @keys );
-		if ( $input->{ object } )
-		{
-			print "The object '$input->{object}' is not valid";
-		}
-		else
-		{
-			print "No object was selected";
-		}
-		print ", please, try with: \n\t> ";
-		print $join;
-		print "\n";
-		die $FIN;
-	}
-
-	# getting ACTION
-	my $act_def = $def;
-	$def = $def->{ $input->{ action } };
-	if ( !defined $def )
-	{
-		my @keys = keys %{ $act_def };
-		my $join = join ( ', ', @keys );
-		if ( $input->{ action } )
-		{
-			print "The action '$input->{action}' is not valid";
-		}
-		else
-		{
-			print "No action was selected";
-		}
-		print ", please, try with: \n\t> ";
-		print $join;
-		print "\n";
-		die $FIN;
-	}
+	my %call_obj = %{ $def };
+	my $call     = \%call_obj;
 
 	# getting IDs
-	{
-		%call = %{ $def };
-
-		my @ids = @{ $input->{ id } };
-
-		foreach my $id ( @ids )
-		{
-			unless ( $call{ uri } =~ s/\<[\w -]+\>/$id/ )
-			{
-				print "The id '$id' was not expected\n";
-				die $FIN;
-			}
-		}
-
-		# error si falta algun id por sustituir
-		if ( $call{ uri } =~ /\<([\w -]+)\>/ )
-		{
-			print "The id '$1' was not set";
-			die $FIN;
-		}
-	}
+	$call->{ uri } = &replaceUrl( $def->{ uri }, $input->{ id } );
 
 	# getting uri parameters
 	if ( exists $def->{ uri_param } )
@@ -324,7 +366,7 @@ sub checkInput
 		my $tag = $Define::UriParamTag;
 		foreach my $p ( @{ $input->{ uri_param } } )
 		{
-			unless ( $call{ uri } =~ s/$tag/$p/ )
+			unless ( $call->{ uri } =~ s/$tag/$p/ )
 			{
 				print "Error replacing the param '$p'";
 				die $FIN;
@@ -333,58 +375,34 @@ sub checkInput
 	}
 
 	# getting upload file
-	if ( exists $call{ upload_file } )
+	if ( exists $call->{ upload_file } )
 	{
-		if ( !defined $input->{ upload_file } )
-		{
-			print "The file name to upload is not set";
-			die $FIN;
-		}
-		if ( !-e $input->{ upload_file } )
-		{
-			print "The file '$input->{upload_file}' does not exist";
-			die $FIN;
-		}
-		$call{ upload_file } = $input->{ upload_file };
+		$call->{ upload_file } = $input->{ upload_file };
 	}
 
 	# getting download file
-	if ( exists $call{ download_file } )
+	if ( exists $call->{ download_file } )
 	{
-		if ( !defined $input->{ download_file } )
-		{
-			print "The file name to save the download is not set";
-			die $FIN;
-		}
-		if ( -e $input->{ download_file } )
-		{
-			print "The file '$input->{download_file}' already exist, select another name";
-			die $FIN;
-		}
-		$call{ download_file } = $input->{ download_file };
+		$call->{ download_file } = $input->{ download_file };
 	}
 
 	# get PARAMS
-	if ( ( $call{ method } eq 'POST' or $call{ method } eq 'PUT' )
-		 and !exists $call{ download_file }
-		 or $call{ upload_file } )
+	if ( ( $call->{ method } eq 'POST' or $call->{ method } eq 'PUT' )
+		 and !exists $call->{ download_file }
+		 or $call->{ upload_file } )
 	{
-		say "?????? montando params";
-
-		if ( exists $def->{ params } )
+		if ( exists $input->{ params } )
 		{
-			$call{ params } = $def->{ params };
-		}
-
-		else
-		{
-			$call{ params } = $input->{ params };
+			foreach my $p ( keys %{ $input->{ params } } )
+			{
+				$call->{ params }->{ $p } = $input->{ params }->{ $p };
+			}
 		}
 	}
 
-	&dev( Dumper( \%call ), "request sumary", 2 );
+	&dev( Dumper( $call ), "request sumary", 2 );
 
-	return \%call;
+	return $call;
 }
 
 sub checkUriParams
@@ -668,17 +686,14 @@ Returns:
 
 sub listParams
 {
-	my ( $obj_def, $obj, $act, $ids, $host ) = @_;
-
-	my @args = ( $obj, $act, @{ $ids } );
+	my ( $obj_def, $args_parsed, $host ) = @_;
 
 	# remove predefined values
-	my $predef_params = $Objects::Zcli->{ $obj }->{ $act }->{ params };
-	delete $Objects::Zcli->{ $obj }->{ $act }->{ params };
+	my $predef_params = $obj_def->{ params };
+	delete $obj_def->{ params };
 
-	my $in_parsed = &parseInput( $Objects::Zcli->{ $obj }->{ $act }, @args );
 	my $request =
-	  &checkInput( $Objects::Zcli, $in_parsed, $host, $Env::HOST_IDS_TREE );
+	  &createZapiRequest( $obj_def, $args_parsed, $host, $Env::HOST_IDS_TREE );
 
 	my $params_ref = &zapi( $request, $host )->{ json }->{ params };
 
@@ -704,23 +719,15 @@ sub listParams
 	#		 ]
 
 	# set again the predefined parameters
-	$Objects::Zcli->{ $obj }->{ $act }->{ params } = $predef_params;
+	$obj_def->{ params } = $predef_params if ( defined $predef_params );
 
 	$Env::CMD_PARAMS_DEF = {};
 	foreach my $p ( @{ $params_ref } )
 	{
+		$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ exist } = 1;
 		$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ possible_values } =
 		  $p->{ possible_values }
 		  if ( exists $p->{ possible_values } );
-
-		my $blank = ( !( exists $p->{ regex } and exists $p->{ format } ) ) ? 1 : 0;
-		$blank = 1
-		  if (
-			   $blank
-			   and ( !exists $p->{ non_blank }
-					 or ( exists $p->{ non_blank } and $p->{ non_blank } eq 'false' ) )
-		  );
-		$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ blank } = 1 if ( $blank );
 	}
 
 	return $Env::CMD_PARAMS_DEF;
@@ -1167,7 +1174,7 @@ sub check_is_lb
 	  'dpkg -l |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3 2>/dev/null';
 	my $version = `$cmd`;
 
-	return ( !$version or $version < $Define::REQUIRED_ZEVEVENET_VERSION ) ? 0 : 1;
+	return ( !$version or $version < $Global::REQ_ZEVEVENET_VERSION ) ? 0 : 1;
 }
 
 1;

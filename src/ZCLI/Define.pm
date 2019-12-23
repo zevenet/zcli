@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Global;
-our $DEBUG = 1;
+our $DEBUG = 0;
 our $FIN = ( $DEBUG ) ? "" : "\n";  # This will add the dying line in debug mode
 our $REQ_ZEVEVENET_VERSION = "6.1";
 

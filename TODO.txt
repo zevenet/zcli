@@ -41,7 +41,7 @@
 									'values'    => ["drain", "cut"],
 			};
 		}
-
+- Obtener Edicion (Enterprise o community) y quitar comandos de la EE
 
 
 --- TAREAS DE FORMATO ---
