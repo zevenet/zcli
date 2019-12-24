@@ -4,3 +4,9 @@ src/hosts.ini
 packages/
 workdir/
 /zcli
+
+src/.vscode/
+src/.vstags
+
+.vstags
+vscode.workspace.code-workspace

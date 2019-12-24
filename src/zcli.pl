@@ -21,7 +21,6 @@ my $zcli_dir     = $Global::config_dir;
 my $zcli_history = $Global::history_path;
 
 # overriding error method
-#*{ Term::ShellUI::error } = sub {
 *Term::ShellUI::error = sub {
 	say "$_[1]";
 	&reload_prompt( 1 );

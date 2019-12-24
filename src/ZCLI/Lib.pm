@@ -46,11 +46,21 @@ sub dev
 	say "";
 }
 
+=begin nd
+Function: printHelp
+
+	It prints the help
+
+Parametes:
+	none - .
+
+Returns:
+	none - .
+
+=cut
+
 sub printHelp
 {
-	my $executed = shift
-	  // 0;    # 1 when the help is printed for command line invocation
-
 	print "\n";
 	print
 	  "ZCLI can be executed with the following options (the options are available at the moment of the invocation):\n";
@@ -105,7 +115,7 @@ sub printHelp
 =begin nd
 Function: replaceUrl
 
-	It replaces the url id for the url of a definition objects that contains the tags "<keys>".
+	It replaces the url ids in the url of the request definition that contains the tags "<keys>".
 	If the number of arguments is minor than the tags, the returned url won't be totally replaced.
 
 Parametes:
@@ -141,16 +151,24 @@ sub replaceUrl
 =begin nd
 Function: parseInput
 
-	It receives a ZCLI command line and parse the arguments creating a hash
+	It receives a ZCLI command line and it parses the arguments creating a hash
 	with the obtained information.
 
+	The autocomplete flag is used to parse the input commands in the autocomplete step.
+	For this task, the last argument is remove to get again the list of possible values for that item.
+
+	The parse is done always following the same order. The order or the command arguments are:
+	zcli [object] [action] [ids list] [ids_params list] [file_upload|download] [body_params lists]
+
 Parametes:
-	Object definition - It is a object hash with the parameters that defines a zapi call
-	Arguments - It is an array wih the command line arguments
+	Object definition - It is a object hash with the parameters that defines a zapi call.
+	Autocomplete - It is a flag to parses the arguments in the autocomplete step or when the zapi request is going to be done. The possible values are 1 or 0.
+	Arguments - The rest of parameters are the input command arguments, the first one must be the 'object', next the 'action' and following the others arguments (IDS, uri_params, files and body_params).
 
 Returns:
 	Array - The first position is a hash with the arguments grouped by type.
-			The second position is an string with the folloing kind of required argument.
+			The second position is an string with the key of the folloing kind of required argument.
+			The third position is a flag to return if the command was totally parsed. It the case than the command accepts body_params, the last phase will be the 'body_params'.
 
 =cut
 
@@ -292,6 +310,26 @@ sub parseInput
 	return ( $input, $final_step, $parsed_completed );
 }
 
+=begin nd
+Function: parseOptions
+
+	It receives the ZCLI command line arguments, parse the options and remove them
+	from the list of arguments.
+	The options are the arguments that are following the zcli program name and using the tag '-'.
+
+Parametes:
+	args - It is an array ref with the list of arguments.
+
+Returns:
+	Hash ref - It is a hash with the options parsed. The possible keys are:
+		{
+			help => 1,
+			silence => 1,
+			host => localhost,
+		};
+
+=cut
+
 sub parseOptions
 {
 	my $args   = $_[0];
@@ -336,16 +374,16 @@ sub parseOptions
 =begin nd
 Function: createZapiRequest
 
-	It creates an zapi definition object from a ZCLI definition object.
-	First it copies de object and next replace some values from the input.
+	It creates an zapi request object from a ZCLI definition object.
+	First it copies de object and next replaces some values from the input.
 	It uses the parameters that were previously parsed
 
 Parametes:
-	Object definition - It is a object hash with the parameters that defines a zapi call
-	Argument parsed - It is a hash with the information parsed and gruped by type
+	Object definition - It is an object hash with the parameters that defines a zapi call.
+	Argument parsed - It is a hash with the input information parsed and grouped by type.
 
 Returns:
-	Hash ref - Is the zcli object updated with the info to do the zapi request
+	Hash ref - Is the zcli object updated with the info to do the zapi request.
 
 =cut
 
@@ -405,34 +443,13 @@ sub createZapiRequest
 	return $call;
 }
 
-sub checkUriParams
-{
-	my $uri_param = shift;
-	my @params    = @_;
-	my @p_out;
-	if ( defined $uri_param )
-	{
-		foreach my $p ( @{ $uri_param } )
-		{
-			my $val = shift @params;
-			my $tag = $Define::UriParamTag;
-			unless ( $uri_param =~ s/$tag/$val/ )
-			{
-				push @p_out, undef;
-				print "This command expects $p->{name}, $p->{desc}\n";
-			}
-		}
-	}
-	return @p_out;
-}
-
 =begin nd
 Function: getLBIdsTree
 
-	Gets and modify te load balancer IDs tree to adapt it to ZCLI.
+	It gets and modifies the load balancer IDs tree to adapt it to ZCLI. This tree is used to the autocomplete feature of the IDs
 
 Parametes:
-	Host - It is a reference to a host object that contains the information about connecting with the load balancer
+	Host - It is a reference to a host object that contains the information about connecting with the load balancer.
 
 Returns:
 	Hash ref - It is a hash with the IDs tree
@@ -461,31 +478,12 @@ sub getLBIdsTree
 	return $tree;
 }
 
-sub getIdValues
-{
-	my $tree     = shift;    # arbol de keys, va comprobandose recursivamente
-	my $keys_arr = shift;    # claves que estoy buscando
-
-	my %hash_recursive = %{ $tree };
-	my $href           = \%hash_recursive;
-
-	# look for the key
-	foreach my $id ( @{ $keys_arr } )
-	{
-		return undef if !exists $href->{ $id };
-		$href = $href->{ $id };
-	}
-
-	my @values = keys %{ $href };
-	return \@values;
-}
-
 ## ZAPI requests
 
 =begin nd
 Function: getUserAgent
 
-	Initializate the HTTP client used to do action using the ZAPI
+	Initializate the HTTP client used to do ZAPI requests
 
 Parametes:
 	none - .
@@ -506,6 +504,42 @@ sub getUserAgent
 	);
 	return $ua;
 }
+
+=begin nd
+Function: zapi
+
+	It does a HTTP request to the load balancer ZAPI service.
+
+Parametes:
+	Request - It is a hash with the required parameter to create a ZAPI request. The possible keys are:
+		uri - It is the HTTP URI for the ZAPI request.
+		method - It is the HTTP URI for the ZAPI method (verb).
+		content_type - It is the content_type required for the ZAPI request. If 'params' exists content_type will use the 'application/json' value by default.
+		params - It is a hash with the parameters used in the POST or PUT method.
+		upload_file - It is the path to the file is going to be uploaded.
+		download_file - It is the path to the file where save the donwloaded file.
+	Host - It is a hash with information about the host. The possible keys are:
+		HOST - It is the host IP or network hostname.
+		PORT - It is the port of the ZAPI service.
+		ZAPI_VERSION - It is the ZAPI verison used
+
+Returns:
+	Hash ref - The output contains the following keys:
+		code, it is an integer with the HTTP code that the ZAPI returns.
+		msg, it is the message of the JSON response returned by the ZAPI.
+		err, it returns 0 if the response contains a 2xx code, else it will return the value 1.
+		json, it is a JSON object with the reponse body, this parameter will appear if the response uses the header "content-type: application/json". 
+		txt, it is an string with the body response, this parameter will appear if the response uses the header "content-type: text/plain".
+		
+			{
+				'code' => $response->code,
+				'json' => $json_dec,
+				'msg'  => $msg,
+				'err'  => ( $response->code =~ /^2/ ) ? 0 : 1,
+			}
+	};
+
+=cut
 
 sub zapi
 {
@@ -629,7 +663,7 @@ sub zapi
 =begin nd
 Function: getIds
 
-	Get an URI and look for the parameters which expects.
+	It receives an URI and it looks for the parameters that expects the URI.
 
 Parametes:
 	Uri - It is a string with the URI. An URI contains tag as "<TAG_NAME>" (/interfaces/virtual/<virtual>) that is related to the name of the parameter expected.
@@ -658,7 +692,7 @@ sub getIds
 Function: listParams
 
 	It does a ZAPI call to get the parameters that that call needs.
-	If the definition of the call has some predefined parameter, it is removed before doing de call.
+	If the definition of the call has some predefined parameter, they are removed before doing de call.
 
 Parametes:
 	Request - It is an request object that need the "zapi" function.
@@ -678,7 +712,6 @@ Returns:
 					ip,
 					hash_port
 				],
-				blank : 1
 			}
 		}
 
@@ -794,6 +827,37 @@ sub printOutput
 }
 
 ## host
+
+=begin nd
+Function: setHost
+
+	This function ask the HOST configuration to the user. It has two mode of working, one for creating a new host
+	or another to modify it. The hosts are saved in the config file "$ENV{HOME}/.zcli/hosts.ini"
+
+	There is a special host called 'localhost', this host is used when ZCLI is executed from the load balancer.
+	Localhost only has a parameter (zapikey).
+
+Parametes:
+	host name - It is the nick of the hostname to create or modify. This parameter is empty if it is executed in creation mode.
+	new host - It is a flag that creates a new host (value 0) or modify a host that exist (value 0). This flag manage which parameters are mandatory and allow to keep the old value.
+
+Returns:
+	Hash ref - It returns the host struct updated with the new values or undef if there is an error. The keys if the host struct are:
+		ZAPI_VERSION, it is the ZAPI version used
+		NAME, it is a nick name of the load balancer
+		HOST, it is the IP or nameserver or the load balancer
+		PORT, it is the ZAPI management port
+		ZAPIKEY, it is the user key used for the ZAPI requests
+		
+	Example:
+		$cfg = {
+				 ZAPI_VERSION => "4.0",
+				 NAME         => zevenet-lb-1,
+				 HOST         => 192.168.100.254,
+				 PORT         => 444,
+				 ZAPI_KEY     => v2kl3QK658awg34qaQbaewba3wjnzdkfxGbqbwq4,
+		}
+=cut
 
 sub setHost
 {
@@ -966,6 +1030,19 @@ sub setHost
 	return $Config->{ $hostname };
 }
 
+=begin nd
+Function: refreshLocalHost
+
+	This function is used when the ZCLI is used from a load balancer. It overwrites the IP and port where the ZAPI is listening.
+
+Parametes:
+	none - .
+
+Returns:
+	none - .
+		
+=cut
+
 sub refreshLocalHost
 {
 	my $localname = "localhost";
@@ -979,6 +1056,19 @@ sub refreshLocalHost
 
 	$Config->write( $hostfile );
 }
+
+=begin nd
+Function: delHost
+
+	It removes a host from the configuration file.
+
+Parametes:
+	host name - It is the host nick name that is going to be deleted.
+
+Returns:
+	Integer - Error code: 0 on success or another value on failure.
+		
+=cut
 
 sub delHost
 {
@@ -1006,10 +1096,22 @@ sub delHost
 	return $err;
 }
 
+=begin nd
+Function: listHost
+
+	It returns a list of the registered host names.
+
+Parametes:
+	none - .
+
+Returns:
+	Array - It is a list with the host names.
+		
+=cut
+
 sub listHost
 {
-	my $host_name = shift;
-	my $hostfile  = $Global::hosts_path;
+	my $hostfile = $Global::hosts_path;
 
 	use Config::Tiny;
 	my $Config = Config::Tiny->read( $hostfile );
@@ -1020,10 +1122,10 @@ sub listHost
 =begin nd
 Function: hostInfo
 
-	It returns an object with information about the host
+	It retrieves the configuration of a host.
 
 Parametes:
-	Host name - It is the name used to identify the host
+	Host name - It is the name used to identify the host.
 
 Returns:
 	Hash ref - Struct with the host info. If the host does not exist, the function will return undef

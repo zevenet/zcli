@@ -21,6 +21,20 @@ my $zcli_history = $Global::history_path;
 
 ### definition of functions
 
+=begin nd
+Function: create_zcli
+
+	It creates a Term object that implements the ZCLI. 
+	The object will be available from the variable '$Env::ZCLI'.
+
+Parametes:
+	none - .
+
+Returns:
+	none - .
+
+=cut
+
 sub create_zcli
 {
 	&reload_cmd_struct();
@@ -34,6 +48,22 @@ sub create_zcli
 	# $Env::ZCLI->add_eof_exit_hook($self->save_history()); # ????
 	$Env::ZCLI->run();
 }
+
+=begin nd
+Function: reload_prompt
+
+	It reloads the prompt line of the ZCLI. The color will change between green (the last command was successful) or 
+	red (the last command finishes with failure).
+
+	The host name will be printed as gray if ZCLI has not connectivity with the load balancer.
+
+Parametes:
+	Error code - It is used to select the prompt color. It expects 0 on success or another value on failure.
+
+Returns:
+	none - .
+
+=cut
 
 sub reload_prompt
 {
@@ -53,6 +83,19 @@ sub reload_prompt
 	$Env::ZCLI->prompt( "$color$tag$no_color: " );
 }
 
+=begin nd
+Function: reload_cmd_struct
+
+	It reloads the struct used for ZCLI with the definition of the possible commands
+
+Parametes:
+	none - .
+
+Returns:
+	none - .
+
+=cut
+
 sub reload_cmd_struct
 {
 	$Env::CONNECTIVITY = &check_connectivity( $Env::HOST );
@@ -64,6 +107,35 @@ sub reload_cmd_struct
 
 	$Env::ZCLI->commands( $Env::ZCLI_CMD_ST ) if ( defined $Env::ZCLI );
 }
+
+=begin nd
+Function: gen_cmd_struct
+
+	It creates a struct with a tree with the possible values and its expected arguments.
+	There are two kind of commands:
+		* Commands to the load balancer: they only are available when ZCLI has connectivity with the load balancer.
+		* Commands to the ZCLI: they apply action over the ZCLI app. For example: help, history, zcli, host.s
+
+Parametes:
+	Ids tree - It is the struct with the tree of IDsS
+
+Returns:
+	Hash ref - It is a struct with the following format:
+		{
+			'$object' : {				# name of the object
+				cmds: {					
+					'$action' : {		# action to apply
+						desc : "",		# description for the command
+						proc : sub {}.	# Reference to the function that process the command
+						args : sub {}.	# Reference to the function that autocompletes them
+						maxargs : \d	# Maximun number of arguments expected. This parameter does not appear always.
+					}
+				},
+			},
+		}
+
+
+=cut
 
 sub gen_cmd_struct
 {
@@ -162,6 +234,7 @@ Function: gen_obj
 
 Parametes:
 	object - Object name is being implemented
+	Ids tree - It is the struct with the tree of IDsS
 
 Returns:
 	Hash string - It returns the command struct used for Term for all actions of an 'object'
@@ -199,6 +272,19 @@ sub gen_obj
 
 	return $object_struct;
 }
+
+=begin nd
+Function: desc_cb
+
+	It creates a message with the expected format for the command.
+
+Parametes:
+	object struct - It is a hash ref with the required argments for the command
+
+Returns:
+	String - It returns the message with the expected parameters
+
+=cut
 
 sub desc_cb
 {
@@ -240,6 +326,19 @@ sub desc_cb
 
 	return $msg;
 }
+
+=begin nd
+Function: proc_cb
+
+	It executes the ZAPI request. First, parsing the arguments from the command line, next execute the request and then print the output.
+
+Parametes:
+	object struct - It is a hash ref with the required argments for the command
+
+Returns:
+	none - .
+
+=cut
 
 sub proc_cb
 {

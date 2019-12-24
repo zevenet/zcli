@@ -16,6 +16,7 @@
 
 --- NUEVAS PROPIEDADES O MEJORAS ---
 
+- Puede que haga falta pintar la descripcion del comando esperado como parte del error .
 - Al cambia valores de escucha de cherokee se pierde la conectividad con la API, ejemplo, cambiar el puerto.
 - si arranca el comando con parámetros, enviarlos sin entrar en modo interactivo
 - por defecto que arranque modo no interactivo
