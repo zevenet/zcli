@@ -14,7 +14,7 @@ use ZCLI::Lib;
 use ZCLI::Objects;
 
 my %V   = %Define::Actions;
-my $FIN = $Define::FIN;
+my $FIN = $Global::FIN;
 
 my $zcli_dir     = $Global::config_dir;
 my $zcli_history = $Global::history_path;
@@ -355,6 +355,8 @@ sub proc_cb
 		unless ( $success )
 		{
 			say "Some parameters are missing";
+			my $desc = &desc_cb( $obj_def );
+			say $desc;
 			die $FIN;
 		}
 

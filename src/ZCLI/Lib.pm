@@ -10,7 +10,7 @@ use Storable qw(dclone);
 use ZCLI::Define;
 use ZCLI::Objects;
 
-my $FIN = $Define::FIN;
+my $FIN = $Global::FIN;
 
 ## Global functions
 
@@ -278,7 +278,7 @@ sub parseInput
 		 and !exists $def->{ 'download_file' }
 		 and $def->{ method } =~ /POST|PUT/ )
 	{
-		$parsed_completed = 1;
+		$parsed_completed = 0;
 		$final_step       = $steps->{ body_params };
 
 		# json params
@@ -288,7 +288,8 @@ sub parseInput
 		{
 			if ( $args[$ind] =~ s/^\-// )
 			{
-				$param_flag = 1;
+				$parsed_completed = 1;
+				$param_flag       = 1;
 				my $key = $args[$ind];
 				my $val = $args[$ind + 1];
 				$ind++;
