@@ -152,27 +152,25 @@ sub gen_cmd_struct
 	}
 
 	# add static functions
-	$st->{ 'help' }->{ cmds }->{ $V{ LIST } }->{ desc } = "Print the ZCLI help";
-	$st->{ 'help' }->{ cmds }->{ $V{ LIST } }->{ proc } =
-	  sub { &printHelp(); &reload_prompt( 0 ); };
-	$st->{ 'help' }->{ cmds }->{ $V{ LIST } }->{ maxargs } = 0;
+	$st->{ 'help' }->{ desc }    = "Print the ZCLI help";
+	$st->{ 'help' }->{ proc }    = sub { &printHelp(); &reload_prompt( 0 ); };
+	$st->{ 'help' }->{ maxargs } = 0;
 
-	$st->{ 'history' }->{ cmds }->{ $V{ LIST } }->{ desc } =
-	  "Print the list of commands executed";
-	$st->{ 'history' }->{ cmds }->{ $V{ LIST } }->{ method } =
+	$st->{ 'history' }->{ desc } = "Print the list of commands executed";
+	$st->{ 'history' }->{ method } =
 	  sub { shift->history_call(); };
-	$st->{ 'history' }->{ cmds }->{ $V{ LIST } }->{ maxargs } = 0;
+	$st->{ 'history' }->{ maxargs } = 0;
 
-	$st->{ 'zcli' }->{ cmds }->{ $V{ RELOAD } }->{ desc } =
+	$st->{ 'zcli' }->{ $V{ RELOAD } }->{ desc } =
 	  "Force a ZCLI reload to refresh the ID objects";
-	$st->{ 'zcli' }->{ cmds }->{ $V{ RELOAD } }->{ proc } =
+	$st->{ 'zcli' }->{ $V{ RELOAD } }->{ proc } =
 	  sub { &reload_cmd_struct(); };
-	$st->{ 'zcli' }->{ cmds }->{ $V{ RELOAD } }->{ maxargs } = 0;
-	$st->{ 'zcli' }->{ cmds }->{ $V{ QUIT } }->{ dec } = "Escape from the ZCLI";
-	$st->{ 'zcli' }->{ cmds }->{ $V{ QUIT } }->{ method } =
+	$st->{ 'zcli' }->{ $V{ RELOAD } }->{ maxargs } = 0;
+	$st->{ 'zcli' }->{ $V{ QUIT } }->{ dec }       = "Escape from the ZCLI";
+	$st->{ 'zcli' }->{ $V{ QUIT } }->{ method } =
 	  sub { shift->exit_requested( 1 ); };
-	$st->{ 'zcli' }->{ cmds }->{ $V{ 'QUIT' } }->{ exclude_from_history } = 1;
-	$st->{ 'zcli' }->{ cmds }->{ $V{ QUIT } }->{ maxargs } = 0;
+	$st->{ 'zcli' }->{ $V{ QUIT } }->{ exclude_from_history } = 1;
+	$st->{ 'zcli' }->{ $V{ QUIT } }->{ maxargs }              = 0;
 
 	my $host_st;
 	my @host_list = &listHost();
