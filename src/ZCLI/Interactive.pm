@@ -55,7 +55,6 @@ sub create_zcli
 									history_file => $zcli_history, );
 	print "Zevenet Client Line Interface\n";
 	$Env::ZCLI->load_history();
-	$Env::ZCLI->load_history();
 	$Env::ZCLI->getset( 'done', 0 );
 
 	my $err = 0;
@@ -187,16 +186,16 @@ sub gen_cmd_struct
 	  sub { shift->history_call(); };
 	$st->{ 'history' }->{ maxargs } = 0;
 
-	$st->{ 'zcli' }->{ $V{ RELOAD } }->{ desc } =
+	$st->{ $V{ RELOAD } }->{ desc } =
 	  "Force a ZCLI reload to refresh the ID objects";
-	$st->{ 'zcli' }->{ $V{ RELOAD } }->{ proc } =
-	  sub { &reload_cmd_struct(); };
-	$st->{ 'zcli' }->{ $V{ RELOAD } }->{ maxargs } = 0;
-	$st->{ 'zcli' }->{ $V{ QUIT } }->{ dec }       = "Escape from the ZCLI";
-	$st->{ 'zcli' }->{ $V{ QUIT } }->{ method } =
+	$st->{ $V{ RELOAD } }->{ proc } =
+	  sub { ( 0 ) };
+	$st->{ $V{ RELOAD } }->{ maxargs } = 0;
+	$st->{ $V{ QUIT } }->{ dec }       = "Escape from the ZCLI";
+	$st->{ $V{ QUIT } }->{ method } =
 	  sub { shift->exit_requested( 1 ); };
-	$st->{ 'zcli' }->{ $V{ QUIT } }->{ exclude_from_history } = 1;
-	$st->{ 'zcli' }->{ $V{ QUIT } }->{ maxargs }              = 0;
+	$st->{ $V{ QUIT } }->{ exclude_from_history } = 1;
+	$st->{ $V{ QUIT } }->{ maxargs }              = 0;
 
 	my $host_st;
 	my @host_list = &listHost();
