@@ -16,14 +16,9 @@
 
 --- NUEVAS PROPIEDADES O MEJORAS ---
 
-- Puede que haga falta pintar la descripcion del comando esperado como parte del error .
 - Al cambia valores de escucha de cherokee se pierde la conectividad con la API, ejemplo, cambiar el puerto.
-- si arranca el comando con parámetros, enviarlos sin entrar en modo interactivo
-- por defecto que arranque modo no interactivo
-	- (podria arreglarse solo tras mod lo de antes) al ejecutar la ayuda esta entrando en modo interfactivo
 - añadir opción para aceptar parametros como json
 - Soportar ZCLI en la CE
-- atajo a comando HELP
 - Añadir un "help" por cada módulo
 - funcion para que compruebe que la version de zapi del lb es minimo 4.0.1
 - devolver error si hay parametros en el comando cuando es GET.

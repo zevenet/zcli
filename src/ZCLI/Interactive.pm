@@ -28,15 +28,17 @@ Function: create_zcli
 	The object will be available from the variable '$Env::ZCLI'.
 
 Parametes:
-	none - .
+	Options struct - It receives a hash with the command line options parsed
 
 Returns:
-	none - .
+	Error code - It returns the error code of the last command execution, 0 on success or another value on failure
 
 =cut
 
 sub create_zcli
 {
+	my $opt = shift;
+
 	&reload_cmd_struct();
 
 	$Env::ZCLI = new Term::ShellUI( commands     => $Env::ZCLI_CMD_ST,
@@ -45,8 +47,32 @@ sub create_zcli
 	&reload_prompt();
 	$Env::ZCLI->load_history();
 
-	# $Env::ZCLI->add_eof_exit_hook($self->save_history()); # ????
-	$Env::ZCLI->run();
+	# Execute and exit
+	my @args = ();
+	if ( exists $opt->{ silence } )
+	{
+		&dev( "execute and exit", undef, 1 );
+		@args = @ARGV;
+	}
+
+	# code of ShellUI->run modified
+	# $Env::ZCLI->run(@args); this function is not completed
+	my $incmd = join " ", @args;
+
+	$Env::ZCLI->load_history();
+	$Env::ZCLI->getset( 'done', 0 );
+
+	my $err = 0;
+	while ( !$Env::ZCLI->{ done } )
+	{
+		$err = $Env::ZCLI->process_a_cmd( $incmd );
+		$Env::ZCLI->save_history();
+
+		last if $opt->{ silence };
+		last if $incmd;              # only loop if we're prompting for commands
+	}
+
+	return $err;
 }
 
 =begin nd
@@ -364,7 +390,6 @@ sub proc_cb
 
 		$resp = &zapi( $request, $Env::HOST );
 		&printOutput( $resp );
-		$Env::ZCLI->save_history();
 
 		# reload structs
 		&reload_cmd_struct();
@@ -372,6 +397,8 @@ sub proc_cb
 	say $@ if $@;
 	my $err = ( $@ or $resp->{ err } ) ? 1 : 0;
 	&reload_prompt( $err );
+
+	( $err );
 }
 
 # [ids list] [ids_params list] [file_upload|download] [body_params list]

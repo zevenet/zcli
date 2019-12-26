@@ -32,6 +32,10 @@ our $Debug = {
 											 'action' => 'stop',
 								 },
 				 },
+				 $V{ GET } => {
+								uri    => "/farms/<$K{FARM}>",
+								method => 'GET',
+				 }
 	},
 
 	'system-backups' => {

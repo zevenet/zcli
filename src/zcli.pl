@@ -73,24 +73,6 @@ if ( !$Env::HOST )
 	$Env::HOST = &setHost();
 }
 
-# Launching only a cmd
-if ( $opt->{ 'silence' } )
-{
-	my $resp;
-	eval {
-		my $obj = $_[0];
-		my $act = $_[1];
-
-		my $input = &parseInput( $Objects::Zcli->{ $obj }->{ $act }, @ARGV );
-		my $request =
-		  &checkInput( $Objects::Zcli, $input, $Env::HOST, $Env::HOST_IDS_TREE );
-		$resp = &zapi( $request, $Env::HOST );
-		&printOutput( $resp );
-	};
-	say $@ if $@;
-	my $err = ( $@ or $resp->{ err } ) ? 1 : 0;
-	POSIX::_exit( $err );
-}
-
 # Use interactive
-&create_zcli();
+my $err = &create_zcli( $opt );
+exit $err;

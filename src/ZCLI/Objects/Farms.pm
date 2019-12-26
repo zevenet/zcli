@@ -59,22 +59,23 @@ our $Farms = {
 	},
 
 	'farms-services' => {
-		$V{ CREATE } => {
-						  uri    => "/farms/<$K{FARM}>/services",
-						  method => 'POST',
-		},
-		$V{ SET } => {
-					   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
-					   method => 'PUT',
-		},
-		$V{ DELETE } => {
-						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
-						  method => 'DELETE',
-		},
-		$V{ MOVE } => {
-			uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/actions",
-			method => 'POST',
-		},
+						  $V{ CREATE } => {
+											uri    => "/farms/<$K{FARM}>/services",
+											uri    => "/farms/<$K{FARM}>/services",
+											method => 'POST',
+						  },
+						  $V{ SET } => {
+										 uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
+										 method => 'PUT',
+						  },
+						  $V{ DELETE } => {
+											uri => "/farms/<$K{FARM}>/services/<$K{SRV}>",
+											method => 'DELETE',
+						  },
+						  $V{ MOVE } => {
+									  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/actions",
+									  method => 'POST',
+						  },
 	},
 
 	'farms-services-backends' => {
@@ -87,35 +88,35 @@ our $Farms = {
 					   method => 'PUT',
 		},
 		$V{ DELETE } => {
-						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>",
+						  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>",
 						  method => 'DELETE',
 		},
 		$V{ MAINTENANCE } => {
-						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>/maintenance",
-						  method => 'PUT',
-						  params => {
-							  action => 'maintenance',
-							  mode => 'drain',
-						  }
+				uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>/maintenance",
+				method => 'PUT',
+				params => {
+							action => 'maintenance',
+							mode   => 'drain',
+				}
 		},
 		$V{ NON_MAINTENANCE } => {
-						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>/maintenance",
-						  method => 'PUT',
-						  params => {
-							  action => 'up',
-						  }
+				uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>/maintenance",
+				method => 'PUT',
+				params => {
+							action => 'up',
+				}
 		},
 	},
 
 	'farms-services-farmguardian' => {
-		$V{ ADD } => {
-					   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg",
-					   method => 'POST',
-		},
-		$V{ REMOVE } => {
-						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg/<$K{FG}>",
-						  method => 'DELETE',
-		},
+						  $V{ ADD } => {
+										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg",
+										 method => 'POST',
+						  },
+						  $V{ REMOVE } => {
+								  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg/<$K{FG}>",
+								  method => 'DELETE',
+						  },
 	},
 
 	'farms-zones' => {
@@ -134,34 +135,34 @@ our $Farms = {
 	},
 
 	'farms-zones-resources' => {
-					   $V{ LIST } => {
-										 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources",
-										 method => 'GET',
-					   },
-					   $V{ CREATE } => {
-									  uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources",
-									  method => 'POST',
-					   },
-					   $V{ SET } => {
-										 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
-										 method => 'PUT',
-										 uri_param => [
-													   {
-														 name => "resource ID",
-														 desc => "the IP address of the source which will be modified",
-													   },
-										 ],
-					   },
-					   $V{ DELETE } => {
-										 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
-										 method => 'DELETE',
-										 uri_param => [
-													   {
-														 name => "resource ID",
-														 desc => "the IP address of the source which will be removed",
-													   },
-										 ],
-					   },
+		$V{ LIST } => {
+						uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources",
+						method => 'GET',
+		},
+		$V{ CREATE } => {
+						  uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources",
+						  method => 'POST',
+		},
+		$V{ SET } => {
+			 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
+			 method => 'PUT',
+			 uri_param => [
+						   {
+							 name => "resource ID",
+							 desc => "the IP address of the source which will be modified",
+						   },
+			 ],
+		},
+		$V{ DELETE } => {
+			  uri => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
+			  method    => 'DELETE',
+			  uri_param => [
+							{
+							  name => "resource ID",
+							  desc => "the IP address of the source which will be removed",
+							},
+			  ],
+		},
 	},
 
 	'farms-certificates' => {

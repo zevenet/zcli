@@ -271,15 +271,16 @@ sub parseInput
 		}
 	}
 
-	$parsed_completed = 1;
 	my $final_step = $steps->{ end };
+	$parsed_completed = 1;
 
 	if (     !exists $def->{ 'upload_file' }
 		 and !exists $def->{ 'download_file' }
 		 and $def->{ method } =~ /POST|PUT/ )
 	{
-		$parsed_completed = 0;
-		$final_step       = $steps->{ body_params };
+		$parsed_completed = 1 if ( exists $def->{ params } );
+
+		$final_step = $steps->{ body_params };
 
 		# json params
 		my $param_flag = 0;
@@ -301,7 +302,7 @@ sub parseInput
 				$parsed_completed = 0;
 				print
 				  "Error parsing the parameters. The parameters have to have the following format:\n";
-				print "   -param1-name param1-value -param2-name param2-value";
+				print "   -param_name_1 param_value_1 -param_name_2 param_value_2";
 				return ( $input, $final_step, $parsed_completed );
 			}
 		}
@@ -342,6 +343,8 @@ sub parseOptions
 	{
 		if ( $o !~ /^-/ )
 		{
+			# Run in silence mode if there are arguments in the execution
+			$opt_st->{ silence } = 1;
 			last;
 		}
 		else

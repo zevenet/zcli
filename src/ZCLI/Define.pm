@@ -11,9 +11,9 @@ our $REQ_ZEVEVENET_VERSION = "6.1";
 our $config_dir   = "$ENV{HOME}/.zcli";
 our $history_path = "$config_dir/zcli-history";
 our $hosts_path   = "$config_dir/hosts.ini";
+our $CONNECTIVITY = 1;    # It is the result of a connectivity test with the lb
 
 package Env;
-our $CONNECTIVITY = 1;    # It is the result of a connectivity test with the lb
 our $HOST;   # It is the host struct with info to connect with the load balancer
 our
   $HOST_IDS_TREE;  # It is the tree with the IDs that the load balancer contains
