@@ -39,14 +39,6 @@ sub create_zcli
 {
 	my $opt = shift;
 
-	&reload_cmd_struct();
-
-	$Env::ZCLI = new Term::ShellUI( commands     => $Env::ZCLI_CMD_ST,
-									history_file => $zcli_history, );
-	print "Zevenet Client Line Interface\n";
-	&reload_prompt();
-	$Env::ZCLI->load_history();
-
 	# Execute and exit
 	my @args = ();
 	if ( exists $opt->{ silence } )
@@ -59,13 +51,21 @@ sub create_zcli
 	# $Env::ZCLI->run(@args); this function is not completed
 	my $incmd = join " ", @args;
 
+	$Env::ZCLI = new Term::ShellUI( commands     => $Env::ZCLI_CMD_ST,
+									history_file => $zcli_history, );
+	print "Zevenet Client Line Interface\n";
+	$Env::ZCLI->load_history();
 	$Env::ZCLI->load_history();
 	$Env::ZCLI->getset( 'done', 0 );
 
 	my $err = 0;
 	while ( !$Env::ZCLI->{ done } )
 	{
+		&reload_cmd_struct();
+		&reload_prompt( $err );
+
 		$err = $Env::ZCLI->process_a_cmd( $incmd );
+		$err = 1 if not defined $err;
 		$Env::ZCLI->save_history();
 
 		last if $opt->{ silence };
@@ -140,7 +140,7 @@ Function: gen_cmd_struct
 	It creates a struct with a tree with the possible values and its expected arguments.
 	There are two kind of commands:
 		* Commands to the load balancer: they only are available when ZCLI has connectivity with the load balancer.
-		* Commands to the ZCLI: they apply action over the ZCLI app. For example: help, history, zcli, host.s
+		* Commands to the ZCLI: they apply action over the ZCLI app. For example: help, history, zcli, hosts
 
 Parametes:
 	Ids tree - It is the struct with the tree of IDsS
@@ -152,7 +152,7 @@ Returns:
 				cmds: {					
 					'$action' : {		# action to apply
 						desc : "",		# description for the command
-						proc : sub {}.	# Reference to the function that process the command
+						proc : sub {}.	# Reference to the function that process the command. The last condition of the proc function has to returns 0 on success
 						args : sub {}.	# Reference to the function that autocompletes them
 						maxargs : \d	# Maximun number of arguments expected. This parameter does not appear always.
 					}
@@ -179,7 +179,7 @@ sub gen_cmd_struct
 
 	# add static functions
 	$st->{ 'help' }->{ desc }    = "Print the ZCLI help";
-	$st->{ 'help' }->{ proc }    = sub { &printHelp(); &reload_prompt( 0 ); };
+	$st->{ 'help' }->{ proc }    = sub { &printHelp(); };
 	$st->{ 'help' }->{ maxargs } = 0;
 
 	$st->{ 'history' }->{ desc } = "Print the list of commands executed";
@@ -214,9 +214,10 @@ sub gen_cmd_struct
 			{
 				# reload the host configuration
 				$Env::HOST = $new_host if ( $Env::HOST->{ NAME } eq $new_host->{ NAME } );
+				$err       = 0;
 			}
-			$Env::CONNECTIVITY = &check_connectivity( $Env::HOST );
-			&reload_prompt( $err );
+
+			( $err );
 		},
 	};
 	$host_st->{ $V{ DELETE } } = {
@@ -236,9 +237,7 @@ sub gen_cmd_struct
 	$host_st->{ $V{ APPLY } } = {
 		proc => sub {
 			$Env::HOST = hostInfo( @_ );
-			my $err = ( defined $Env::HOST ) ? 0 : 1;
-			&reload_prompt( $err );
-			&reload_cmd_struct();
+			( defined $Env::HOST ) ? 0 : 1;
 		},
 		args    => [sub { \@host_list }],
 		maxargs => 1,
@@ -369,6 +368,7 @@ sub proc_cb
 	my $obj_def = shift;
 
 	my $resp;
+	my $err;
 	eval {
 		$Env::CMD_STRING = "";    # clean string
 
@@ -389,14 +389,13 @@ sub proc_cb
 							  $Env::HOST_IDS_TREE );
 
 		$resp = &zapi( $request, $Env::HOST );
+		$err  = $resp->{ err };
+
 		&printOutput( $resp );
 
-		# reload structs
-		&reload_cmd_struct();
 	};
 	say $@ if $@;
-	my $err = ( $@ or $resp->{ err } ) ? 1 : 0;
-	&reload_prompt( $err );
+	$err = ( $@ or $err ) ? 1 : 0;
 
 	( $err );
 }

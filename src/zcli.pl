@@ -20,12 +20,6 @@ my $FIN = $Define::FIN;
 my $zcli_dir     = $Global::config_dir;
 my $zcli_history = $Global::history_path;
 
-# overriding error method
-*Term::ShellUI::error = sub {
-	say "$_[1]";
-	&reload_prompt( 1 );
-};
-
 # Init!
 
 system ( "mkdir -p $zcli_dir" ) if ( !-d $zcli_dir );
