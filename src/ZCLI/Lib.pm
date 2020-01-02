@@ -278,7 +278,7 @@ sub parseInput
 		 and !exists $def->{ 'download_file' }
 		 and $def->{ method } =~ /POST|PUT/ )
 	{
-		$parsed_completed = 1 if ( exists $def->{ params } );
+		$parsed_completed = 0 if ( !exists $def->{ params } );
 
 		$final_step = $steps->{ body_params };
 
@@ -302,7 +302,7 @@ sub parseInput
 				$parsed_completed = 0;
 				print
 				  "Error parsing the parameters. The parameters have to have the following format:\n";
-				print "   -param_name_1 param_value_1 -param_name_2 param_value_2";
+				print "	$Define::Description_param";
 				return ( $input, $final_step, $parsed_completed );
 			}
 		}
@@ -758,13 +758,17 @@ sub listParams
 	# set again the predefined parameters
 	$obj_def->{ params } = $predef_params if ( defined $predef_params );
 
-	$Env::CMD_PARAMS_DEF = {};
-	foreach my $p ( @{ $params_ref } )
+	$Env::CMD_PARAMS_DEF = undef;
+	if ( defined $params_ref )
 	{
-		$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ exist } = 1;
-		$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ possible_values } =
-		  $p->{ possible_values }
-		  if ( exists $p->{ possible_values } );
+		$Env::CMD_PARAMS_DEF = {};
+		foreach my $p ( @{ $params_ref } )
+		{
+			$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ exist } = 1;
+			$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ possible_values } =
+			  $p->{ possible_values }
+			  if ( exists $p->{ possible_values } );
+		}
 	}
 
 	return $Env::CMD_PARAMS_DEF;

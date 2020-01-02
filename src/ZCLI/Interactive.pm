@@ -46,6 +46,10 @@ sub create_zcli
 		&dev( "execute and exit", undef, 1 );
 		@args = @ARGV;
 	}
+	else
+	{
+		print "Zevenet Client Line Interface\n";
+	}
 
 	# code of ShellUI->run modified
 	# $Env::ZCLI->run(@args); this function is not completed
@@ -53,7 +57,7 @@ sub create_zcli
 
 	$Env::ZCLI = new Term::ShellUI( commands     => $Env::ZCLI_CMD_ST,
 									history_file => $zcli_history, );
-	print "Zevenet Client Line Interface\n";
+
 	$Env::ZCLI->load_history();
 	$Env::ZCLI->getset( 'done', 0 );
 
@@ -343,7 +347,7 @@ sub desc_cb
 		 and not exists $def->{ params }
 		 and $params )
 	{
-		$msg .= " [-param_name param_value ...]";
+		$msg .= " $Define::Description_param";
 	}
 
 	return $msg;
@@ -377,9 +381,25 @@ sub proc_cb
 
 		unless ( $success )
 		{
-			say "Some parameters are missing";
+			say "Some parameters are missing, the expected syntax is:";
 			my $desc = &desc_cb( $obj_def );
-			say $desc;
+
+			# force reload if params does not exist
+			&listParams( $obj_def, $input_parsed, $Env::HOST )
+			  if ( !defined $Env::CMD_PARAMS_DEF );
+
+			if ( defined $Env::CMD_PARAMS_DEF )
+			{
+				my $params = "";
+				foreach my $p ( keys %{ $Env::CMD_PARAMS_DEF } )
+				{
+					$params .= "[-$p <$p>] ";
+				}
+				my $pattern = quotemeta ( $Define::Description_param );
+				$desc =~ s/$pattern/$params/;
+			}
+			say "	[zcli] $desc";
+
 			die $FIN;
 		}
 
@@ -457,9 +477,6 @@ sub complete_body_params
 	my ( $obj_def, $args_parsed, $args_used, $arg_previus ) = @_;
 	my $out;
 
-	# Get the last parameter struct
-	my $p_obj = $Env::CMD_PARAMS_DEF;
-
 	# command that is being executing
 	my $cmd_string = "$obj_def->{object} $obj_def->{action}";
 
@@ -471,12 +488,12 @@ sub complete_body_params
 	if ( $Env::CMD_STRING eq '' or $Env::CMD_STRING ne $cmd_string )
 	{
 		$Env::ZCLI->completemsg( "  ## Refreshing params\n" ) if ( $Global::DEBUG );
-		$p_obj = &listParams( $obj_def, $args_parsed, $Env::HOST );
+		&listParams( $obj_def, $args_parsed, $Env::HOST );
 
 		# refresh values
-		$Env::CMD_STRING     = $cmd_string;
-		$Env::CMD_PARAMS_DEF = $p_obj;
+		$Env::CMD_STRING = $cmd_string;
 	}
+	my $p_obj = $Env::CMD_PARAMS_DEF;
 
 	$Env::ZCLI->completemsg( "  ## prev: $p_obj->{ $previus_param }\n" )
 	  if ( $Global::DEBUG );

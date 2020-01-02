@@ -16,10 +16,10 @@
 
 --- NUEVAS PROPIEDADES O MEJORAS ---
 
+- Mandar los mensajes de error de formato a salida de errores!
 - Al cambia valores de escucha de cherokee se pierde la conectividad con la API, ejemplo, cambiar el puerto.
 - añadir opción para aceptar parametros como json
 - Soportar ZCLI en la CE
-- Añadir un "help" por cada módulo
 - funcion para que compruebe que la version de zapi del lb es minimo 4.0.1
 - devolver error si hay parametros en el comando cuando es GET.
 - completar funcionalidades:

@@ -24,12 +24,15 @@ our $ZCLI_CMD_ST; # It is the ZCLI commands struct used for the TERM module
 our $ZCLI_OPTIONS;    #
 
 # save the last parameter list to avoid repeat the params zapi call for each tab
-our $CMD_PARAMS_DEF
-  ; # It is the last parameter object returned by the ZAPI. It is used to autocomplete the command
+our $CMD_PARAMS_DEF = undef;
+; # It is the last parameter object returned by the ZAPI. It is used to autocomplete the command
 our $CMD_STRING = ''
   ; # It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded
 
 package Define;
+
+our $Description_param =
+  "[-param_name_1 param_value_1] [-param_name_2 param_value_2] ...";
 
 # object keys
 our %Keys = (
