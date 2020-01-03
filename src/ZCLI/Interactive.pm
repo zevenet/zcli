@@ -28,7 +28,7 @@ Function: create_zcli
 	The object will be available from the variable '$Env::ZCLI'.
 
 Parametes:
-	Options struct - It receives a hash with the command line options parsed
+	none - .
 
 Returns:
 	Error code - It returns the error code of the last command execution, 0 on success or another value on failure
@@ -37,18 +37,12 @@ Returns:
 
 sub create_zcli
 {
-	my $opt = shift;
-
 	# Execute and exit
 	my @args = ();
-	if ( exists $opt->{ silence } )
+	if ( $Env::SILENCE )
 	{
 		&dev( "execute and exit", undef, 1 );
 		@args = @ARGV;
-	}
-	else
-	{
-		print "Zevenet Client Line Interface\n";
 	}
 
 	# code of ShellUI->run modified
@@ -72,7 +66,7 @@ sub create_zcli
 		$err = 1 if not defined $err;
 		$Env::ZCLI->save_history();
 
-		last if $opt->{ silence };
+		last if $Env::SILENCE;
 		last if $incmd;              # only loop if we're prompting for commands
 	}
 

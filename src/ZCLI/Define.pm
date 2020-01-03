@@ -14,6 +14,7 @@ our $hosts_path   = "$config_dir/hosts.ini";
 our $CONNECTIVITY = 1;    # It is the result of a connectivity test with the lb
 
 package Env;
+our $SILENCE = 0;	# It is the execution options to run without interactive
 our $HOST;   # It is the host struct with info to connect with the load balancer
 our
   $HOST_IDS_TREE;  # It is the tree with the IDs that the load balancer contains

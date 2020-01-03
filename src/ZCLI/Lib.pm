@@ -352,6 +352,8 @@ sub parseOptions
 		}
 	}
 
+	$Env::SILENCE = 1 if exists $opt_st->{ silence };
+
 	return $opt_st;
 }
 
@@ -887,10 +889,7 @@ sub printSuccess
 	my $msg = shift;
 	my $header = shift // 1;
 
-	# ??? print 
-	my $silence = 0;
-
-	&printMsg($msg,0) unless ( $header and $silence );
+	&printMsg($msg,0) unless ( $header and $Env::SILENCE );
 }
 
 

@@ -68,5 +68,5 @@ if ( !$Env::HOST )
 }
 
 # Use interactive
-my $err = &create_zcli( $opt );
+my $err = &create_zcli();
 exit $err;
