@@ -375,6 +375,32 @@ sub desc_cb
 }
 
 =begin nd
+Function: get_args_num
+
+	It calculates the number of expected arguments for a command. 
+	This function is only valid for GET methods
+
+Parametes:
+	object struct - It is a hash ref with the required argments for the command
+
+Returns:
+	Integer - number of expeted arguments
+
+=cut
+sub get_args_num
+{
+	my $def = shift;
+
+	my $num = (exists $def->{ upload_file } or exists $def->{ download_file })? 1 : 0;
+	$num += 2; 	# the object and the action 
+	$num += scalar &getIds( $def->{ uri } );
+	$num += scalar @{ $def->{ uri_param } } if ( exists $def->{ uri_param } );
+
+	return $num;
+}
+
+
+=begin nd
 Function: proc_cb
 
 	It executes the ZAPI request. First, parsing the arguments from the command line, next execute the request and then print the output.
@@ -393,12 +419,12 @@ sub proc_cb
 
 	my $resp;
 	my $err;
+	my @input_args = ($obj_def->{ object }, $obj_def->{ action }, @_ );
 	eval {
 		$Env::CMD_STRING = "";    # clean string
 
-		# puede que haya que añadirle mensajes de error si hay errores en el parsing
 		my ( $input_parsed, $next_arg, $success ) =
-		  &parseInput( $obj_def, 0, $obj_def->{ object }, $obj_def->{ action }, @_ );
+		  &parseInput( $obj_def, 0, @input_args);
 
 		unless ( $success )
 		{
@@ -419,6 +445,15 @@ sub proc_cb
 				my $pattern = quotemeta ( $Define::Description_param );
 				$desc =~ s/$pattern/$params/;
 			}
+			&printError ("	[zcli] $desc");
+			die $FIN;
+		}
+
+		# do not allow sending extra arguments using GET methods
+		if ($obj_def->{method} eq 'GET' and (scalar (@input_args) > &get_args_num($obj_def)) )
+		{
+			my $desc = &desc_cb( $obj_def );
+			&printError (" There are extra arguments in the command, the expected syntax is:");
 			&printError ("	[zcli] $desc");
 			die $FIN;
 		}

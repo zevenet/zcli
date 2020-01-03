@@ -11,7 +11,6 @@
 	* farms-blacklist <fname> -name <aqui_blacklists>
 - añadir opción para aceptar parametros como json
 - Soportar ZCLI en la CE
-- devolver error si hay parametros en el comando cuando es GET.
 - completar funcionalidades:
 	farms-add/rem headers
 	# configurar scheduler de tiempo
