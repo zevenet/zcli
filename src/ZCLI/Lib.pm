@@ -535,7 +535,7 @@ sub zapi
 	&dev( Dumper( $arg ), 'req', 2 );
 
 	# This is a workaround to manage l4 and datalink services.
-	$arg->{ uri } =~ s|/services/_/|/|m;
+	$arg->{ uri } =~ s|/services/$Define::L4_SERVICE/|/|m;
 
 	# create URL
 	my $URL =

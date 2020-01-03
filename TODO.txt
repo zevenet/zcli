@@ -2,9 +2,6 @@
 
 - Autocompletar posibles valores de un parametro.
 	* Añadir cadena vacia si el parametro acepta valor ""
-- Para los comandos que llevan algunos parametros preseleccionados, listar los posibles comandos y quitar de la lista los que ya esten preseleccionados
-	- Hay comandos (como backup apply) que son macros que contienen algunos parametros predefinidos, y al enviarse la llamada para obtener los posibles valores, se esta ejecutando la acción
-- A veces aparece al usar autocompletado: system-backups apply old Can't use string ("") as an ARRAY ref while "strict refs" in use at /usr/bin/zcli line 380
 
 
 
@@ -31,15 +28,14 @@
 - Obtener Edicion (Enterprise o community) y quitar comandos de la EE
 
 
+
 --- TAREAS DE FORMATO ---
 
 - cambiar el nombre del servicio por defecto en L4
-- transformar la respuesta en json
 - Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
 - En el autocompletado poner un mensaje si el comando no puede completarse. E.j. se quiere modificar un srv de una granja que no tiene srv.
 - estandarizar nombre funciones y variables
 - añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
-
 
 
 
@@ -53,7 +49,6 @@
 - documentar la implementacion
 - quitar comentarios debug ????
 - Crear un script con comandos para usar en la documentación como ejemplos de llamadas
-
 
 
 

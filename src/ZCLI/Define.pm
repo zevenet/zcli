@@ -34,6 +34,7 @@ package Define;
 
 our $Description_param =
   "[-param_name_1 param_value_1] [-param_name_2 param_value_2] ...";
+our $L4_SERVICE = "default_service";  
 
 # object keys
 our %Keys = (
