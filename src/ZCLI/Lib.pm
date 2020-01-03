@@ -455,7 +455,12 @@ sub getLBIdsTree
 	#~ &dev(Dumper($resp),"id tree", 2);
 
 	my $tree;
-	if ( $resp->{ 'json' }->{ 'params' } )
+
+	if ($resp->{code} == 404)
+	{
+		&printError("Error connecting, ZCLI needs a load balancer with the version $Global::REQ_ZEVEVENET_VERSION or higher");
+	}
+	elsif ( $resp->{ 'json' }->{ 'params' } )
 	{
 		$tree = $resp->{ 'json' }->{ 'params' };
 		$tree->{ 'monitoring' }->{ 'fg' } = $tree->{ 'farmguardians' };

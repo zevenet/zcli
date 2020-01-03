@@ -126,6 +126,10 @@ sub reload_cmd_struct
 	if ( $Env::CONNECTIVITY )
 	{
 		$Env::HOST_IDS_TREE = &getLBIdsTree( $Env::HOST );
+		if (!defined $Env::HOST_IDS_TREE)
+		{
+			$Env::CONNECTIVITY = 0;
+		}
 	}
 	$Env::ZCLI_CMD_ST = &gen_cmd_struct( $Env::HOST_IDS_TREE );
 
