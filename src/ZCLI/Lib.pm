@@ -808,10 +808,10 @@ sub printOutput
 
 		if ( %{ $resp->{ json } } )
 		{
+			delete $resp->{msg} if exists $resp->{ msg };
 			my $json_enc = "";
-			my $obj = $resp->{ json }->{ params } // $resp->{ json };
 			eval {
-				$json_enc = JSON::to_json( $obj, { utf8 => 1, pretty => 1 } );
+				$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
 			};
 			&printSuccess ( "$json_enc", 0 ) if ( $json_enc );
 		}
