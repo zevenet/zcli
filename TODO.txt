@@ -31,12 +31,12 @@
 
 --- TAREAS DE FORMATO ---
 
-- cambiar el nombre del servicio por defecto en L4
 - Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
 - En el autocompletado poner un mensaje si el comando no puede completarse. E.j. se quiere modificar un srv de una granja que no tiene srv.
 - estandarizar nombre funciones y variables
 - añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
-
+- el json de salida se pierden campos si no estan dentro de params:
+	* farms get <farm>, no muestra las reglas ipds porque estan fuera de params
 
 
 --- DOC ---
@@ -45,10 +45,13 @@
 - quitar comentarios en español
 - cambiar objetos por singular
 - help, repasar
-- funciones
 - documentar la implementacion
 - quitar comentarios debug ????
 - Crear un script con comandos para usar en la documentación como ejemplos de llamadas
+
+
+--- Tests ---
+Completar
 
 
 
