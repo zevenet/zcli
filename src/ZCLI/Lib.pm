@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+	#!/usr/bin/perl
 
 use strict;
 use feature "say";
@@ -61,55 +61,37 @@ Returns:
 
 sub printHelp
 {
-	print "\n";
-	print
-	  "ZCLI can be executed with the following options (the options are available at the moment of the invocation):\n";
-	say "	-help: it prints this ZCLI help.";
-	say
-	  "	-host <name>: it selects the 'name' as destination load balancer of the command.";
-	say "	-silence, -s: it executes the action without the human interaction.";
+	my $err = shift // 0;
 
-	print "\n";
-	print "A ZCLI command uses the following arguments:\n";
-	print "<object> <action> <id> <id2>... -param1 value [-param2 value]\n";
-	print
-	  "    'object' is the load balancer module over the command is going to be executed\n";
-	print
-	  "    'action' is the verb is going to be used. Each object has itself actions\n";
-	print
-	  "    'id' specify a object name inside of a module. For example a farm name, an interface name or blacklist name.\n";
-	print
-	  "         To execute some commands, it is necessary use more than one 'ids', to refer several objects that take part in the command.\n";
-	print
-	  "    'param value' some command need parameters. Theese parameters are indicated using the hyphen symbol '-' following with the param name, a black space and the param value.\n";
-	print "\n";
+	my $msg = "
+ZCLI can be executed with the following options (the options are available at the moment of the invocation):
+	-help: it prints this ZCLI help.
+	-host <name>: it selects the 'name' as destination load balancer of the command.
+	-silence, -s: it executes the action without the human interaction.
 
-	print
-	  "ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command\n";
-	print
-	  "If the autocomplete does not list more options, press <intro> to get further information\n";
-	print "\n";
+A ZCLI command uses the following arguments:
+<object> <action> <id> <id2>... -param1 value [-param2 value]
+    'object' is the load balancer module over the command is going to be executed
+    'action' is the verb is going to be used. Each object has itself actions
+	      'id' specify a object name inside of a module. For example a farm name, an interface name or blacklist name.
+	           To execute some commands, it is necessary use more than one 'ids', to refer several objects that take part in the command.
+	      'param value' some command need parameters. Theese parameters are indicated using the hyphen symbol '-' following with the param name, a black space and the param value.
 
-	print
-	  "ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation: \n";
-	print "https://www.zevenet.com/zapidocv4.0/\n";
-	print "\n";
+ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command
+If the autocomplete does not list more options, press <intro> to get further information
 
-	print "\n";
-	print "Examples:\n";
-	print "farms set gslbfarm -vport 53 -vip 10.0.0.20\n";
-	print
-	  "  This command is setting the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm\n";
-	print "\n";
-	print "network-virtual create -name eth0:srv -ip 192.168.100.32\n";
-	print
-	  "  This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32\n";
-	print "\n";
+ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation: 
+https://www.zevenet.com/zapidocv4.0/
 
-# 	print "$0 [-opt1 <val1> [..]] object order <id> -param1 value [-param2 value]";
-# añadir:
-# -js, js output, borrar todos los mensajes que no sean el json de respuesta
-# -h,  host, cambia el host destinatario de la peticion. Añadir opcion para mandar a varios hosts a la vez
+Examples:
+farms set gslbfarm -vport 53 -vip 10.0.0.20
+  	This command is setting the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm
+
+network-virtual create -name eth0:srv -ip 192.168.100.32
+	This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32
+";
+
+	&printMsg($msg,$err);
 }
 
 =begin nd
@@ -138,7 +120,7 @@ sub replaceUrl
 		$index++;
 		unless ( $url =~ s/\<[\w -]+\>/$arg/ )
 		{
-			print "The id '$index' could not be replaced";
+			&printError ( "The id '$index' could not be replaced");
 			die $Define::FIN;
 		}
 	}
@@ -239,7 +221,6 @@ sub parseInput
 			}
 			else
 			{
-				#print "This command expects $p->{name}, $p->{desc}\n";
 				return ( $input, $steps->{ uri_param }, $parsed_completed );
 			}
 		}
@@ -300,9 +281,9 @@ sub parseInput
 			elsif ( $param_flag )
 			{
 				$parsed_completed = 0;
-				print
-				  "Error parsing the parameters. The parameters have to have the following format:\n";
-				print "	$Define::Description_param";
+				&printError ( 
+				  "Error parsing the parameters. The parameters have to have the following format:" );
+				&printError ( "  $Define::Description_param" );
 				return ( $input, $final_step, $parsed_completed );
 			}
 		}
@@ -364,9 +345,8 @@ sub parseOptions
 			}
 			else
 			{
-				say "The '$o' option is not recognized.";
-				say "";
-				&printHelp( 1 );
+				&printError ("The '$o' option is not recognized.");
+				&printHelp(1);
 				exit 1;
 			}
 		}
@@ -410,7 +390,7 @@ sub createZapiRequest
 		{
 			unless ( $call->{ uri } =~ s/$tag/$p/ )
 			{
-				print "Error replacing the param '$p'";
+				&printError ( "Error replacing the param '$p'" );
 				die $FIN;
 			}
 		}
@@ -611,7 +591,7 @@ sub zapi
 	my $json_dec;
 	my $msg;
 
-	# tratamiento para descargar certs, backups...
+	# Getting files (certs, backups...)
 	if ( exists $arg->{ 'download_file' } )
 	{
 		open ( my $download_fh, '>', $arg->{ 'download_file' } );
@@ -623,7 +603,7 @@ sub zapi
 		$msg = "The file was properly saved in the file '$arg->{ 'download_file' }'.";
 	}
 
-	# tratamiento texto
+	# Getting text bodies
 	elsif ( $response->header( 'content-type' ) =~ 'text/plain' )
 	{
 		$txt = $response->content();
@@ -799,40 +779,120 @@ sub printOutput
 
 	if ( exists $resp->{ json }->{ description } )
 	{
-		print "Info: $resp->{json}->{description}\n";
+		&printSuccess ( "Info: $resp->{json}->{description}" );
 		delete $resp->{ json }->{ description };
 	}
 
 	if ( $resp->{ err } )
 	{
-		print "Error!! ";
-		print "$resp->{msg}";
-		print "\n";
+		&printError ( "Error! $resp->{msg}" );
 	}
 	else
 	{
 		if ( exists $resp->{ msg } and defined $resp->{ msg } )
 		{
-			print "$resp->{ msg }\n";
+			&printSuccess ( "$resp->{ msg }" );
 		}
 
 		if ( exists $resp->{ txt } )
 		{
-			print "$resp->{txt}";
-			print "\n";
+			&printSuccess ( "$resp->{txt}", 0 );
 		}
 
 		if ( %{ $resp->{ json } } )
 		{
 			my $json_enc = "";
+			my $obj = $resp->{ json }->{ params } // $resp->{ json };
 			eval {
-				$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
+				$json_enc = JSON::to_json( $obj, { utf8 => 1, pretty => 1 } );
 			};
-			print "$json_enc" if ( $json_enc );
+			&printSuccess ( "$json_enc", 0 ) if ( $json_enc );
 		}
 	}
-	print "\n";
+	&printSuccess ( "" ); # extra new line
 }
+
+
+=begin nd
+Function: printMsg
+
+	This function will print a message using the standard output or the error output.
+
+Parametes:
+	Message - It is a string with the message to print.
+	Error flag - If the flag is 0 the message is printed in the standard output, else it will be printed in the error output.
+
+Returns:
+	none - .
+
+=cut
+
+sub printMsg
+{
+	my $msg = shift;
+	my $err = shift // 0;
+
+	chomp($msg);
+	$msg .= "\n"; 
+
+	if ($err)
+	{
+		print STDERR $msg;
+	}
+	else
+	{
+		print STDOUT $msg;
+	}
+}
+
+=begin nd
+Function: printError
+
+	This function is a macro to print error messages
+
+Parametes:
+	Message - It is a string with the message to print.
+	Error flag - If the flag is 0 the message is printed in the standard output, else it will be printed in the error output.
+
+Returns:
+	none - .
+
+=cut
+
+sub printError
+{
+	my $msg = shift;
+
+	&printMsg($msg,1);
+}
+
+=begin nd
+Function: printSuccess
+
+	This function is a macro to print successful messages.
+
+	Depend on the ZCLI was executed as silence mode, the information messages and non JSON ZAPI responses won't be printed
+
+Parametes:
+	Message - It is a string with the message to print.
+	Header - It is a flag that has the value 1 if the message is an information message.
+
+Returns:
+	none - .
+
+=cut
+
+sub printSuccess
+{
+	my $msg = shift;
+	my $header = shift // 1;
+
+	# ??? print 
+	my $silence = 0;
+
+	&printMsg($msg,0) unless ( $header and $silence );
+}
+
 
 ## host
 
@@ -908,11 +968,11 @@ sub setHost
 		{
 			if ( !defined $hostname )
 			{
-				say "A host name is required";
+				&printError ("A host name is required");
 			}
 			else
 			{
-				say "The '$hostname' host does not exist";
+				&printError ("The '$hostname' host does not exist");
 			}
 			return undef;
 		}
@@ -925,7 +985,7 @@ sub setHost
 	{
 		do
 		{
-			print "Load balancer host name: ";
+			&printMsg (  "Load balancer host name: " );
 			$valid_flag = 1;
 			$hostname   = <STDIN>;
 			chomp $hostname;
@@ -933,12 +993,12 @@ sub setHost
 			if ( $hostname !~ /\S+/ )
 			{
 				$valid_flag = 0;
-				say "Invalid name. It expects a string with the load balancer host name";
+				&printError ("Invalid name. It expects a string with the load balancer host name");
 			}
 			elsif ( exists $Config->{ $hostname } )
 			{
 				$valid_flag = 0;
-				say "Invalid name. The '$hostname' host already exist";
+				&printError ("Invalid name. The '$hostname' host already exist");
 			}
 		} while ( !$valid_flag );
 	}
@@ -948,8 +1008,8 @@ sub setHost
 	{
 		do
 		{
-			print "Load balancer management IP: ";
-			print "[$set_msg: $cfg->{HOST}] " if not $new_flag;
+			&printMsg ( "Load balancer management IP: " );
+			&printMsg ( "[$set_msg: $cfg->{HOST}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
@@ -957,7 +1017,7 @@ sub setHost
 			unless ( $cfg->{ HOST } =~ /$ip_regex/ )
 			{
 				$valid_flag = 0;
-				say "Invalid IP for load balancer. It expects an IP v4 or v6";
+				&printError ("Invalid IP for load balancer. It expects an IP v4 or v6");
 			}
 		} while ( !$valid_flag );
 	}
@@ -967,8 +1027,8 @@ sub setHost
 	{
 		do
 		{
-			print "Load balancer management port: ";
-			print "[$set_msg: $cfg->{PORT}] " if not $new_flag;
+			&printMsg ( "Load balancer management port: " );
+			&printMsg ( "[$set_msg: $cfg->{PORT}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
@@ -976,7 +1036,7 @@ sub setHost
 			unless ( $cfg->{ PORT } > 0 and $cfg->{ PORT } <= 65535 )
 			{
 				$valid_flag = 0;
-				say "Invalid PORT for load balancer. It expects a port between 1 and 65535";
+				&printError ("Invalid PORT for load balancer. It expects a port between 1 and 65535");
 			}
 		} while ( !$valid_flag );
 	}
@@ -984,8 +1044,8 @@ sub setHost
 	# get zapi key
 	do
 	{
-		print "Load balancer zapi key: ";
-		print "[$set_msg: $cfg->{ZAPI_KEY}] " if not $new_flag;
+		&printMsg ( "Load balancer zapi key: " );
+		&printMsg ( "[$set_msg: $cfg->{ZAPI_KEY}] " ) if not $new_flag;
 		$valid_flag = 1;
 		my $val = <STDIN>;
 		chomp $val;
@@ -993,22 +1053,21 @@ sub setHost
 		unless ( $cfg->{ ZAPI_KEY } =~ /\S+/ )
 		{
 			$valid_flag = 0;
-			say "Invalid zapi key. It expects a string with the zapi key";
+			&printError ("Invalid zapi key. It expects a string with the zapi key");
 		}
 	} while ( !$valid_flag );
 
 	# get zapi version
 	#	do
 	#	{
-	#		print "Load balancer zapi version: ";
+	#		&printMsg ( "Load balancer zapi version: " );
 	#		$valid_flag = 1;
 	#		$cfg->{ ZAPI_VERSION } = <STDIN>;
 	#		chomp $cfg->{ ZAPI_VERSION };
 	#		unless ( $cfg->{ ZAPI_VERSION } =~ /^(4.0)$/ )
 	#		{
 	#			$valid_flag = 0;
-	#			say
-	#			  "Invalid zapi version. It expects once of the following versions: 4.0.";
+	#			&printError ( "Invalid zapi version. It expects once of the following versions: 4.0" );
 	#		}
 	#	} while ( !$valid_flag );
 	$cfg->{ ZAPI_VERSION } = "4.0";
@@ -1019,20 +1078,20 @@ sub setHost
 	if ( !defined $Config->{ _ }->{ default_host } )
 	{
 		$Config->{ _ }->{ default_host } = $hostname;
-		say "Saved as default profile";
+		&printSuccess ( "Saved as default profile", 0 );
 	}
 	elsif ( $Config->{ _ }->{ default_host } ne $hostname )
 	{
-		print "Do you wish set this host as the default one? [yes|no=default]: ";
+		&printMsg (  "Do you wish set this host as the default one? [yes|no=default]: " );
 		my $confirmation = <STDIN>;
 		chomp $confirmation;
 		if ( $confirmation =~ /^(y|yes)$/i )
 		{
 			$Config->{ _ }->{ default_host } = $hostname;
-			say "Saved as default profile";
+			&printSuccess ( "Saved as default profile" );
 		}
 	}
-	say "";
+	&printSuccess ( "" );
 
 	$Config->write( $hostfile );
 	return $Config->{ $hostname };
@@ -1095,11 +1154,11 @@ sub delHost
 			delete $Config->{ $name };
 			$Config->write( $hostfile );
 			$err = 0;
-			say "The '$name' host was unregistered from zcli";
+			&printSuccess ( "The '$name' host was unregistered from zcli", 0 );
 		}
 	}
 
-	say "The '$name' host was not found" if $err;
+	&printError ( "The '$name' host was not found" ) if $err;
 
 	return $err;
 }
@@ -1256,7 +1315,7 @@ sub check_connectivity
 	  )
 	  or do
 	{
-		say "The '$host->{NAME}' host ($host->{HOST}:$host->{PORT}) cannot be reached.";
+		&printError ( "The '$host->{NAME}' host ($host->{HOST}:$host->{PORT}) cannot be reached." );
 		return 0;
 	};
 
@@ -1281,7 +1340,7 @@ Returns:
 sub check_is_lb
 {
 	my $cmd =
-	  'dpkg -l |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3 2>/dev/null';
+	  'dpkg -l 2>/dev/null |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3';
 	my $version = `$cmd`;
 
 	return ( !$version or $version < $Global::REQ_ZEVEVENET_VERSION ) ? 0 : 1;

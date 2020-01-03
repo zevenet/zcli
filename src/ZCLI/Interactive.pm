@@ -58,6 +58,7 @@ sub create_zcli
 	$Env::ZCLI = new Term::ShellUI( commands     => $Env::ZCLI_CMD_ST,
 									history_file => $zcli_history, );
 
+	&printSuccess ( "Zevenet Client Line Interface" );
 	$Env::ZCLI->load_history();
 	$Env::ZCLI->getset( 'done', 0 );
 
@@ -203,7 +204,7 @@ sub gen_cmd_struct
 
 	my $host_st;
 	my @host_list = &listHost();
-	$host_st->{ $V{ LIST } }->{ proc }      = sub { say $_ for ( &listHost ) };
+	$host_st->{ $V{ LIST } }->{ proc }      = sub { printSuccess($_,0) for ( &listHost ) };
 	$host_st->{ $V{ LIST } }->{ maxargs }   = 1;
 	$host_st->{ $V{ CREATE } }->{ proc }    = \&setHost;
 	$host_st->{ $V{ CREATE } }->{ maxargs } = 1;
@@ -227,7 +228,7 @@ sub gen_cmd_struct
 		proc => sub {
 			if ( $Env::HOST->{ name } eq $_[0] )
 			{
-				say "The '$Env::HOST->{NAME}' host is being used";
+				&printError ("The '$Env::HOST->{NAME}' host is being used");
 			}
 			else
 			{
@@ -381,7 +382,8 @@ sub proc_cb
 
 		unless ( $success )
 		{
-			say "Some parameters are missing, the expected syntax is:";
+<<<<<<< HEAD
+			&printError ("Some parameters are missing, the expected syntax is:" );
 			my $desc = &desc_cb( $obj_def );
 
 			# force reload if params does not exist
@@ -398,8 +400,13 @@ sub proc_cb
 				my $pattern = quotemeta ( $Define::Description_param );
 				$desc =~ s/$pattern/$params/;
 			}
-			say "	[zcli] $desc";
+			&printError ("	[zcli] $desc");
 
+=======
+			my $desc = &desc_cb( $obj_def );
+			&printError ("Some parameters are missing");
+			&printError ($desc);
+>>>>>>> [Improvement] Create a functions to print the application messages
 			die $FIN;
 		}
 
@@ -413,7 +420,7 @@ sub proc_cb
 		&printOutput( $resp );
 
 	};
-	say $@ if $@;
+	&printError ( $@ ) if $@;
 	$err = ( $@ or $err ) ? 1 : 0;
 
 	( $err );
@@ -449,8 +456,6 @@ sub args_cb
 	{
 		my $uri_index = scalar @{ $args_parsed->{ uri_param } };
 		$possible_values = "<$obj_def->{uri_param}->[$uri_index]->{name}>";
-
-		# say "$obj_def->{uri_param}->[$uri_index]->{desc}";
 	}
 	elsif ( $next_arg =~ /file/ )
 	{

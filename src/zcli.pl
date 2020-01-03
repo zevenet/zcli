@@ -34,7 +34,7 @@ if ( &check_is_lb() )
 {
 	if ( !defined $localhost )
 	{
-		print "Type the zapi key for the current load balancer\n";
+		&printSuccess ( "Type the zapi key for the current load balancer", 0 );
 		&setHost( "localhost", 1 );
 	}
 
@@ -50,20 +50,20 @@ if ( !$Env::HOST )
 {
 	if ( exists $opt->{ 'host' } )
 	{
-		say "Not found the '$opt->{host}' host, selecting the default host";
+		&printError ("Not found the '$opt->{host}' host, selecting the default host");
 		$Env::HOST = &hostInfo( $opt->{ 'host' } );
 	}
 
 	if ( $opt->{ 'silence' } )
 	{
-		say "The silence mode needs a host profile";
+		&printError ("The silence mode needs a host profile");
 		exit 1;
 	}
 }
 
 if ( !$Env::HOST )
 {
-	say "Not found the host info, try to configure the default host profile";
+	&printSuccess ("Not found the host info, try to configure the default host profile");
 	$Env::HOST = &setHost();
 }
 

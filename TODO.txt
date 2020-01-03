@@ -1,6 +1,5 @@
 --- TAREAS DE PARAMETROS ---
 
-- Cambiar formato parametros: key=value
 - Autocompletar posibles valores de un parametro.
 	* Añadir cadena vacia si el parametro acepta valor ""
 - Para los comandos que llevan algunos parametros preseleccionados, listar los posibles comandos y quitar de la lista los que ya esten preseleccionados
@@ -16,7 +15,14 @@
 
 --- NUEVAS PROPIEDADES O MEJORAS ---
 
-- Mandar los mensajes de error de formato a salida de errores!
+
+- Cambiar salida del error: 
+# zcli farms create d
+Zevenet Client Line Interface
+Info: Creating a farm
+Error! No parameter has been sent. Please, try with:
+
+
 - Al cambia valores de escucha de cherokee se pierde la conectividad con la API, ejemplo, cambiar el puerto.
 - añadir opción para aceptar parametros como json
 - Soportar ZCLI en la CE
@@ -27,7 +33,6 @@
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
 	routing
-- Guardar el history: add_eof_exit_hook(subroutine_reference)
 - Hay llamadas que tienen parametros dependientes de otros, como poner en mantenimiento un backend.
 	Hacer que buscar un metodo para que se añadan y los compruebe la API. P.e. definirlos undef en la plantilla de definiciones de llamadas
 		if ( $json_obj->{ action } eq 'maintenance' )
