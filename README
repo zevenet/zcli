@@ -143,8 +143,6 @@ The functions used follow the following order:
 	|-> $def->{ proc } = subrutine that executes the ZAPI action
 
 
-????? adding a cmd struct example
-
 
 ##############################################################################
 # Packager

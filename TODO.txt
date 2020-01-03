@@ -7,9 +7,10 @@
 
 --- NUEVAS PROPIEDADES O MEJORAS ---
 
+- añadir autocompletado en algunos parametros (sobre todo al lincar objetos)	
+	* farms-blacklist <fname> -name <aqui_blacklists>
 - añadir opción para aceptar parametros como json
 - Soportar ZCLI en la CE
-- funcion para que compruebe que la version de zapi del lb es minimo 4.0.1
 - devolver error si hay parametros en el comando cuando es GET.
 - completar funcionalidades:
 	farms-add/rem headers
@@ -32,7 +33,10 @@
 --- TAREAS DE FORMATO ---
 
 - Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
-- En el autocompletado poner un mensaje si el comando no puede completarse. E.j. se quiere modificar un srv de una granja que no tiene srv.
+	* ocurre al rescatar el ultimo comando y volver a descartarlo
+	* el comando anterior debe haber sido el primero en ejecutarse y haber sido exito
+- En el autocompletado poner un mensaje si el comando no puede completarse. 
+		* E.j. se quiere modificar un srv de una granja que no tiene srv.
 - estandarizar nombre funciones y variables
 - añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
 - el json de salida se pierden campos si no estan dentro de params:

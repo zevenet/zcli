@@ -27,9 +27,6 @@ our $Farmguardian = {
 						  uri    => "/monitoring/fg",
 						  method => 'POST',
 		},
-
-		# ??? add copy
-
 		$V{ SET } => {
 					   uri    => "/monitoring/fg/<$K{FG}>",
 					   method => 'PUT',

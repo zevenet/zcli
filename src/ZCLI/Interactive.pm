@@ -19,6 +19,21 @@ my $FIN = $Global::FIN;
 my $zcli_dir     = $Global::config_dir;
 my $zcli_history = $Global::history_path;
 
+
+# overwriting methods
+
+# It is overwritten to print using the error output
+*Term::ShellUI::error = sub {
+	&printError ("$_[1]");
+};
+
+# skip reload when the input is a blank line
+my $skip_reload = 0;
+*Term::ShellUI::blank_line = sub {
+	$skip_reload = 1;
+};
+
+
 ### definition of functions
 
 =begin nd
@@ -59,8 +74,15 @@ sub create_zcli
 	my $err = 0;
 	while ( !$Env::ZCLI->{ done } )
 	{
-		&reload_cmd_struct();
-		&reload_prompt( $err );
+		if(!$skip_reload)
+		{
+			&reload_cmd_struct();
+			&reload_prompt( $err );
+		}
+		else
+		{
+			$skip_reload = 0;
+		}
 
 		$err = $Env::ZCLI->process_a_cmd( $incmd );
 		$err = 1 if not defined $err;

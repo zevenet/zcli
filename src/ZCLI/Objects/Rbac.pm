@@ -101,10 +101,10 @@ our $Rbac = {
 						  uri    => "/rbac/roles",
 						  method => 'POST',
 		},
-		$V{ SET } => {  # ??? PUEDE dar problemas por la forma de parsear lss parametros
-					   uri    => "/rbac/roles/<$K{RBAC_ROLE}>",
-					   method => 'PUT',
-		},
+#		$V{ SET } => {
+#					   uri    => "/rbac/roles/<$K{RBAC_ROLE}>",
+#					   method => 'PUT',
+#		},
 		$V{ DELETE } => {
 						  uri    => "/rbac/roles/<$K{RBAC_ROLE}>",
 						  method => 'DELETE',
