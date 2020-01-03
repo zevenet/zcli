@@ -382,7 +382,6 @@ sub proc_cb
 
 		unless ( $success )
 		{
-<<<<<<< HEAD
 			&printError ("Some parameters are missing, the expected syntax is:" );
 			my $desc = &desc_cb( $obj_def );
 
@@ -401,12 +400,6 @@ sub proc_cb
 				$desc =~ s/$pattern/$params/;
 			}
 			&printError ("	[zcli] $desc");
-
-=======
-			my $desc = &desc_cb( $obj_def );
-			&printError ("Some parameters are missing");
-			&printError ($desc);
->>>>>>> [Improvement] Create a functions to print the application messages
 			die $FIN;
 		}
 
