@@ -104,7 +104,7 @@ sub reload_prompt
 	my $conn_color = ( !$conn ) ? $gray : "";
 
 	my $tag = "zcli($conn_color$host$color)";
-	$Env::ZCLI->prompt( "$color$tag$no_color: " );
+	$Env::ZCLI->prompt( "$no_color$color$tag$no_color: " );
 }
 
 =begin nd

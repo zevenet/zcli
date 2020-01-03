@@ -4,26 +4,12 @@
 	* Añadir cadena vacia si el parametro acepta valor ""
 - Para los comandos que llevan algunos parametros preseleccionados, listar los posibles comandos y quitar de la lista los que ya esten preseleccionados
 	- Hay comandos (como backup apply) que son macros que contienen algunos parametros predefinidos, y al enviarse la llamada para obtener los posibles valores, se esta ejecutando la acción
-	- Cuando el parametro esta en la definicion y la api pide uno mas, no se esta mandando
-		system-backups apply old -force true
-		Info: Apply a backup to the system
-		Error!! The backup version (5.2.17) is different to the Zevenet version (_VERSION_). The parameter 'force' must be used to force the backup applying.
 - A veces aparece al usar autocompletado: system-backups apply old Can't use string ("") as an ARRAY ref while "strict refs" in use at /usr/bin/zcli line 380
-
 
 
 
 --- NUEVAS PROPIEDADES O MEJORAS ---
 
-
-- Cambiar salida del error: 
-# zcli farms create d
-Zevenet Client Line Interface
-Info: Creating a farm
-Error! No parameter has been sent. Please, try with:
-
-
-- Al cambia valores de escucha de cherokee se pierde la conectividad con la API, ejemplo, cambiar el puerto.
 - añadir opción para aceptar parametros como json
 - Soportar ZCLI en la CE
 - funcion para que compruebe que la version de zapi del lb es minimo 4.0.1
@@ -47,7 +33,6 @@ Error! No parameter has been sent. Please, try with:
 
 --- TAREAS DE FORMATO ---
 
-- quitar subrayado
 - cambiar el nombre del servicio por defecto en L4
 - transformar la respuesta en json
 - Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
