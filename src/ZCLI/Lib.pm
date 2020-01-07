@@ -68,6 +68,7 @@ ZCLI can be executed with the following options (the options are available at th
 	-help: it prints this ZCLI help.
 	-host <name>: it selects the 'name' as destination load balancer of the command.
 	-silence, -s: it executes the action without the human interaction.
+	-json, -j: the parameters will be parsed as JSON. The silence flag will be activated automatically if this flag is enabled
 
 A ZCLI command uses the following arguments:
 <object> <action> <id> <id2>... -param1 value [-param2 value]
@@ -85,9 +86,11 @@ https://www.zevenet.com/zapidocv4.0/
 
 Examples:
 farms set gslbfarm -vport 53 -vip 10.0.0.20
+farms -j set gslbfarm '{\"vport\":53,\"vip\":\"10.0.0.20\"}'
   	This command is setting the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm
 
 network-virtual create -name eth0:srv -ip 192.168.100.32
+network-virtual create '{\"name\":\"eth0:srv\",\"ip\":\"192.168.100.32\"}'
 	This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32
 ";
 
@@ -259,32 +262,47 @@ sub parseInput
 		 and !exists $def->{ 'download_file' }
 		 and $def->{ method } =~ /POST|PUT/ )
 	{
-		$parsed_completed = 0 if ( !exists $def->{ params } );
-
-		$final_step = $steps->{ body_params };
-
-		# json params
-		my $param_flag = 0;
-		my $index      = 0;
-		for ( my $ind = 0 ; $ind <= $#args ; $ind++ )
+		if ($Env::INPUT_JSON)
 		{
-			if ( $args[$ind] =~ s/^\-// )
-			{
-				$parsed_completed = 1;
-				$param_flag       = 1;
-				my $key = $args[$ind];
-				my $val = $args[$ind + 1];
-				$ind++;
+			my $json_args = join ('', @args);
 
-				$input->{ params }->{ $key } = $val;
-			}
-			elsif ( $param_flag )
+			eval { $input->{ params } = JSON::decode_json( $json_args ); };
+			if ( $@ )
 			{
-				$parsed_completed = 0;
-				&printError ( 
-				  "Error parsing the parameters. The parameters have to have the following format:" );
-				&printError ( "  $Define::Description_param" );
-				return ( $input, $final_step, $parsed_completed );
+				&printError("Error decoding the input JSON");
+				die $FIN;
+			}
+
+		}
+		else
+		{
+			$parsed_completed = 0 if ( !exists $def->{ params } );
+
+			$final_step = $steps->{ body_params };
+
+			# json params
+			my $param_flag = 0;
+			my $index      = 0;
+			for ( my $ind = 0 ; $ind <= $#args ; $ind++ )
+			{
+				if ( $args[$ind] =~ s/^\-// )
+				{
+					$parsed_completed = 1;
+					$param_flag       = 1;
+					my $key = $args[$ind];
+					my $val = $args[$ind + 1];
+					$ind++;
+
+					$input->{ params }->{ $key } = $val;
+				}
+				elsif ( $param_flag )
+				{
+					$parsed_completed = 0;
+					&printError ( 
+					"Error parsing the parameters. The parameters have to have the following format:" );
+					&printError ( "  $Define::Description_param" );
+					return ( $input, $final_step, $parsed_completed );
+				}
 			}
 		}
 	}
@@ -309,6 +327,7 @@ Returns:
 			help => 1,
 			silence => 1,
 			host => localhost,
+			json => 1,
 		};
 
 =cut
@@ -339,6 +358,10 @@ sub parseOptions
 			{
 				$opt_st->{ 'silence' } = 1;
 			}
+			elsif ( $opt eq '-json' or $opt eq '-j' )
+			{
+				$opt_st->{ 'json' } = 1;
+			}
 			elsif ( $opt eq '-host' and $args->[0] !~ /^-/ )
 			{
 				$opt_st->{ 'host' } = shift @{ $args };
@@ -353,6 +376,7 @@ sub parseOptions
 	}
 
 	$Env::SILENCE = 1 if exists $opt_st->{ silence };
+	$Env::INPUT_JSON = 1 if exists $opt_st->{ json };
 
 	return $opt_st;
 }

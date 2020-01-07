@@ -65,7 +65,10 @@ sub create_zcli
 	my $incmd = join " ", @args;
 
 	$Env::ZCLI = new Term::ShellUI( commands     => $Env::ZCLI_CMD_ST,
-									history_file => $zcli_history, );
+									history_file => $zcli_history,
+									keep_quotes => 1,
+									token_chars => '',
+									 );
 
 	&printSuccess ( "Zevenet Client Line Interface" );
 	$Env::ZCLI->load_history();
