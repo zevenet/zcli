@@ -10,7 +10,6 @@
 - añadir autocompletado en algunos parametros (sobre todo al lincar objetos)	
 	* farms-blacklist <fname> -name <aqui_blacklists>
 	* en la definicion nuevo parametro: autocomplete_param
-- añadir opción para aceptar parametros como json
 - Soportar ZCLI en la CE
 - Obtener Edicion (Enterprise o community) y quitar comandos de la EE
 	* añadir llamada /ids a la community
