@@ -1,5 +1,6 @@
 --- NUEVAS PROPIEDADES O MEJORAS ---
 
+- Cambiar entre verbos (create/add y delete/remove) en funcion de si se crean o enlazan objetos
 - En zevenet borrar el fichero hosts.ini cuando se hace factory reset
 - al tabular tras un comando fallado se pierden los parametros:
 	* ej: lanzar 'farms create'
@@ -15,7 +16,6 @@
 	farms-add/rem headers
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
-	routing
 - quitar mensaje '1: unknown command' cuando se manda un comando vacio
 
 

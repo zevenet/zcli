@@ -11,6 +11,7 @@ use ZCLI::Objects::Vlan;
 use ZCLI::Objects::Bonding;
 use ZCLI::Objects::Floating;
 use ZCLI::Objects::Alias;
+use ZCLI::Objects::Routing;
 
 # verbs
 my %V = %Define::Actions;
@@ -69,5 +70,7 @@ $Objects::Interfaces =
   &Hash::Merge::merge( $Objects::Interfaces, $Objects::Floating );
 $Objects::Interfaces =
   &Hash::Merge::merge( $Objects::Interfaces, $Objects::Alias );
+$Objects::Interfaces =
+  &Hash::Merge::merge( $Objects::Interfaces, $Objects::Routing );
 
 1;
