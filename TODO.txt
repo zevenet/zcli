@@ -1,13 +1,11 @@
---- TAREAS DE PARAMETROS ---
-
-- Autocompletar posibles valores de un parametro.
-	* Añadir cadena vacia si el parametro acepta valor ""
-
-
-
 --- NUEVAS PROPIEDADES O MEJORAS ---
 
-- añadir autocompletado en algunos parametros (sobre todo al lincar objetos)	
+- En zevenet borrar el fichero hosts.ini cuando se hace factory reset
+- al tabular tras un comando fallado se pierden los parametros:
+	* ej: lanzar 'farms create'
+	* si se recupera o escribe de nuevo no completa porque el comando es igual que el anterior
+	* aunque se recargue ZCLI no funciona
+- añadir autocompletado en algunos parametros (sobre todo al lincar objetos)
 	* farms-blacklist <fname> -name <aqui_blacklists>
 	* en la definicion nuevo parametro: autocomplete_param
 - Soportar ZCLI en la CE
@@ -18,6 +16,7 @@
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
 	routing
+- quitar mensaje '1: unknown command' cuando se manda un comando vacio
 
 
 
@@ -26,7 +25,7 @@
 - Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
 	* ocurre al rescatar el ultimo comando y volver a descartarlo
 	* el comando anterior debe haber sido el primero en ejecutarse y haber sido exito
-- En el autocompletado poner un mensaje si el comando no puede completarse. 
+- En el autocompletado poner un mensaje si el comando no puede completarse.
 		* E.j. se quiere modificar un srv de una granja que no tiene srv.
 - estandarizar nombre funciones y variables
 - añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
@@ -35,6 +34,7 @@
 
 --- DOC ---
 
+- Doc el color del host del prompt en la ayuda. Los colores en funcion de si hay o no conectividad
 - Licencia
 - quitar comentarios en español
 - cambiar objetos por singular

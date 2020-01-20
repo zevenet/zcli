@@ -19,12 +19,11 @@ my $FIN = $Global::FIN;
 my $zcli_dir     = $Global::config_dir;
 my $zcli_history = $Global::history_path;
 
-
 # overwriting methods
 
 # It is overwritten to print using the error output
 *Term::ShellUI::error = sub {
-	&printError ("$_[1]");
+	&printError( "$_[1]" );
 };
 
 # skip reload when the input is a blank line
@@ -32,7 +31,6 @@ my $skip_reload = 0;
 *Term::ShellUI::blank_line = sub {
 	$skip_reload = 1;
 };
-
 
 ### definition of functions
 
@@ -64,20 +62,21 @@ sub create_zcli
 	# $Env::ZCLI->run(@args); this function is not completed
 	my $incmd = join " ", @args;
 
-	$Env::ZCLI = new Term::ShellUI( commands     => $Env::ZCLI_CMD_ST,
+	$Env::ZCLI = new Term::ShellUI(
+									commands     => $Env::ZCLI_CMD_ST,
 									history_file => $zcli_history,
-									keep_quotes => 1,
-									token_chars => '',
-									 );
+									keep_quotes  => 1,
+									token_chars  => '',
+	);
 
-	&printSuccess ( "Zevenet Client Line Interface" );
+	&printSuccess( "Zevenet Client Line Interface" );
 	$Env::ZCLI->load_history();
 	$Env::ZCLI->getset( 'done', 0 );
 
 	my $err = 0;
 	while ( !$Env::ZCLI->{ done } )
 	{
-		if(!$skip_reload)
+		if ( !$skip_reload )
 		{
 			&reload_cmd_struct();
 			&reload_prompt( $err );
@@ -92,7 +91,7 @@ sub create_zcli
 		$Env::ZCLI->save_history();
 
 		last if $Env::SILENCE;
-		last if $incmd;              # only loop if we're prompting for commands
+		last if $incmd;          # only loop if we're prompting for commands
 	}
 
 	return $err;
@@ -151,7 +150,7 @@ sub reload_cmd_struct
 	if ( $Env::CONNECTIVITY )
 	{
 		$Env::HOST_IDS_TREE = &getLBIdsTree( $Env::HOST );
-		if (!defined $Env::HOST_IDS_TREE)
+		if ( !defined $Env::HOST_IDS_TREE )
 		{
 			$Env::CONNECTIVITY = 0;
 		}
@@ -227,7 +226,8 @@ sub gen_cmd_struct
 
 	my $host_st;
 	my @host_list = &listHost();
-	$host_st->{ $V{ LIST } }->{ proc }      = sub { printSuccess($_,0) for ( &listHost ) };
+	$host_st->{ $V{ LIST } }->{ proc } =
+	  sub { printSuccess( $_, 0 ) for ( &listHost ) };
 	$host_st->{ $V{ LIST } }->{ maxargs }   = 1;
 	$host_st->{ $V{ CREATE } }->{ proc }    = \&setHost;
 	$host_st->{ $V{ CREATE } }->{ maxargs } = 1;
@@ -251,7 +251,7 @@ sub gen_cmd_struct
 		proc => sub {
 			if ( $Env::HOST->{ name } eq $_[0] )
 			{
-				&printError ("The '$Env::HOST->{NAME}' host is being used");
+				&printError( "The '$Env::HOST->{NAME}' host is being used" );
 			}
 			else
 			{
@@ -377,6 +377,20 @@ sub desc_cb
 	return $msg;
 }
 
+sub getMissingParam
+{
+	my ( $desc, $input_args ) = @_;
+
+	my $it = 0;
+	foreach my $p ( split ( ' ', $desc ) )
+	{
+		return $p if !defined $input_args->[$it];
+		$it++;
+	}
+
+	return undef;
+}
+
 =begin nd
 Function: get_args_num
 
@@ -390,18 +404,19 @@ Returns:
 	Integer - number of expeted arguments
 
 =cut
+
 sub get_args_num
 {
 	my $def = shift;
 
-	my $num = (exists $def->{ upload_file } or exists $def->{ download_file })? 1 : 0;
-	$num += 2; 	# the object and the action 
+	my $num =
+	  ( exists $def->{ upload_file } or exists $def->{ download_file } ) ? 1 : 0;
+	$num += 2;                                 # the object and the action
 	$num += scalar &getIds( $def->{ uri } );
 	$num += scalar @{ $def->{ uri_param } } if ( exists $def->{ uri_param } );
 
 	return $num;
 }
-
 
 =begin nd
 Function: proc_cb
@@ -422,17 +437,34 @@ sub proc_cb
 
 	my $resp;
 	my $err;
-	my @input_args = ($obj_def->{ object }, $obj_def->{ action }, @_ );
+	my @input_args = ( $obj_def->{ object }, $obj_def->{ action }, @_ );
 	eval {
 		$Env::CMD_STRING = "";    # clean string
 
 		my ( $input_parsed, $next_arg, $success ) =
-		  &parseInput( $obj_def, 0, @input_args);
+		  &parseInput( $obj_def, 0, @input_args );
+
+		# if there isn't a path to download the file, it is used the same name
+		if ( !$success and ( $next_arg eq 'download_file' ) )
+		{
+			$input_parsed->{ download_file } = $input_args[-1];
+			$success = 1;
+		}
 
 		unless ( $success )
 		{
-			&printError ("Some parameters are missing, the expected syntax is:" );
-			my $desc = &desc_cb( $obj_def );
+			my $desc      = &desc_cb( $obj_def );
+			my $missing_p = &getMissingParam( $desc, \@input_args );
+
+			#		if (!defined $missing_p )
+			{
+				&printError( "Some parameters are missing. The expected syntax is:" );
+			}
+
+#		else
+#		{
+#			&printError ("Some parameters are missing, it failed getting '$missing_p'. The expected syntax is:" );
+#		}
 
 			# force reload if params does not exist
 			&listParams( $obj_def, $input_parsed, $Env::HOST )
@@ -443,21 +475,30 @@ sub proc_cb
 				my $params = "";
 				foreach my $p ( keys %{ $Env::CMD_PARAMS_DEF } )
 				{
-					$params .= "[-$p <$p>] ";
+					if ( exists $Env::CMD_PARAMS_DEF->{ $p }->{ required } )
+					{
+						$params = "<-$p $p> $params";
+					}
+					else
+					{
+						$params .= "[-$p $p] ";
+					}
 				}
 				my $pattern = quotemeta ( $Define::Description_param );
 				$desc =~ s/$pattern/$params/;
 			}
-			&printError ("	[zcli] $desc");
+			&printError( "	[zcli] $desc" );
 			die $FIN;
 		}
 
 		# do not allow sending extra arguments using GET methods
-		if ($obj_def->{method} eq 'GET' and (scalar (@input_args) > &get_args_num($obj_def)) )
+		if ( $obj_def->{ method } eq 'GET'
+			 and ( scalar ( @input_args ) > &get_args_num( $obj_def ) ) )
 		{
 			my $desc = &desc_cb( $obj_def );
-			&printError (" There are extra arguments in the command, the expected syntax is:");
-			&printError ("	[zcli] $desc");
+			&printError(
+						 " There are extra arguments in the command, the expected syntax is:" );
+			&printError( "	[zcli] $desc" );
 			die $FIN;
 		}
 
@@ -471,7 +512,7 @@ sub proc_cb
 		&printOutput( $resp );
 
 	};
-	&printError ( $@ ) if $@;
+	&printError( $@ ) if $@;
 	$err = ( $@ or $err ) ? 1 : 0;
 
 	( $err );
@@ -590,8 +631,10 @@ sub complete_body_params
 		if ( !@params )
 		{
 			@params = ();
-			$Env::ZCLI->completemsg( "  ## This command does not expect more parameters\n" )
-			  if ( $Global::DEBUG );
+			$Env::ZCLI->completemsg(
+									 "  ## This command does not expect more parameters\n" );
+
+			#if ( $Global::DEBUG );
 		}
 
 		$out = \@params;
@@ -631,8 +674,9 @@ sub get_next_id
 		my @values = keys %{ $nav_tree };
 		if ( !@values )
 		{
-			my $msg = "This object is not using the feature '$key'\n";
-			$Env::ZCLI->completemsg( "  ## $msg\n" ) if ( $Global::DEBUG );
+			# my $msg = "This object is not using the feature '$key'\n";
+			# $Env::ZCLI->completemsg( "  ## $msg\n" ) if ( $Global::DEBUG );
+			$Env::ZCLI->completemsg( "  ## There is no any '$key'\n" );
 		}
 
 		return \@values;

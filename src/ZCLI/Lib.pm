@@ -1,4 +1,4 @@
-	#!/usr/bin/perl
+#!/usr/bin/perl
 
 use strict;
 use feature "say";
@@ -94,7 +94,7 @@ network-virtual create '{\"name\":\"eth0:srv\",\"ip\":\"192.168.100.32\"}'
 	This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32
 ";
 
-	&printMsg($msg,$err);
+	&printMsg( $msg, $err );
 }
 
 =begin nd
@@ -123,7 +123,7 @@ sub replaceUrl
 		$index++;
 		unless ( $url =~ s/\<[\w -]+\>/$arg/ )
 		{
-			&printError ( "The id '$index' could not be replaced");
+			&printError( "The id '$index' could not be replaced" );
 			die $Define::FIN;
 		}
 	}
@@ -262,14 +262,14 @@ sub parseInput
 		 and !exists $def->{ 'download_file' }
 		 and $def->{ method } =~ /POST|PUT/ )
 	{
-		if ($Env::INPUT_JSON)
+		if ( $Env::INPUT_JSON )
 		{
-			my $json_args = join ('', @args);
+			my $json_args = join ( '', @args );
 
 			eval { $input->{ params } = JSON::decode_json( $json_args ); };
 			if ( $@ )
 			{
-				&printError("Error decoding the input JSON");
+				&printError( "Error decoding the input JSON" );
 				die $FIN;
 			}
 
@@ -298,9 +298,10 @@ sub parseInput
 				elsif ( $param_flag )
 				{
 					$parsed_completed = 0;
-					&printError ( 
-					"Error parsing the parameters. The parameters have to have the following format:" );
-					&printError ( "  $Define::Description_param" );
+					&printError(
+						"Error parsing the parameters. The parameters have to have the following format:"
+					);
+					&printError( "  $Define::Description_param" );
 					return ( $input, $final_step, $parsed_completed );
 				}
 			}
@@ -368,14 +369,14 @@ sub parseOptions
 			}
 			else
 			{
-				&printError ("The '$o' option is not recognized.");
-				&printHelp(1);
+				&printError( "The '$o' option is not recognized." );
+				&printHelp( 1 );
 				exit 1;
 			}
 		}
 	}
 
-	$Env::SILENCE = 1 if exists $opt_st->{ silence };
+	$Env::SILENCE    = 1 if exists $opt_st->{ silence };
 	$Env::INPUT_JSON = 1 if exists $opt_st->{ json };
 
 	return $opt_st;
@@ -416,7 +417,7 @@ sub createZapiRequest
 		{
 			unless ( $call->{ uri } =~ s/$tag/$p/ )
 			{
-				&printError ( "Error replacing the param '$p'" );
+				&printError( "Error replacing the param '$p'" );
 				die $FIN;
 			}
 		}
@@ -480,9 +481,11 @@ sub getLBIdsTree
 
 	my $tree;
 
-	if ($resp->{code} == 404)
+	if ( $resp->{ code } == 404 )
 	{
-		&printError("Error connecting, ZCLI needs a load balancer with the version $Global::REQ_ZEVEVENET_VERSION or higher");
+		&printError(
+			"Error connecting, ZCLI needs a load balancer with the version $Global::REQ_ZEVEVENET_VERSION or higher"
+		);
 	}
 	elsif ( $resp->{ 'json' }->{ 'params' } )
 	{
@@ -775,6 +778,8 @@ sub listParams
 		$Env::CMD_PARAMS_DEF = {};
 		foreach my $p ( @{ $params_ref } )
 		{
+			$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ required } = 1
+			  if ( exists $p->{ options } and grep ( /^required$/, @{ $p->{ options } } ) );
 			$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ exist } = 1;
 			$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ possible_values } =
 			  $p->{ possible_values }
@@ -810,39 +815,38 @@ sub printOutput
 
 	if ( exists $resp->{ json }->{ description } )
 	{
-		&printSuccess ( "Info: $resp->{json}->{description}" );
+		&printSuccess( "Info: $resp->{json}->{description}" );
 		delete $resp->{ json }->{ description };
 	}
 
 	if ( $resp->{ err } )
 	{
-		&printError ( "Error! $resp->{msg}" );
+		&printError( "Error! $resp->{msg}" );
 	}
 	else
 	{
 		if ( exists $resp->{ msg } and defined $resp->{ msg } )
 		{
-			&printSuccess ( "$resp->{ msg }" );
+			&printSuccess( "$resp->{ msg }" );
 		}
 
 		if ( exists $resp->{ txt } )
 		{
-			&printSuccess ( "$resp->{txt}", 0 );
+			&printSuccess( "$resp->{txt}", 0 );
 		}
 
 		if ( %{ $resp->{ json } } )
 		{
-			delete $resp->{msg} if exists $resp->{ msg };
+			delete $resp->{ msg } if exists $resp->{ msg };
 			my $json_enc = "";
 			eval {
 				$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
 			};
-			&printSuccess ( "$json_enc", 0 ) if ( $json_enc );
+			&printSuccess( "$json_enc", 0 ) if ( $json_enc );
 		}
 	}
-	&printSuccess ( "" ); # extra new line
+	&printSuccess( "" );    # extra new line
 }
-
 
 =begin nd
 Function: printMsg
@@ -863,10 +867,10 @@ sub printMsg
 	my $msg = shift;
 	my $err = shift // 0;
 
-	chomp($msg);
-	$msg .= "\n"; 
+	chomp ( $msg );
+	$msg .= "\n";
 
-	if ($err)
+	if ( $err )
 	{
 		print STDERR $msg;
 	}
@@ -894,7 +898,7 @@ sub printError
 {
 	my $msg = shift;
 
-	&printMsg($msg,1);
+	&printMsg( $msg, 1 );
 }
 
 =begin nd
@@ -915,12 +919,11 @@ Returns:
 
 sub printSuccess
 {
-	my $msg = shift;
+	my $msg    = shift;
 	my $header = shift // 1;
 
-	&printMsg($msg,0) unless ( $header and $Env::SILENCE );
+	&printMsg( $msg, 0 ) unless ( $header and $Env::SILENCE );
 }
-
 
 ## host
 
@@ -996,11 +999,11 @@ sub setHost
 		{
 			if ( !defined $hostname )
 			{
-				&printError ("A host name is required");
+				&printError( "A host name is required" );
 			}
 			else
 			{
-				&printError ("The '$hostname' host does not exist");
+				&printError( "The '$hostname' host does not exist" );
 			}
 			return undef;
 		}
@@ -1013,7 +1016,7 @@ sub setHost
 	{
 		do
 		{
-			&printMsg (  "Load balancer host name: " );
+			&printMsg( "Load balancer host name: " );
 			$valid_flag = 1;
 			$hostname   = <STDIN>;
 			chomp $hostname;
@@ -1021,12 +1024,13 @@ sub setHost
 			if ( $hostname !~ /\S+/ )
 			{
 				$valid_flag = 0;
-				&printError ("Invalid name. It expects a string with the load balancer host name");
+				&printError(
+							 "Invalid name. It expects a string with the load balancer host name" );
 			}
 			elsif ( exists $Config->{ $hostname } )
 			{
 				$valid_flag = 0;
-				&printError ("Invalid name. The '$hostname' host already exist");
+				&printError( "Invalid name. The '$hostname' host already exist" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1036,8 +1040,8 @@ sub setHost
 	{
 		do
 		{
-			&printMsg ( "Load balancer management IP: " );
-			&printMsg ( "[$set_msg: $cfg->{HOST}] " ) if not $new_flag;
+			&printMsg( "Load balancer management IP: " );
+			&printMsg( "[$set_msg: $cfg->{HOST}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
@@ -1045,7 +1049,7 @@ sub setHost
 			unless ( $cfg->{ HOST } =~ /$ip_regex/ )
 			{
 				$valid_flag = 0;
-				&printError ("Invalid IP for load balancer. It expects an IP v4 or v6");
+				&printError( "Invalid IP for load balancer. It expects an IP v4 or v6" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1055,8 +1059,8 @@ sub setHost
 	{
 		do
 		{
-			&printMsg ( "Load balancer management port: " );
-			&printMsg ( "[$set_msg: $cfg->{PORT}] " ) if not $new_flag;
+			&printMsg( "Load balancer management port: " );
+			&printMsg( "[$set_msg: $cfg->{PORT}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
@@ -1064,7 +1068,8 @@ sub setHost
 			unless ( $cfg->{ PORT } > 0 and $cfg->{ PORT } <= 65535 )
 			{
 				$valid_flag = 0;
-				&printError ("Invalid PORT for load balancer. It expects a port between 1 and 65535");
+				&printError(
+						  "Invalid PORT for load balancer. It expects a port between 1 and 65535" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1072,8 +1077,8 @@ sub setHost
 	# get zapi key
 	do
 	{
-		&printMsg ( "Load balancer zapi key: " );
-		&printMsg ( "[$set_msg: $cfg->{ZAPI_KEY}] " ) if not $new_flag;
+		&printMsg( "Load balancer zapi key: " );
+		&printMsg( "[$set_msg: $cfg->{ZAPI_KEY}] " ) if not $new_flag;
 		$valid_flag = 1;
 		my $val = <STDIN>;
 		chomp $val;
@@ -1081,23 +1086,23 @@ sub setHost
 		unless ( $cfg->{ ZAPI_KEY } =~ /\S+/ )
 		{
 			$valid_flag = 0;
-			&printError ("Invalid zapi key. It expects a string with the zapi key");
+			&printError( "Invalid zapi key. It expects a string with the zapi key" );
 		}
 	} while ( !$valid_flag );
 
-	# get zapi version
-	#	do
-	#	{
-	#		&printMsg ( "Load balancer zapi version: " );
-	#		$valid_flag = 1;
-	#		$cfg->{ ZAPI_VERSION } = <STDIN>;
-	#		chomp $cfg->{ ZAPI_VERSION };
-	#		unless ( $cfg->{ ZAPI_VERSION } =~ /^(4.0)$/ )
-	#		{
-	#			$valid_flag = 0;
-	#			&printError ( "Invalid zapi version. It expects once of the following versions: 4.0" );
-	#		}
-	#	} while ( !$valid_flag );
+# get zapi version
+#	do
+#	{
+#		&printMsg ( "Load balancer zapi version: " );
+#		$valid_flag = 1;
+#		$cfg->{ ZAPI_VERSION } = <STDIN>;
+#		chomp $cfg->{ ZAPI_VERSION };
+#		unless ( $cfg->{ ZAPI_VERSION } =~ /^(4.0)$/ )
+#		{
+#			$valid_flag = 0;
+#			&printError ( "Invalid zapi version. It expects once of the following versions: 4.0" );
+#		}
+#	} while ( !$valid_flag );
 	$cfg->{ ZAPI_VERSION } = "4.0";
 
 	$Config->{ $hostname } = $cfg;
@@ -1106,20 +1111,20 @@ sub setHost
 	if ( !defined $Config->{ _ }->{ default_host } )
 	{
 		$Config->{ _ }->{ default_host } = $hostname;
-		&printSuccess ( "Saved as default profile", 0 );
+		&printSuccess( "Saved as default profile", 0 );
 	}
 	elsif ( $Config->{ _ }->{ default_host } ne $hostname )
 	{
-		&printMsg (  "Do you wish set this host as the default one? [yes|no=default]: " );
+		&printMsg( "Do you wish set this host as the default one? [yes|no=default]: " );
 		my $confirmation = <STDIN>;
 		chomp $confirmation;
 		if ( $confirmation =~ /^(y|yes)$/i )
 		{
 			$Config->{ _ }->{ default_host } = $hostname;
-			&printSuccess ( "Saved as default profile" );
+			&printSuccess( "Saved as default profile" );
 		}
 	}
-	&printSuccess ( "" );
+	&printSuccess( "" );
 
 	$Config->write( $hostfile );
 	return $Config->{ $hostname };
@@ -1182,11 +1187,11 @@ sub delHost
 			delete $Config->{ $name };
 			$Config->write( $hostfile );
 			$err = 0;
-			&printSuccess ( "The '$name' host was unregistered from zcli", 0 );
+			&printSuccess( "The '$name' host was unregistered from zcli", 0 );
 		}
 	}
 
-	&printError ( "The '$name' host was not found" ) if $err;
+	&printError( "The '$name' host was not found" ) if $err;
 
 	return $err;
 }
@@ -1343,7 +1348,8 @@ sub check_connectivity
 	  )
 	  or do
 	{
-		&printError ( "The '$host->{NAME}' host ($host->{HOST}:$host->{PORT}) cannot be reached." );
+		&printError(
+			  "The '$host->{NAME}' host ($host->{HOST}:$host->{PORT}) cannot be reached." );
 		return 0;
 	};
 
