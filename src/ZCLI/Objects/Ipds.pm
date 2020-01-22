@@ -21,14 +21,16 @@ package Objects;
 our $Ipds = {
 			  'ipds' => {
 						  $V{ LIST } => {
-										  uri    => "/ipds",
-										  method => 'GET',
+										  uri        => "/ipds",
+										  method     => 'GET',
+										  enterprise => 1,
 						  },
 			  },
 			  'ipds-package' => {
 								  $V{ GET } => {
-												 uri    => "/ipds/package",
-												 method => 'GET',
+												 uri        => "/ipds/package",
+												 method     => 'GET',
+												 enterprise => 1,
 								  },
 								  $V{ UPGRADE } => {
 													 uri    => "/ipds/package",
@@ -36,6 +38,7 @@ our $Ipds = {
 													 params => {
 																 'action' => 'upgrade',
 													 },
+													 enterprise => 1,
 								  },
 			  },
 };

@@ -14,45 +14,49 @@ my %K = %Define::Keys;
 package Objects;
 
 my $uri_param_rule = [
-					{
-						name => "id",
-						desc => "the id inside the set rule",
-					},
-			  ];
+					  {
+						 name => "id",
+						 desc => "the id inside the set rule",
+					  },
+];
 
 my $uri_param_match = [
-					{
-						name => "id",
-						desc => "the id inside the set rule",
-					},
-					{
-						name => "match",
-						desc => "the match inside the rule",
-					},
-			  ];
-
+					   {
+						  name => "id",
+						  desc => "the id inside the set rule",
+					   },
+					   {
+						  name => "match",
+						  desc => "the match inside the rule",
+					   },
+];
 
 our $Waf = {
 	'ipds-waf' => {
 					$V{ LIST } => {
-									uri    => "/ipds/waf",
-									method => 'GET',
+									uri        => "/ipds/waf",
+									method     => 'GET',
+									enterprise => 1,
 					},
 					$V{ GET } => {
-								   uri    => "/ipds/waf/<$K{WAF}>",
-								   method => 'GET',
+								   uri        => "/ipds/waf/<$K{WAF}>",
+								   method     => 'GET',
+								   enterprise => 1,
 					},
 					$V{ CREATE } => {
-									  uri    => "/ipds/waf",
-									  method => 'POST',
+									  uri        => "/ipds/waf",
+									  method     => 'POST',
+									  enterprise => 1,
 					},
 					$V{ SET } => {
-								   uri    => "/ipds/waf/<$K{WAF}>",
-								   method => 'PUT',
+								   uri        => "/ipds/waf/<$K{WAF}>",
+								   method     => 'PUT',
+								   enterprise => 1,
 					},
 					$V{ DELETE } => {
-									  uri    => "/ipds/waf/<$K{WAF}>",
-									  method => 'DELETE',
+									  uri        => "/ipds/waf/<$K{WAF}>",
+									  method     => 'DELETE',
+									  enterprise => 1,
 					},
 					$V{ START } => {
 									 uri    => "/ipds/waf/<$K{WAF}>/actions",
@@ -60,6 +64,7 @@ our $Waf = {
 									 params => {
 												 'action' => 'start',
 									 },
+									 enterprise => 1,
 					},
 					$V{ STOP } => {
 									uri    => "/ipds/waf/<$K{WAF}>/actions",
@@ -67,50 +72,61 @@ our $Waf = {
 									params => {
 												'action' => 'stop',
 									},
+									enterprise => 1,
 					},
 	},
 	'ipds-waf-rule' => {
-						 $V{ GET } => {
-										uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag",
-										method => 'GET',
-										uri_param => $uri_param_rule,
-						 },
-						 $V{ CREATE } => {
-										   uri    => "/ipds/waf/<$K{WAF}>/rules",
-										   method => 'POST',
-						 },
-						 $V{ SET } => {
-										uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag",
-										method => 'PUT',
-										uri_param => $uri_param_rule,
-						 },
-						 $V{ DELETE } => {
-										  uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag",
-										  method => 'DELETE',
-										  uri_param => $uri_param_rule,
-						 },
-						 $V{ MOVE } => {
-								  uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/actions",
-								  method => 'POST',
-								  uri_param => $uri_param_rule,
-						 },
+					$V{ GET } => {
+								   uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag",
+								   method     => 'GET',
+								   uri_param  => $uri_param_rule,
+								   enterprise => 1,
+					},
+					$V{ CREATE } => {
+									  uri        => "/ipds/waf/<$K{WAF}>/rules",
+									  method     => 'POST',
+									  enterprise => 1,
+					},
+					$V{ SET } => {
+								   uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag",
+								   method     => 'PUT',
+								   uri_param  => $uri_param_rule,
+								   enterprise => 1,
+					},
+					$V{ DELETE } => {
+									uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag",
+									method     => 'DELETE',
+									uri_param  => $uri_param_rule,
+									enterprise => 1,
+					},
+					$V{ MOVE } => {
+							uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/actions",
+							method     => 'POST',
+							uri_param  => $uri_param_rule,
+							enterprise => 1,
+					},
 	},
 	'ipds-waf-rule-match' => {
-		  $V{ CREATE } => {
-							uri    => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/matches",
-							method => 'POST',
-							uri_param => $uri_param_rule,
-		  },
-		  $V{ SET } => {
-				  uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/matches/$Define::UriParamTag",
-				  method => 'PUT',
-				  uri_param => $uri_param_match,
-		  },
-		  $V{ DELETE } => {
-				  uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/matches/$Define::UriParamTag",
-				  method => 'DELETE',
-				  uri_param => $uri_param_match,
-		  },
+		$V{ CREATE } => {
+						  uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/matches",
+						  method     => 'POST',
+						  uri_param  => $uri_param_rule,
+						  enterprise => 1,
+		},
+		$V{ SET } => {
+			uri =>
+			  "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/matches/$Define::UriParamTag",
+			method     => 'PUT',
+			uri_param  => $uri_param_match,
+			enterprise => 1,
+		},
+		$V{ DELETE } => {
+			uri =>
+			  "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/matches/$Define::UriParamTag",
+			method     => 'DELETE',
+			uri_param  => $uri_param_match,
+			enterprise => 1,
+		},
 	},
 };
 

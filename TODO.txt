@@ -9,19 +9,21 @@
 - añadir autocompletado en algunos parametros (sobre todo al lincar objetos)
 	* farms-blacklist <fname> -name <aqui_blacklists>
 	* en la definicion nuevo parametro: autocomplete_param
-- Soportar ZCLI en la CE
-- Obtener Edicion (Enterprise o community) y quitar comandos de la EE
-	* añadir llamada /ids a la community
 - completar funcionalidades:
 	farms-add/rem headers
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
 - quitar mensaje '1: unknown command' cuando se manda un comando vacio
+- Mostrar ayuda al enviar comando sin  parametros: 	[zcli] farms create <-vip vip> <-vport vport> <-farmname farmname> <-profile profile> [-copy_from copy_from] 
+	zcli(devcano): farms create 
+	Info: Creating a farm
+	Error! No parameter has been sent. Please, try with:
 
 
 
 --- TAREAS DE FORMATO ---
 
+- cambiar HOST por PROFILE
 - Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
 	* ocurre al rescatar el ultimo comando y volver a descartarlo
 	* el comando anterior debe haber sido el primero en ejecutarse y haber sido exito
@@ -42,6 +44,7 @@
 - documentar la implementacion
 - quitar comentarios debug ????
 - Crear un script con comandos para usar en la documentación como ejemplos de llamadas
+
 
 
 --- Tests ---

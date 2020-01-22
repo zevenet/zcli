@@ -18,18 +18,22 @@ our $Floating = {
 										  $V{ LIST } => {
 														  uri    => "/interfaces/floating",
 														  method => 'GET',
+														  enterprise => 1,
 										  },
 										  $V{ GET } => {
 												  uri => "/interfaces/floating/<$K{IFACE}>",
-												  method => 'GET',
+												  method     => 'GET',
+												  enterprise => 1,
 										  },
 										  $V{ SET } => {
 												  uri => "/interfaces/floating/<$K{IFACE}>",
-												  method => 'PUT',
+												  method     => 'PUT',
+												  enterprise => 1,
 										  },
 										  $V{ DELETE } => {
 												  uri => "/interfaces/floating/<$K{IFACE}>",
-												  method => 'DELETE',
+												  method     => 'DELETE',
+												  enterprise => 1,
 										  },
 				  },
 };

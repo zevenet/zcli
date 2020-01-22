@@ -14,8 +14,8 @@ our $hosts_path   = "$config_dir/hosts.ini";
 our $CONNECTIVITY = 1;    # It is the result of a connectivity test with the lb
 
 package Env;
-our $INPUT_JSON = 0;	# It is the execution options to run without interactive
-our $SILENCE = 0;	# It is the execution options to run without interactive
+our $INPUT_JSON = 0;    # It is the execution options to run without interactive
+our $SILENCE    = 0;    # It is the execution options to run without interactive
 our $HOST;   # It is the host struct with info to connect with the load balancer
 our
   $HOST_IDS_TREE;  # It is the tree with the IDs that the load balancer contains
@@ -35,31 +35,32 @@ package Define;
 
 our $Description_param =
   "[-param_name_1 param_value_1] [-param_name_2 param_value_2] ...";
-our $L4_SERVICE = "default_service";  
+our $L4_SERVICE = "default_service";
 
 # object keys
 our %Keys = (
-			  FARM       => 'farm',
-			  SRV        => 'service',
-			  BK         => 'backend',
-			  FG         => 'farmguardian',
-			  ZONES      => 'zones',
-			  CERT       => 'certificate',
-			  WAF        => 'waf',
-			  WAF_RULE   => 'rule',
-			  WAF_MATCH  => 'match',
-			  BL         => 'blacklist',
-			  RBL        => 'rbl',
-			  DOS        => 'dos',
-			  IFACE      => 'interface',
-			  BOND_SLAVE => 'slave',
-			  ALIAS      => 'slave',
-			  DOMAIN     => 'domain',
-			  LOG        => 'log',
-			  BACKUP     => 'backup',
-			  RBAC_USER  => 'user',
-			  RBAC_GROUP => 'group',
-			  RBAC_ROLE  => 'role',
+			  FARM          => 'farm',
+			  SRV           => 'service',
+			  BK            => 'backend',
+			  FG            => 'farmguardian',
+			  ZONES         => 'zones',
+			  CERT          => 'certificate',
+			  WAF           => 'waf',
+			  WAF_RULE      => 'rule',
+			  WAF_MATCH     => 'match',
+			  BL            => 'blacklist',
+			  RBL           => 'rbl',
+			  DOS           => 'dos',
+			  IFACE         => 'interface',
+			  BOND_SLAVE    => 'slave',
+			  ALIAS         => 'slave',
+			  DOMAIN        => 'domain',
+			  LOG           => 'log',
+			  BACKUP        => 'backup',
+			  RBAC_USER     => 'user',
+			  RBAC_GROUP    => 'group',
+			  RBAC_ROLE     => 'role',
+			  ROUTING_TABLE => 'table',
 );
 
 our %Actions = (

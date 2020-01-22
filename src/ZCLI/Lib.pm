@@ -989,6 +989,7 @@ sub setHost
 				 HOST         => $localip,
 				 PORT         => $localport,
 				 ZAPI_KEY     => $Config->{ $localname }->{ ZAPI_KEY } // '',
+				 EDITION      => ( eval { require Zevenet::ELoad; } ) ? 'EE' : 'CE',
 		};
 	}
 
@@ -1105,6 +1106,10 @@ sub setHost
 #	} while ( !$valid_flag );
 	$cfg->{ ZAPI_VERSION } = "4.0";
 
+	# Get Edition
+	my $edition = &updateHostEdition( $cfg );
+	$cfg->{ EDITION } = $edition if ( defined $edition );
+
 	$Config->{ $hostname } = $cfg;
 
 	# set the default
@@ -1127,7 +1132,72 @@ sub setHost
 	&printSuccess( "" );
 
 	$Config->write( $hostfile );
+
 	return $Config->{ $hostname };
+}
+
+=begin nd
+Function: getHostEdition
+
+	It does a zapi call to get the zevenet edition
+
+Parametes:
+	Host - It is a struct with host information.
+
+Parametes:
+	Host - It is a struct with host information.
+
+Returns:
+	String - It returns 'EE' if Zevenet is entreprise, 'CE' if it is community or 'undef' if there was an error
+		
+=cut
+
+sub getHostEdition
+{
+	my $host = shift;
+
+	my $req = {
+				uri    => '/system/info',
+				method => 'GET'
+	};
+
+	my $resp = &zapi( $req, $host );
+
+	my $edition = $resp->{ json }->{ params }->{ edition };
+	if ( defined $edition )
+	{
+		$edition = ( $edition eq 'enterprise' ) ? 'EE' : 'CE';
+	}
+
+	return $edition;
+}
+
+=begin nd
+Function: updateHostEdition
+
+	It saves the Zevenet edition (enterprise or community) in the host configuration
+
+Parametes:
+	Host - It is the host name used to save the configuration
+	Edtiion - It expects 'EE' for enterprise or 'CE' for community
+
+Returns:
+	none - .
+		
+=cut
+
+sub updateHostEdition
+{
+	my $hostname = shift;
+	my $edition  = shift;
+
+	use Config::Tiny;
+	my $hostfile = $Global::hosts_path;
+
+	my $Config = Config::Tiny->read( $hostfile );
+	$Config->{ $hostname }->{ EDITION } = $edition;
+
+	$Config->write( $hostfile );
 }
 
 =begin nd

@@ -199,7 +199,8 @@ sub gen_cmd_struct
 	{
 		foreach my $cmd ( keys %{ $Objects::Zcli } )
 		{
-			$st->{ $cmd } = &gen_obj( $cmd, $ids_tree );
+			my $obj = &gen_obj( $cmd, $ids_tree );
+			$st->{ $cmd } = $obj if defined $obj;
 		}
 	}
 
@@ -297,14 +298,17 @@ sub gen_obj
 	my $id_tree  = shift;
 
 	# copy the Zcli object.
-	# $Objects::Zcli will be used as template and it won't be modified
+	# $Objects::Zcli swill be used as template and it won't be modified
 	# the object_struct will be expanded.
-	my $object_struct = dclone( $Objects::Zcli );
-
-	foreach my $action ( keys %{ $object_struct->{ $obj_name } } )
+	my $object_struct;
+	foreach my $action ( keys %{ $Objects::Zcli->{ $obj_name } } )
 	{
 		my $cmd;
-		my $obj_def = $object_struct->{ $obj_name }->{ $action };
+		my $obj_def = dclone( $Objects::Zcli->{ $obj_name }->{ $action } );
+
+		# skip EE features when the load balancer is of type CE
+		next if ( $Env::HOST->{ EDITION } eq 'CE' and exists $obj_def->{ enterprise } );
+
 		my @ids_def = &getIds( $obj_def->{ uri } );
 
 		# complete the definition

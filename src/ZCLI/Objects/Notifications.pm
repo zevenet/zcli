@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use ZCLI::Define;
+
 # verbs
 my %V = %Define::Actions;
 
@@ -16,11 +17,13 @@ our $Notifications = {
 					 'system-notifications-alerts-backends' => {
 							 $V{ GET } => {
 											uri => "/system/notifications/alerts/backends",
-											method => 'GET',
+											method     => 'GET',
+											enterprise => 1,
 							 },
 							 $V{ SET } => {
 											uri => "/system/notifications/alerts/backends",
-											method => 'POST',
+											method     => 'POST',
+											enterprise => 1,
 							 },
 							 $V{ START } => {
 									 uri => "/system/notifications/alerts/backends/actions",
@@ -28,6 +31,7 @@ our $Notifications = {
 									 params => {
 												 action => 'enable',
 									 },
+									 enterprise => 1,
 							 },
 							 $V{ STOP } => {
 									 uri => "/system/notifications/alerts/backends/actions",
@@ -35,16 +39,19 @@ our $Notifications = {
 									 params => {
 												 action => 'disable',
 									 },
+									 enterprise => 1,
 							 },
 					 },
 					 'system-notifications-alerts-cluster' => {
 							  $V{ GET } => {
 											 uri => "/system/notifications/alerts/cluster",
-											 method => 'GET',
+											 method     => 'GET',
+											 enterprise => 1,
 							  },
 							  $V{ SET } => {
 											 uri => "/system/notifications/alerts/cluster",
-											 method => 'POST',
+											 method     => 'POST',
+											 enterprise => 1,
 							  },
 							  $V{ START } => {
 									  uri => "/system/notifications/alerts/cluster/actions",
@@ -52,6 +59,7 @@ our $Notifications = {
 									  params => {
 												  action => 'enable',
 									  },
+									  enterprise => 1,
 							  },
 							  $V{ STOP } => {
 									  uri => "/system/notifications/alerts/cluster/actions",
@@ -59,20 +67,24 @@ our $Notifications = {
 									  params => {
 												  action => 'disable',
 									  },
+									  enterprise => 1,
 							  },
 					 },
 					 'system-notifications-methods-email' => {
 							   $V{ GET } => {
 											  uri => "/system/notifications/methods/email",
-											  method => 'GET',
+											  method     => 'GET',
+											  enterprise => 1,
 							   },
 							   $V{ SET } => {
 											  uri => "/system/notifications/methods/email",
-											  method => 'POST',
+											  method     => 'POST',
+											  enterprise => 1,
 							   },
 							   $V{ TEST } => {
 											   uri => "/system/notifications/methods/email",
-											   method => 'POST',
+											   method     => 'POST',
+											   enterprise => 1,
 							   },
 							   $V{ STOP } => {
 									   uri => "/system/notifications/methods/email/actions",
@@ -80,6 +92,7 @@ our $Notifications = {
 									   params => {
 												   action => 'test',
 									   },
+									   enterprise => 1,
 							   },
 					 },
 };

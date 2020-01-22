@@ -46,32 +46,38 @@ our $Services = {
 				  },
 				  'system-services-ssh' => {
 											 $V{ GET } => {
-															uri    => "/system/ssh",
-															method => 'GET',
+															uri        => "/system/ssh",
+															method     => 'GET',
+															enterprise => 1,
 											 },
 											 $V{ SET } => {
-															uri    => "/system/ssh",
-															method => 'POST',
+															uri        => "/system/ssh",
+															method     => 'POST',
+															enterprise => 1,
 											 },
 				  },
 				  'system-services-http' => {
 											  $V{ GET } => {
-															 uri    => "/system/http",
-															 method => 'GET',
+															 uri        => "/system/http",
+															 method     => 'GET',
+															 enterprise => 1,
 											  },
 											  $V{ SET } => {
-															 uri    => "/system/http",
-															 method => 'POST',
+															 uri        => "/system/http",
+															 method     => 'POST',
+															 enterprise => 1,
 											  },
 				  },
 				  'system-services-proxy' => {
 											   $V{ GET } => {
-															  uri    => "/system/proxy",
-															  method => 'GET',
+															  uri        => "/system/proxy",
+															  method     => 'GET',
+															  enterprise => 1,
 											   },
 											   $V{ SET } => {
-															  uri    => "/system/proxy",
-															  method => 'POST',
+															  uri        => "/system/proxy",
+															  method     => 'POST',
+															  enterprise => 1,
 											   },
 				  },
 };

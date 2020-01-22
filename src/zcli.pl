@@ -34,7 +34,7 @@ if ( &check_is_lb() )
 {
 	if ( !defined $localhost )
 	{
-		&printSuccess ( "Type the zapi key for the current load balancer", 0 );
+		&printSuccess( "Type the zapi key for the current load balancer", 0 );
 		&setHost( "localhost", 1 );
 	}
 
@@ -48,23 +48,25 @@ if ( &check_is_lb() )
 $Env::HOST = &hostInfo( $opt->{ 'host' } );
 if ( !$Env::HOST )
 {
-	if ( exists $opt->{ 'host' } )
-	{
-		&printError ("Not found the '$opt->{host}' host, selecting the default host");
-		$Env::HOST = &hostInfo( $opt->{ 'host' } );
-	}
-
 	if ( $opt->{ 'silence' } )
 	{
-		&printError ("The silence mode needs a host profile");
+		&printError( "The silence mode needs a host profile" );
 		exit 1;
 	}
 }
 
 if ( !$Env::HOST )
 {
-	&printSuccess ("Not found the host info, try to configure the default host profile");
+	&printSuccess(
+				 "Not found the host info, try to configure the default host profile" );
 	$Env::HOST = &setHost();
+}
+
+# update the Zevenet version if it does not exit
+if ( !exists $Env::HOST->{ edition } )
+{
+	my $edition = &getHostEdition( $Env::HOST );
+	&updateHostEdition( $Env::HOST->{ NAME }, $edition ) if ( defined $edition );
 }
 
 # Use interactive
