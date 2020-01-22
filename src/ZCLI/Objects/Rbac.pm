@@ -58,8 +58,11 @@ our $Rbac = {
 										enterprise => 1,
 					  },
 					  $V{ SET } => {
-									 uri        => "/rbac/groups/<$K{RBAC_GROUP}>",
-									 method     => 'PUT',
+									 uri                 => "/rbac/groups/<$K{RBAC_GROUP}>",
+									 method              => 'PUT',
+									 params_autocomplete => {
+															  role => ['rbac', 'roles'],
+									 },
 									 enterprise => 1,
 					  },
 					  $V{ DELETE } => {
@@ -72,6 +75,9 @@ our $Rbac = {
 					  $V{ ADD } => {
 									 uri    => "/rbac/groups/<$K{RBAC_GROUP}>/interfaces",
 									 method => 'POST',
+									 params_autocomplete => {
+															  name => ['interfaces', 'virtual'],
+									 },
 									 enterprise => 1,
 					  },
 					  $V{ REMOVE } => {
@@ -84,6 +90,9 @@ our $Rbac = {
 							$V{ ADD } => {
 										   uri    => "/rbac/groups/<$K{RBAC_GROUP}>/farms",
 										   method => 'POST',
+										   params_autocomplete => {
+																	name => ['farms'],
+										   },
 										   enterprise => 1,
 							},
 							$V{ REMOVE } => {
@@ -94,8 +103,11 @@ our $Rbac = {
 	},
 	'rbac-group-users' => {
 					   $V{ ADD } => {
-									  uri        => "/rbac/groups/<$K{RBAC_GROUP}>/users",
-									  method     => 'POST',
+									  uri    => "/rbac/groups/<$K{RBAC_GROUP}>/users",
+									  method => 'POST',
+									  params_autocomplete => {
+															   name => ['rbac', 'users'],
+									  },
 									  enterprise => 1,
 					   },
 					   $V{ REMOVE } => {

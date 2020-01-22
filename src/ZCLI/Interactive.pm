@@ -561,7 +561,8 @@ sub args_cb
 	elsif ( $next_arg eq 'body_params' )
 	{
 		$possible_values =
-		  &complete_body_params( $obj_def, $args_parsed, \@args_used, $arg_previus );
+		  &complete_body_params( $obj_def,     $args_parsed, \@args_used,
+								 $arg_previus, $id_tree );
 	}
 
 	# fin
@@ -575,7 +576,7 @@ sub args_cb
 
 sub complete_body_params
 {
-	my ( $obj_def, $args_parsed, $args_used, $arg_previus ) = @_;
+	my ( $obj_def, $args_parsed, $args_used, $arg_previus, $id_tree ) = @_;
 	my $out;
 
 	# command that is being executing
@@ -609,6 +610,19 @@ sub complete_body_params
 		if ( exists $p_def->{ possible_values } )
 		{
 			$out = $p_def->{ possible_values };
+		}
+
+		# try to autocomplete
+		elsif ( exists $obj_def->{ params_autocomplete }->{ $previus_param } )
+		{
+			# get list of possible values from the id tree
+			my $id_ref = $id_tree;
+			foreach my $it ( @{ $obj_def->{ params_autocomplete }->{ $previus_param } } )
+			{
+				$id_ref = $id_ref->{ $it };
+			}
+			my @list = keys %{ $id_ref };
+			$out = \@list;
 		}
 		else
 		{

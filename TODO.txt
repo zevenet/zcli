@@ -1,51 +1,3 @@
---- NUEVAS PROPIEDADES O MEJORAS ---
-
-- Cambiar entre verbos (create/add y delete/remove) en funcion de si se crean o enlazan objetos
-- En zevenet borrar el fichero hosts.ini cuando se hace factory reset
-- al tabular tras un comando fallado se pierden los parametros:
-	* ej: lanzar 'farms create'
-	* si se recupera o escribe de nuevo no completa porque el comando es igual que el anterior
-	* aunque se recargue ZCLI no funciona
-- añadir autocompletado en algunos parametros (sobre todo al lincar objetos)
-	* farms-blacklist <fname> -name <aqui_blacklists>
-	* en la definicion nuevo parametro: autocomplete_param
-- completar funcionalidades:
-	farms-add/rem headers
-	# configurar scheduler de tiempo
-	# asignar y desasignar recursos de un grupo RBAC
-- quitar mensaje '1: unknown command' cuando se manda un comando vacio
-- Mostrar ayuda al enviar comando sin  parametros: 	[zcli] farms create <-vip vip> <-vport vport> <-farmname farmname> <-profile profile> [-copy_from copy_from] 
-	zcli(devcano): farms create 
-	Info: Creating a farm
-	Error! No parameter has been sent. Please, try with:
-
-
-
---- TAREAS DE FORMATO ---
-
-- cambiar HOST por PROFILE
-- Al rescatar el ultimo un comando (flecha arriba) y cancelar (flecha abajo) queda establecido un valor residual del comando. ej. "farms-zones-resources"
-	* ocurre al rescatar el ultimo comando y volver a descartarlo
-	* el comando anterior debe haber sido el primero en ejecutarse y haber sido exito
-- En el autocompletado poner un mensaje si el comando no puede completarse.
-		* E.j. se quiere modificar un srv de una granja que no tiene srv.
-- estandarizar nombre funciones y variables
-- añadir descripcion a los objetos 'networking-virtual', 'farms-services'...
-
-
-
---- DOC ---
-
-- Doc el color del host del prompt en la ayuda. Los colores en funcion de si hay o no conectividad
-- Licencia
-- quitar comentarios en español
-- cambiar objetos por singular
-- help, repasar
-- documentar la implementacion
-- quitar comentarios debug ????
-- Crear un script con comandos para usar en la documentación como ejemplos de llamadas
-
-
 
 --- Tests ---
 Completar
@@ -74,3 +26,8 @@ Completar
 									'values'    => ["drain", "cut"],
 			};
 		}
+
+- completar funcionalidades:
+	farms-add/rem headers
+	# configurar scheduler de tiempo
+	# asignar y desasignar recursos de un grupo RBAC

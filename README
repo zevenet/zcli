@@ -34,7 +34,7 @@ The objects used to implement a feature of ZCLI are defined in the directory src
 Each object follow a format and can contain a list of possible parameters to define how implement the ZAPI request
 
 # Module key used in zcli commands
-'module' =>
+'module' => {
 
 	# action key used in zcli commands. There are reserved words in Define.pm module to be used here.
 	'action' => {
@@ -71,6 +71,15 @@ Each object follow a format and can contain a list of possible parameters to def
 		#      its values as 'restart', 'stop'... Each element of this hash uses as key the parameter name and as value the value name.
 		params => {
 			'action' => 'stop',
+		}
+		
+		# The option 'enterprise' is set to '1' when that call is exclusive of EE
+		enterprise => 1,
+		
+		# 'params_autocomplete' defines how to autocomplete a parameter
+		params_autocomplete => {
+				name =>		# name of the parameter to autocomplete
+					'ipds/blacklists',	# it is the information to look for the IDs to autocomplete. The keys of the id tree is separated by '/'.
 		}
 	}
 }
@@ -172,3 +181,4 @@ https://stackoverflow.com/questions/8055063/how-to-install-pp-par-packager
 Requisitos:
 - Install Strawberry Perl for windows (I installed strawberry-perl-5.16.3.1-64bit.msi)
 - El binario debe acabar en .exe: "zcli.exe"
+complete_body_params

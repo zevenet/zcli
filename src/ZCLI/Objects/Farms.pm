@@ -112,7 +112,10 @@ our $Farms = {
 	'farms-services-farmguardian' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg",
-										 method => 'POST',
+										 method              => 'POST',
+										 params_autocomplete => {
+																  name => ['farmguardian'],
+										 },
 						  },
 						  $V{ REMOVE } => {
 								  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg/<$K{FG}>",
@@ -177,6 +180,9 @@ our $Farms = {
 						 $V{ ADD } => {
 										uri    => "/farms/<$K{FARM}>/certificates",
 										method => 'POST',
+										params_autocomplete => {
+																 name => ['certificates'],
+										},
 						 },
 						 $V{ MOVE } => {
 								 uri => "/farms/<$K{FARM}>/certificates/<$K{CERT}>/actions",
@@ -192,8 +198,11 @@ our $Farms = {
 
 	'farms-waf' => {
 					 $V{ ADD } => {
-									uri        => "/farms/<$K{FARM}>/ipds/waf",
-									method     => 'POST',
+									uri                 => "/farms/<$K{FARM}>/ipds/waf",
+									method              => 'POST',
+									params_autocomplete => {
+															 name => ['ipds', 'waf'],
+									},
 									enterprise => 1,
 					 },
 					 $V{ REMOVE } => {
@@ -212,7 +221,10 @@ our $Farms = {
 							$V{ ADD } => {
 										   uri    => "/farms/<$K{FARM}>/ipds/blacklists",
 										   method => 'POST',
-										   enterprise => 1,
+										   enterprise          => 1,
+										   params_autocomplete => {
+																 name => ['ipds', 'blacklists'],
+										   },
 							},
 							$V{ REMOVE } => {
 										uri => "/farms/<$K{FARM}>/ipds/blacklists/<$K{BL}>",
@@ -223,8 +235,11 @@ our $Farms = {
 
 	'farms-dos' => {
 					 $V{ ADD } => {
-									uri        => "/farms/<$K{FARM}>/ipds/dos",
-									method     => 'POST',
+									uri                 => "/farms/<$K{FARM}>/ipds/dos",
+									method              => 'POST',
+									params_autocomplete => {
+															 name => ['ipds', 'dos'],
+									},
 									enterprise => 1,
 					 },
 					 $V{ REMOVE } => {
@@ -236,8 +251,11 @@ our $Farms = {
 
 	'farms-rbl' => {
 					 $V{ ADD } => {
-									uri        => "/farms/<$K{FARM}>/ipds/rbl",
-									method     => 'POST',
+									uri                 => "/farms/<$K{FARM}>/ipds/rbl",
+									method              => 'POST',
+									params_autocomplete => {
+															 name => ['ipds', 'rbl'],
+									},
 									enterprise => 1,
 					 },
 					 $V{ REMOVE } => {
