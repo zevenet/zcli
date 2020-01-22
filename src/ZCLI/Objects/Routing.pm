@@ -28,7 +28,7 @@ our $Routing = {
 		$V{ SET } => {
 					  uri       => "/routing/rules/$Define::UriParamTag",
 					  method    => 'PUT',
-					  uri_param => [
+					  param_uri => [
 							  {
 								name => "rule",
 								desc => "the rule id of the rule that is going to be modified",
@@ -39,7 +39,7 @@ our $Routing = {
 		$V{ DELETE } => {
 			 uri       => "/routing/rules/$Define::UriParamTag",
 			 method    => 'DELETE',
-			 uri_param => [
+			 param_uri => [
 						   {
 							 name => "rule",
 							 desc => "the rule id of the rule that is going to be deleted",
@@ -67,7 +67,7 @@ our $Routing = {
 		$V{ SET } => {
 			   uri    => "/routing/tables/<$K{ROUTING_TABLE}>/routes/$Define::UriParamTag",
 			   method => 'PUT',
-			   uri_param => [
+			   param_uri => [
 							{
 							  name => "id",
 							  desc => "the route id of the route that is going to be modified",
@@ -78,7 +78,7 @@ our $Routing = {
 		$V{ DELETE } => {
 			   uri    => "/routing/tables/<$K{ROUTING_TABLE}>/routes/$Define::UriParamTag",
 			   method => 'DELETE',
-			   uri_param => [
+			   param_uri => [
 							{
 							  name => "id",
 							  desc => "the route id of the route that is going to be modified",
@@ -101,7 +101,7 @@ our $Routing = {
 		$V{ REMOVE } => {
 			uri    => "/routing/tables/<$K{ROUTING_TABLE}>/unmanaged/$Define::UriParamTag",
 			method => 'DELETE',
-			uri_param => [
+			param_uri => [
 					  {
 						name => "interface",
 						desc => "the interface name that is going to be managed for the table",

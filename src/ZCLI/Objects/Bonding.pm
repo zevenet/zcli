@@ -73,7 +73,7 @@ our $Bonding = {
 			   },
 			   $V{ REMOVE } => {
 					   uri => "/interfaces/bonding/<$K{IFACE}>/slaves/$Define::UriParamTag",
-					   uri_param => [
+					   param_uri => [
 									 {
 									   name => "slave",
 									   desc => "the slave interface which will be removed",

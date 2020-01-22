@@ -53,7 +53,7 @@ our $System = {
 			 $V{ GET } => {
 					 uri       => "/system/logs/<$K{LOG}>/lines/$Define::UriParamTag",
 					 method    => 'GET',
-					 uri_param => [
+					 param_uri => [
 								   {
 									 name => "lines",
 									 desc => "the number of lines of the log file to show",
@@ -85,7 +85,7 @@ our $System = {
 						 method       => 'PUT',
 						 content_type => 'application/gzip',
 						 upload_file  => undef,
-						 uri_param    => [
+						 param_uri    => [
 									   {
 										 name => "name",
 										 desc => "the name which the backup will be saved",

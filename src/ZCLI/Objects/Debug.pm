@@ -49,7 +49,7 @@ our $Debug = {
 								   method       => 'PUT',
 								   content_type => 'application/gzip',
 								   upload_file  => undef,
-								   uri_param    => [
+								   param_uri    => [
 										   {
 											 name => "name",
 											 desc => "the name which the backup will be saved",

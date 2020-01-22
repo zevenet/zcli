@@ -14,48 +14,49 @@ my %K = %Define::Keys;
 package Objects;
 
 our $Certificates = {
-				  'certificates' => {
-						  $V{ LIST } => {
-										  uri    => "/certificates",
-										  method => 'GET',
-						  },
-						  $V{ DOWNLOAD } => {
-											  uri           => "/certificates/<$K{CERT}>",
-											  method        => 'GET',
-											  download_file => undef,
-						  },
-						  $V{ GET } => {
-										 uri    => "/certificates/<$K{CERT}>/info",
-										 method => 'GET',
-						  },
-						  $V{ DELETE } => {
-											uri    => "/certificates/<$K{CERT}>",
-											method => 'DELETE',
-						  },
-						  $V{ CREATE } => {
-											uri    => "/certificates",
-											method => 'POST',
-						  },
-						  $V{ UPLOAD } => {
-								  uri          => "/certificates/$Define::UriParamTag",
-								  method       => 'POST',
-								  content_type => 'application/x-pem-file',
-								  upload_file  => undef,
-								  uri_param    => [
-										{
-											name => "name",
-											desc => "the name which the certificate will be saved",
-										},
-								  ],
-						  },
-				  },
-# It is not useful for a ZCLI
-# 				  'certificates-ciphers' => {
-# 											  $V{ LIST } => {
-# 															  uri    => "/ciphers",
-# 															  method => 'GET',
-# 											  },
-# 				  },
+	'certificates' => {
+					  $V{ LIST } => {
+									  uri    => "/certificates",
+									  method => 'GET',
+					  },
+					  $V{ DOWNLOAD } => {
+										  uri           => "/certificates/<$K{CERT}>",
+										  method        => 'GET',
+										  download_file => undef,
+					  },
+					  $V{ GET } => {
+									 uri    => "/certificates/<$K{CERT}>/info",
+									 method => 'GET',
+					  },
+					  $V{ DELETE } => {
+										uri    => "/certificates/<$K{CERT}>",
+										method => 'DELETE',
+					  },
+					  $V{ CREATE } => {
+										uri    => "/certificates",
+										method => 'POST',
+					  },
+					  $V{ UPLOAD } => {
+							  uri          => "/certificates/$Define::UriParamTag",
+							  method       => 'POST',
+							  content_type => 'application/x-pem-file',
+							  upload_file  => undef,
+							  param_uri    => [
+									  {
+										name => "name",
+										desc => "the name which the certificate will be saved",
+									  },
+							  ],
+					  },
+	},
+
+	# It is not useful for a ZCLI
+	# 				  'certificates-ciphers' => {
+	# 											  $V{ LIST } => {
+	# 															  uri    => "/ciphers",
+	# 															  method => 'GET',
+	# 											  },
+	# 				  },
 };
 
 1;

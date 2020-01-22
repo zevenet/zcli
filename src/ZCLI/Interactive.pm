@@ -348,7 +348,7 @@ sub desc_cb
 
 	return "$obj" if not defined $act;
 
-	# action object @ids @uri_param @file @params
+	# action object @ids @param_uri @file @params
 	my $msg    = "$obj $act";
 	my $params = 1;
 
@@ -357,9 +357,9 @@ sub desc_cb
 	{
 		$msg .= " <$_>" for @ids;
 	}
-	if ( exists $def->{ uri_param } )
+	if ( exists $def->{ param_uri } )
 	{
-		$msg .= " <$_->{name}>" for @{ $def->{ uri_param } };
+		$msg .= " <$_->{name}>" for @{ $def->{ param_uri } };
 	}
 	if ( exists $def->{ upload_file } )
 	{
@@ -417,7 +417,7 @@ sub get_args_num
 	  ( exists $def->{ upload_file } or exists $def->{ download_file } ) ? 1 : 0;
 	$num += 2;                                 # the object and the action
 	$num += scalar &getIds( $def->{ uri } );
-	$num += scalar @{ $def->{ uri_param } } if ( exists $def->{ uri_param } );
+	$num += scalar @{ $def->{ param_uri } } if ( exists $def->{ param_uri } );
 
 	return $num;
 }
@@ -548,10 +548,10 @@ sub args_cb
 	{
 		$possible_values = &get_next_id( $obj_def, $id_tree, $args_parsed->{ id } );
 	}
-	elsif ( $next_arg eq 'uri_params' )
+	elsif ( $next_arg eq 'param_uris' )
 	{
-		my $uri_index = scalar @{ $args_parsed->{ uri_param } };
-		$possible_values = "<$obj_def->{uri_param}->[$uri_index]->{name}>";
+		my $uri_index = scalar @{ $args_parsed->{ param_uri } };
+		$possible_values = "<$obj_def->{param_uri}->[$uri_index]->{name}>";
 	}
 	elsif ( $next_arg =~ /file/ )
 	{

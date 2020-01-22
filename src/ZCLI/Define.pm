@@ -94,6 +94,6 @@ our %Actions = (
 );
 
 our $UriParamTag =
-  "URI_PARAM";    # is a tag used to replace a parameter of the uri
+  "PARAM_URI";    # is a tag used to replace a parameter of the uri
 
 1;

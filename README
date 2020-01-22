@@ -43,7 +43,7 @@ Each object follow a format and can contain a list of possible parameters to def
 		#    '<id>' is a id parameter of the command and has to match with one element of the IDs tree of the load balancer.
 		#		Those parameters are delemited for the characeters '<' and '>'
 		#    '$Define::UriParamTag' is a id_param parameter of the command and it is not implemented in the IDs tree of the load balancer.
-		#       The name for this value is in the key of this hash 'uri_param'.
+		#       The name for this value is in the key of this hash 'param_uri'.
 		#       The string that defines this parameters is defined in the Define module of ZCLI.
 		uri       => "/system/logs/<$K{LOG}>/lines/$Define::UriParamTag",
 
@@ -60,8 +60,8 @@ Each object follow a format and can contain a list of possible parameters to def
 		# 'download_file' is a flag to invoke the autocomplete subrutine and to require to upload a local file. It has the 'undef' value.
 		download_file => undef,
 
-		# 'uri_param' is the parameter name for 'ids_params'. This list is sort. Each element contains a 'name' and a 'desc' (description) field
-		uri_param    => [
+		# 'param_uri' is the parameter name for 'ids_params'. This list is sort. Each element contains a 'name' and a 'desc' (description) field
+		param_uri    => [
 			{
 				name => "name",
 				desc => "the name which the backup will be saved",
@@ -121,7 +121,7 @@ Examples:
 			  method       => 'PUT',
 			  content_type => 'application/gzip',
 			  upload_file  => undef,
-			  uri_param    => [
+			  param_uri    => [
 					{
 						name => "name",
 						desc => "the name which the backup will be saved",

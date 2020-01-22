@@ -80,7 +80,7 @@ our $Blacklist = {
 		$V{ SET } => {
 			 uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
 			 method    => 'PUT',
-			 uri_param => [
+			 param_uri => [
 						   {
 							 name => "source ID",
 							 desc => "the IP address of the source which will be modified",
@@ -91,7 +91,7 @@ our $Blacklist = {
 		$V{ DELETE } => {
 			  uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
 			  method    => 'DELETE',
-			  uri_param => [
+			  param_uri => [
 							{
 							  name => "source ID",
 							  desc => "the IP address of the source which will be removed",

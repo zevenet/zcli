@@ -155,7 +155,7 @@ our $Farms = {
 		$V{ SET } => {
 			 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
 			 method => 'PUT',
-			 uri_param => [
+			 param_uri => [
 						   {
 							 name => "resource ID",
 							 desc => "the IP address of the source which will be modified",
@@ -166,7 +166,7 @@ our $Farms = {
 		$V{ DELETE } => {
 			  uri => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
 			  method    => 'DELETE',
-			  uri_param => [
+			  param_uri => [
 							{
 							  name => "resource ID",
 							  desc => "the IP address of the source which will be removed",

@@ -148,7 +148,7 @@ Function: parseInput
 Parametes:
 	Object definition - It is a object hash with the parameters that defines a zapi call.
 	Autocomplete - It is a flag to parses the arguments in the autocomplete step or when the zapi request is going to be done. The possible values are 1 or 0.
-	Arguments - The rest of parameters are the input command arguments, the first one must be the 'object', next the 'action' and following the others arguments (IDS, uri_params, files and body_params).
+	Arguments - The rest of parameters are the input command arguments, the first one must be the 'object', next the 'action' and following the others arguments (IDS, param_uris, files and body_params).
 
 Returns:
 	Array - The first position is a hash with the arguments grouped by type.
@@ -168,7 +168,7 @@ sub parseInput
 
 	my $steps = {
 				  uri_id        => 'id',
-				  uri_param     => 'uri_params',
+				  param_uri     => 'param_uris',
 				  download_file => 'download_file',
 				  upload_file   => 'upload_file',
 				  body_params   => 'body_params',
@@ -183,7 +183,7 @@ sub parseInput
 				  object        => shift @args,
 				  action        => shift @args,
 				  id            => [],
-				  uri_param     => [],
+				  param_uri     => [],
 				  download_file => undef,
 				  upload_file   => undef,
 				  params        => undef,
@@ -204,18 +204,18 @@ sub parseInput
 	}
 
 	# adding uri parameters
-	if ( exists $def->{ uri_param } )
+	if ( exists $def->{ param_uri } )
 	{
 		my $tag = $Define::UriParamTag;
 		my $uri = $def->{ uri };
-		foreach my $p ( @{ $def->{ uri_param } } )
+		foreach my $p ( @{ $def->{ param_uri } } )
 		{
 			my $val = shift @args;
 			if ( defined $val )
 			{
 				if ( $uri =~ s/$tag/$val/ )
 				{
-					push @{ $input->{ uri_param } }, $val;
+					push @{ $input->{ param_uri } }, $val;
 				}
 				else
 				{
@@ -224,7 +224,7 @@ sub parseInput
 			}
 			else
 			{
-				return ( $input, $steps->{ uri_param }, $parsed_completed );
+				return ( $input, $steps->{ param_uri }, $parsed_completed );
 			}
 		}
 	}
@@ -410,10 +410,10 @@ sub createZapiRequest
 	$call->{ uri } = &replaceUrl( $def->{ uri }, $input->{ id } );
 
 	# getting uri parameters
-	if ( exists $def->{ uri_param } )
+	if ( exists $def->{ param_uri } )
 	{
 		my $tag = $Define::UriParamTag;
-		foreach my $p ( @{ $input->{ uri_param } } )
+		foreach my $p ( @{ $input->{ param_uri } } )
 		{
 			unless ( $call->{ uri } =~ s/$tag/$p/ )
 			{

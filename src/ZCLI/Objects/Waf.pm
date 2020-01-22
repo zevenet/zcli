@@ -13,14 +13,14 @@ my %K = %Define::Keys;
 
 package Objects;
 
-my $uri_param_rule = [
+my $param_uri_rule = [
 					  {
 						 name => "id",
 						 desc => "the id inside the set rule",
 					  },
 ];
 
-my $uri_param_match = [
+my $param_uri_match = [
 					   {
 						  name => "id",
 						  desc => "the id inside the set rule",
@@ -79,7 +79,7 @@ our $Waf = {
 					$V{ GET } => {
 								   uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag",
 								   method     => 'GET',
-								   uri_param  => $uri_param_rule,
+								   param_uri  => $param_uri_rule,
 								   enterprise => 1,
 					},
 					$V{ CREATE } => {
@@ -90,19 +90,19 @@ our $Waf = {
 					$V{ SET } => {
 								   uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag",
 								   method     => 'PUT',
-								   uri_param  => $uri_param_rule,
+								   param_uri  => $param_uri_rule,
 								   enterprise => 1,
 					},
 					$V{ DELETE } => {
 									uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag",
 									method     => 'DELETE',
-									uri_param  => $uri_param_rule,
+									param_uri  => $param_uri_rule,
 									enterprise => 1,
 					},
 					$V{ MOVE } => {
 							uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/actions",
 							method     => 'POST',
-							uri_param  => $uri_param_rule,
+							param_uri  => $param_uri_rule,
 							enterprise => 1,
 					},
 	},
@@ -110,21 +110,21 @@ our $Waf = {
 		$V{ CREATE } => {
 						  uri => "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/matches",
 						  method     => 'POST',
-						  uri_param  => $uri_param_rule,
+						  param_uri  => $param_uri_rule,
 						  enterprise => 1,
 		},
 		$V{ SET } => {
 			uri =>
 			  "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/matches/$Define::UriParamTag",
 			method     => 'PUT',
-			uri_param  => $uri_param_match,
+			param_uri  => $param_uri_match,
 			enterprise => 1,
 		},
 		$V{ DELETE } => {
 			uri =>
 			  "/ipds/waf/<$K{WAF}>/rules/$Define::UriParamTag/matches/$Define::UriParamTag",
 			method     => 'DELETE',
-			uri_param  => $uri_param_match,
+			param_uri  => $param_uri_match,
 			enterprise => 1,
 		},
 	},
