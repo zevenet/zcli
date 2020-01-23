@@ -49,6 +49,7 @@ my $zcli_dir = $Global::Config_dir;
 my $skip_reload = 0;
 *Term::ShellUI::blank_line = sub {
 	$skip_reload = 1;
+	undef;    # the command used is the last execution of this function
 };
 
 ### definition of functions
@@ -481,15 +482,16 @@ sub geCmdProccessCallback
 			my $desc      = &getCmdDescription( $obj_def );
 			my $missing_p = &getMissingParam( $desc, \@input_args );
 
-			#		if (!defined $missing_p )
+			if ( !defined $missing_p )
 			{
 				&printError( "Some parameters are missing. The expected syntax is:" );
 			}
-
-#		else
-#		{
-#			&printError ("Some parameters are missing, it failed getting '$missing_p'. The expected syntax is:" );
-#		}
+			else
+			{
+				&printError(
+					"Some parameters are missing, it failed getting '$missing_p'. The expected syntax is:"
+				);
+			}
 
 			# force reload if params does not exist
 			&listParams( $obj_def, $input_parsed, $Env::Profile )
