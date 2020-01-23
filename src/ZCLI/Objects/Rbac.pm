@@ -92,7 +92,7 @@ our $Rbac = {
 										enterprise => 1,
 					  },
 	},
-	'rbac-group-interfaces' => {
+	'rbac-group-interface' => {
 					  $V{ ADD } => {
 									 uri    => "/rbac/groups/<$K{RBAC_GROUP}>/interfaces",
 									 method => 'POST',
@@ -107,22 +107,22 @@ our $Rbac = {
 							  enterprise => 1,
 					  },
 	},
-	'rbac-group-farms' => {
-							$V{ ADD } => {
-										   uri    => "/rbac/groups/<$K{RBAC_GROUP}>/farms",
-										   method => 'POST',
-										   params_autocomplete => {
-																	name => ['farms'],
-										   },
-										   enterprise => 1,
-							},
-							$V{ REMOVE } => {
+	'rbac-group-farm' => {
+						   $V{ ADD } => {
+										  uri    => "/rbac/groups/<$K{RBAC_GROUP}>/farms",
+										  method => 'POST',
+										  params_autocomplete => {
+																   name => ['farms'],
+										  },
+										  enterprise => 1,
+						   },
+						   $V{ REMOVE } => {
 									uri => "/rbac/groups/<$K{RBAC_GROUP}>/farms/<$K{FARM}>",
 									method     => 'DELETE',
 									enterprise => 1,
-							},
+						   },
 	},
-	'rbac-group-users' => {
+	'rbac-group-user' => {
 					   $V{ ADD } => {
 									  uri    => "/rbac/groups/<$K{RBAC_GROUP}>/users",
 									  method => 'POST',

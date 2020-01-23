@@ -49,12 +49,12 @@ our $System = {
 								  method => 'GET',
 				   },
 	 },
-	 'system-updates' => {
-						   $V{ LIST } => {
-										   uri        => "/system/packages",
-										   method     => 'GET',
-										   enterprise => 1,
-						   },
+	 'system-update' => {
+						  $V{ LIST } => {
+										  uri        => "/system/packages",
+										  method     => 'GET',
+										  enterprise => 1,
+						  },
 	 },
 	 'system-user' => {
 						$V{ GET } => {
@@ -66,7 +66,7 @@ our $System = {
 									   method => 'POST',
 						},
 	 },
-	 'system-logs' => {
+	 'system-log' => {
 			 $V{ LIST } => {
 							 uri    => "/system/logs",
 							 method => 'GET',
@@ -87,21 +87,21 @@ our $System = {
 								 download_file => undef,
 			 },
 	 },
-	 'system-backups' => {
-						   $V{ LIST } => {
-										   uri    => "/system/backup",
-										   method => 'GET',
-						   },
-						   $V{ CREATE } => {
-											 uri    => "/system/backup",
-											 method => 'POST',
-						   },
-						   $V{ DOWNLOAD } => {
-											   uri    => "/system/backup/<$K{BACKUP}>",
-											   method => 'GET',
-											   download_file => undef,
-						   },
-						   $V{ UPLOAD } => {
+	 'system-backup' => {
+						  $V{ LIST } => {
+										  uri    => "/system/backup",
+										  method => 'GET',
+						  },
+						  $V{ CREATE } => {
+											uri    => "/system/backup",
+											method => 'POST',
+						  },
+						  $V{ DOWNLOAD } => {
+											  uri    => "/system/backup/<$K{BACKUP}>",
+											  method => 'GET',
+											  download_file => undef,
+						  },
+						  $V{ UPLOAD } => {
 								   uri          => "/system/backup/$Define::Uri_param_tag",
 								   method       => 'PUT',
 								   content_type => 'application/gzip',
@@ -112,18 +112,18 @@ our $System = {
 											 desc => "the name which the backup will be saved",
 										   },
 								   ],
-						   },
-						   $V{ DELETE } => {
-											 uri    => "/system/backup/<$K{BACKUP}>",
-											 method => 'DELETE',
-						   },
-						   $V{ APPLY } => {
-											uri    => "/system/backup/<$K{BACKUP}>/actions",
-											method => 'POST',
-											params => {
-														action => 'apply',
-											},
-						   },
+						  },
+						  $V{ DELETE } => {
+											uri    => "/system/backup/<$K{BACKUP}>",
+											method => 'DELETE',
+						  },
+						  $V{ APPLY } => {
+										   uri    => "/system/backup/<$K{BACKUP}>/actions",
+										   method => 'POST',
+										   params => {
+													   action => 'apply',
+										   },
+						  },
 	 },
 	 'system-supportsave' => {
 							   $V{ DOWNLOAD } => {
@@ -172,12 +172,12 @@ our $System = {
 													  enterprise => 1,
 						   },
 	 },
-	 'system-cluster-nodes' => {
-								 $V{ GET } => {
-												uri        => "/system/cluster/nodes",
-												method     => 'GET',
-												enterprise => 1,
-								 },
+	 'system-cluster-node' => {
+								$V{ GET } => {
+											   uri        => "/system/cluster/nodes",
+											   method     => 'GET',
+											   enterprise => 1,
+								},
 	 },
 	 'system-cluster-localhost' => {
 									 $V{ GET } => {

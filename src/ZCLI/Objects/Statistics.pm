@@ -35,33 +35,33 @@ my %K = %Define::Keys;
 package Objects;
 
 our $Statistics = {
-					'statistics-system' => {
-											 $V{ GET } => {
-															uri    => "/stats",
-															method => 'GET',
-											 },
+					'statistic-system' => {
+											$V{ GET } => {
+														   uri    => "/stats",
+														   method => 'GET',
+											},
 					},
-					'statistics-network' => {
+					'statistic-network' => {
 										  $V{ GET } => {
 												  uri => "/stats/system/network/interfaces",
 												  method => 'GET',
 										  },
 					},
-					'statistics-network-connections' => {
+					'statistic-network-connections' => {
 												 $V{ GET } => {
 														 uri => "/stats/system/connections",
 														 method => 'GET',
 												 },
 					},
-					'statistics-farms' => {
-											$V{ LIST } => {
-															uri    => "/stats/farms",
-															method => 'GET',
-											},
-											$V{ GET } => {
-														   uri => "/stats/farms/<$K{FARM}>",
-														   method => 'GET',
-											},
+					'statistic-farm' => {
+										  $V{ LIST } => {
+														  uri    => "/stats/farms",
+														  method => 'GET',
+										  },
+										  $V{ GET } => {
+														 uri => "/stats/farms/<$K{FARM}>",
+														 method => 'GET',
+										  },
 					},
 };
 

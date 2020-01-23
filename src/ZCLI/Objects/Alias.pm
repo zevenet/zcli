@@ -35,24 +35,24 @@ my %K = %Define::Keys;
 package Objects;
 
 our $Alias = {
-			   'network-aliases-backends' => {
-											 $V{ LIST } => {
-															 uri    => "/aliases/backends",
-															 method => 'GET',
-															 enterprise => 1,
-											 },
-											 $V{ SET } => {
+			   'network-alias-backend' => {
+											$V{ LIST } => {
+															uri    => "/aliases/backends",
+															method => 'GET',
+															enterprise => 1,
+											},
+											$V{ SET } => {
 													 uri => "/aliases/backends/<$K{ALIAS}>",
 													 method     => 'PUT',
 													 enterprise => 1,
-											 },
-											 $V{ DELETE } => {
+											},
+											$V{ DELETE } => {
 													 uri => "/aliases/backends/<$K{ALIAS}>",
 													 method     => 'DELETE',
 													 enterprise => 1,
-											 },
+											},
 			   },
-			   'network-aliases-interfaces' => {
+			   'network-alias-interface' => {
 										   $V{ LIST } => {
 														   uri    => "/aliases/interfaces",
 														   method => 'GET',

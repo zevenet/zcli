@@ -35,7 +35,7 @@ my %K = %Define::Keys;
 package Objects;
 
 our $Certificates = {
-	'certificates' => {
+	'certificate' => {
 					  $V{ LIST } => {
 									  uri    => "/certificates",
 									  method => 'GET',

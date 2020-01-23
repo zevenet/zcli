@@ -87,7 +87,7 @@ our $Blacklist = {
 						  },
 	},
 
-	'ipds-blacklist-sources' => {
+	'ipds-blacklist-source' => {
 		$V{ LIST } => {
 						uri        => "/ipds/blacklists/<$K{BL}>/sources",
 						method     => 'GET',

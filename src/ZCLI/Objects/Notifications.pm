@@ -35,7 +35,7 @@ my %K = %Define::Keys;
 package Objects;
 
 our $Notifications = {
-					 'system-notifications-alerts-backends' => {
+					 'system-notifications-alert-backend' => {
 							 $V{ GET } => {
 											uri => "/system/notifications/alerts/backends",
 											method     => 'GET',
@@ -63,7 +63,7 @@ our $Notifications = {
 									 enterprise => 1,
 							 },
 					 },
-					 'system-notifications-alerts-cluster' => {
+					 'system-notifications-alert-cluster' => {
 							  $V{ GET } => {
 											 uri => "/system/notifications/alerts/cluster",
 											 method     => 'GET',
@@ -91,7 +91,7 @@ our $Notifications = {
 									  enterprise => 1,
 							  },
 					 },
-					 'system-notifications-methods-email' => {
+					 'system-notifications-method-email' => {
 							   $V{ GET } => {
 											  uri => "/system/notifications/methods/email",
 											  method     => 'GET',

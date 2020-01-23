@@ -88,27 +88,27 @@ our $Rbl = {
 										  enterprise => 1,
 							 },
 			 },
-			 'ipds-rbl-domains' => {
-									 $V{ LIST } => {
-													 uri        => "/ipds/rbl/domains",
-													 method     => 'GET',
-													 enterprise => 1,
-									 },
-									 $V{ CREATE } => {
-													   uri        => "/ipds/rbl/domains",
-													   method     => 'POST',
-													   enterprise => 1,
-									 },
-									 $V{ SET } => {
-													uri => "/ipds/rbl/domains/<$K{DOMAIN}>",
-													method     => 'PUT',
+			 'ipds-rbl-domain' => {
+									$V{ LIST } => {
+													uri        => "/ipds/rbl/domains",
+													method     => 'GET',
 													enterprise => 1,
-									 },
-									 $V{ DELETE } => {
+									},
+									$V{ CREATE } => {
+													  uri        => "/ipds/rbl/domains",
+													  method     => 'POST',
+													  enterprise => 1,
+									},
+									$V{ SET } => {
+												   uri => "/ipds/rbl/domains/<$K{DOMAIN}>",
+												   method     => 'PUT',
+												   enterprise => 1,
+									},
+									$V{ DELETE } => {
 													uri => "/ipds/rbl/domains/<$K{DOMAIN}>",
 													method     => 'DELETE',
 													enterprise => 1,
-									 },
+									},
 			 },
 };
 

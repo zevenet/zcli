@@ -35,37 +35,37 @@ my %K = %Define::Keys;
 package Objects;
 
 our $Debug = {
-	'farms-services' => {
-						  $V{ CREATE } => {
-											uri    => "/farms/<$K{FARM}>/services",
-											method => 'POST',
-						  },
-						  $V{ SET } => {
-										 uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
-										 method => 'PUT',
-						  },
+	'farm-service' => {
+						$V{ CREATE } => {
+										  uri    => "/farms/<$K{FARM}>/services",
+										  method => 'POST',
+						},
+						$V{ SET } => {
+									   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
+									   method => 'PUT',
+						},
 	},
-	'farms' => {
-				 $V{ STOP } => {
-								 uri    => "/farms/<$K{FARM}>/actions",
-								 method => 'PUT',
-								 params => {
-											 'action' => 'stop',
-								 },
-				 },
-				 $V{ GET } => {
-								uri    => "/farms/<$K{FARM}>",
-								method => 'GET',
-				 }
+	'farm' => {
+				$V{ STOP } => {
+								uri    => "/farms/<$K{FARM}>/actions",
+								method => 'PUT',
+								params => {
+											'action' => 'stop',
+								},
+				},
+				$V{ GET } => {
+							   uri    => "/farms/<$K{FARM}>",
+							   method => 'GET',
+				}
 	},
 
-	'system-backups' => {
-						  $V{ DOWNLOAD } => {
-											  uri    => "/system/backup/<$K{BACKUP}>",
-											  method => 'GET',
-											  download_file => undef,
-						  },
-						  $V{ UPLOAD } => {
+	'system-backup' => {
+						 $V{ DOWNLOAD } => {
+											 uri           => "/system/backup/<$K{BACKUP}>",
+											 method        => 'GET',
+											 download_file => undef,
+						 },
+						 $V{ UPLOAD } => {
 								   uri          => "/system/backup/$Define::Uri_param_tag",
 								   method       => 'PUT',
 								   content_type => 'application/gzip',
@@ -76,7 +76,7 @@ our $Debug = {
 											 desc => "the name which the backup will be saved",
 										   },
 								   ],
-						  },
+						 },
 	}
 };
 

@@ -86,7 +86,7 @@ our $Bonding = {
 										   enterprise => 1,
 							},
 	 },
-	 'network-bonding-slaves' => {
+	 'network-bonding-slave' => {
 			 $V{ ADD } => {
 							uri        => "/interfaces/bonding/<$K{IFACE}>/slaves",
 							method     => 'POST',

@@ -26,37 +26,37 @@ BAKEND_PORT="80"
 # Launching tests
 
 echo "creating a farm"
-$ZCLI farms create -farmname $FARMNAME -vip $IP -vport $PORT_INI -profile $PROFILE
+$ZCLI farm create -farmname $FARMNAME -vip $IP -vport $PORT_INI -profile $PROFILE
 
 echo "setting a farm"
-$ZCLI farms set $FARMNAME -vport $PORT -listener $LISTENER
+$ZCLI farm set $FARMNAME -vport $PORT -listener $LISTENER
 
 echo "creating a service"
-$ZCLI farms-services create $FARMNAME -id $SERVICE_NAME
+$ZCLI farm-service create $FARMNAME -id $SERVICE_NAME
 
 echo "setting a service"
-$ZCLI farms-services set $FARMNAME $SERVICE_NAME -vhost $VIRTUAL_HOST -persistence $PERSISTENCE
+$ZCLI farm-service set $FARMNAME $SERVICE_NAME -vhost $VIRTUAL_HOST -persistence $PERSISTENCE
 
 echo "creating a backend"
-$ZCLI farms-services-backends create $FARMNAME $SERVICE_NAME -ip $BAKEND_IP_INI -port $BAKEND_PORT_INI
+$ZCLI farm-service-backend create $FARMNAME $SERVICE_NAME -ip $BAKEND_IP_INI -port $BAKEND_PORT_INI
 
 echo "setting a backend"
-$ZCLI farms-services-backends set $FARMNAME $SERVICE_NAME $BACKEND_ID -ip $BAKEND_IP -port $BAKEND_PORT
+$ZCLI farm-service-backend set $FARMNAME $SERVICE_NAME $BACKEND_ID -ip $BAKEND_IP -port $BAKEND_PORT
 
 echo "restarting a farm"
-$ZCLI farms restart $FARMNAME
+$ZCLI farm restart $FARMNAME
 
 echo "stopping a farm"
-$ZCLI farms stop $FARMNAME
+$ZCLI farm stop $FARMNAME
 
 echo "starting a farm"
-$ZCLI farms start $FARMNAME
+$ZCLI farm start $FARMNAME
 
 echo "deleting a backend"
-$ZCLI farms-services-backends delete $FARMNAME $SERVICE_NAME $BACKEND_ID
+$ZCLI farm-service-backend delete $FARMNAME $SERVICE_NAME $BACKEND_ID
 
 echo "deleting a service"
-$ZCLI farms-services delete $FARMNAME $SERVICE_NAME
+$ZCLI farm-service delete $FARMNAME $SERVICE_NAME
 
 echo "deleting a farm"
-$ZCLI farms delete $FARMNAME
+$ZCLI farm delete $FARMNAME

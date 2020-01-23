@@ -35,7 +35,7 @@ my %K = %Define::Keys;
 package Objects;
 
 our $Routing = {
-	'network-routing-rules' => {
+	'network-routing-rule' => {
 		$V{ LIST } => {
 						uri        => "/routing/rules",
 						method     => 'GET',
@@ -69,7 +69,7 @@ our $Routing = {
 			 enterprise => 1,
 		},
 	},
-	'network-routing-tables' => {
+	'network-routing-table' => {
 		$V{ LIST } => {
 						uri        => "/routing/tables",
 						method     => 'GET',
@@ -108,7 +108,7 @@ our $Routing = {
 			 enterprise => 1,
 		},
 	},
-	'network-routing-tables-unmanaged' => {
+	'network-routing-table-unmanaged' => {
 		$V{ LIST } => {
 						uri        => "/routing/tables",
 						method     => 'GET',

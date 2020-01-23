@@ -35,72 +35,72 @@ my %K = %Define::Keys;
 package Objects;
 
 our $Farms = {
-	'farms' => {
-				 $V{ LIST } => {
-								 uri    => "/farms",
-								 method => 'GET',
-				 },
-				 $V{ GET } => {
-								uri    => "/farms/<$K{FARM}>",
+	'farm' => {
+				$V{ LIST } => {
+								uri    => "/farms",
 								method => 'GET',
-				 },
-				 $V{ SET } => {
-								uri    => "/farms/<$K{FARM}>",
-								method => 'PUT',
-				 },
-				 $V{ DELETE } => {
-								   uri    => "/farms/<$K{FARM}>",
-								   method => 'DELETE',
-				 },
-				 $V{ START } => {
-								  uri    => "/farms/<$K{FARM}>/actions",
-								  method => 'PUT',
-								  params => {
-											  'action' => 'start',
-								  },
-				 },
-				 $V{ STOP } => {
+				},
+				$V{ GET } => {
+							   uri    => "/farms/<$K{FARM}>",
+							   method => 'GET',
+				},
+				$V{ SET } => {
+							   uri    => "/farms/<$K{FARM}>",
+							   method => 'PUT',
+				},
+				$V{ DELETE } => {
+								  uri    => "/farms/<$K{FARM}>",
+								  method => 'DELETE',
+				},
+				$V{ START } => {
 								 uri    => "/farms/<$K{FARM}>/actions",
 								 method => 'PUT',
 								 params => {
-											 'action' => 'stop',
+											 'action' => 'start',
 								 },
-				 },
-				 $V{ RESTART } => {
-									uri    => "/farms/<$K{FARM}>/actions",
-									method => 'PUT',
-									params => {
-												'action' => 'restart',
-									},
-				 },
-				 $V{ CREATE } => {
-								   uri    => "/farms",
-								   method => 'POST',
-				 },
+				},
+				$V{ STOP } => {
+								uri    => "/farms/<$K{FARM}>/actions",
+								method => 'PUT',
+								params => {
+											'action' => 'stop',
+								},
+				},
+				$V{ RESTART } => {
+								   uri    => "/farms/<$K{FARM}>/actions",
+								   method => 'PUT',
+								   params => {
+											   'action' => 'restart',
+								   },
+				},
+				$V{ CREATE } => {
+								  uri    => "/farms",
+								  method => 'POST',
+				},
 	},
 
-	'farms-services' => {
-						  $V{ CREATE } => {
-											uri    => "/farms/<$K{FARM}>/services",
-											uri    => "/farms/<$K{FARM}>/services",
-											method => 'POST',
-						  },
-						  $V{ SET } => {
-										 uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
-										 method => 'PUT',
-						  },
-						  $V{ DELETE } => {
-											uri => "/farms/<$K{FARM}>/services/<$K{SRV}>",
-											method => 'DELETE',
-						  },
-						  $V{ MOVE } => {
+	'farm-service' => {
+						$V{ CREATE } => {
+										  uri    => "/farms/<$K{FARM}>/services",
+										  uri    => "/farms/<$K{FARM}>/services",
+										  method => 'POST',
+						},
+						$V{ SET } => {
+									   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
+									   method => 'PUT',
+						},
+						$V{ DELETE } => {
+										  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
+										  method => 'DELETE',
+						},
+						$V{ MOVE } => {
 									  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/actions",
 									  method     => 'POST',
 									  enterprise => 1,
-						  },
+						},
 	},
 
-	'farms-services-backends' => {
+	'farm-service-backend' => {
 		$V{ CREATE } => {
 						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends",
 						  method => 'POST',
@@ -130,7 +130,7 @@ our $Farms = {
 		},
 	},
 
-	'farms-services-farmguardian' => {
+	'farm-service-farmguardian' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg",
 										 method              => 'POST',
@@ -144,25 +144,25 @@ our $Farms = {
 						  },
 	},
 
-	'farms-zones' => {
-					   $V{ CREATE } => {
-										 uri        => "/farms/<$K{FARM}>/zones",
-										 method     => 'POST',
-										 enterprise => 1,
-					   },
-					   $V{ SET } => {
-									  uri        => "/farms/<$K{FARM}>/zones/<$K{ZONES}>",
-									  method     => 'PUT',
-									  enterprise => 1,
-					   },
-					   $V{ DELETE } => {
-										 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>",
-										 method => 'DELETE',
-										 enterprise => 1,
-					   },
+	'farm-zone' => {
+					 $V{ CREATE } => {
+									   uri        => "/farms/<$K{FARM}>/zones",
+									   method     => 'POST',
+									   enterprise => 1,
+					 },
+					 $V{ SET } => {
+									uri        => "/farms/<$K{FARM}>/zones/<$K{ZONES}>",
+									method     => 'PUT',
+									enterprise => 1,
+					 },
+					 $V{ DELETE } => {
+									   uri        => "/farms/<$K{FARM}>/zones/<$K{ZONES}>",
+									   method     => 'DELETE',
+									   enterprise => 1,
+					 },
 	},
 
-	'farms-zones-resources' => {
+	'farm-zone-resource' => {
 		$V{ LIST } => {
 						uri        => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources",
 						method     => 'GET',
@@ -197,7 +197,7 @@ our $Farms = {
 		},
 	},
 
-	'farms-certificates' => {
+	'farm-certificate' => {
 						 $V{ ADD } => {
 										uri    => "/farms/<$K{FARM}>/certificates",
 										method => 'POST',
@@ -217,73 +217,71 @@ our $Farms = {
 						 },
 	},
 
-	'farms-waf' => {
-					 $V{ ADD } => {
-									uri                 => "/farms/<$K{FARM}>/ipds/waf",
-									method              => 'POST',
-									params_autocomplete => {
-															 name => ['ipds', 'waf'],
-									},
+	'farm-waf' => {
+					$V{ ADD } => {
+								   uri                 => "/farms/<$K{FARM}>/ipds/waf",
+								   method              => 'POST',
+								   params_autocomplete => {
+															name => ['ipds', 'waf'],
+								   },
+								   enterprise => 1,
+					},
+					$V{ REMOVE } => {
+									  uri        => "/farms/<$K{FARM}>/ipds/waf/<$K{WAF}>",
+									  method     => 'DELETE',
+									  enterprise => 1,
+					},
+					$V{ MOVE } => {
+									uri => "/farms/<$K{FARM}>/ipds/waf/<$K{WAF}>/actions",
+									method     => 'POST',
 									enterprise => 1,
-					 },
-					 $V{ REMOVE } => {
-									   uri        => "/farms/<$K{FARM}>/ipds/waf/<$K{WAF}>",
-									   method     => 'DELETE',
-									   enterprise => 1,
-					 },
-					 $V{ MOVE } => {
-									 uri => "/farms/<$K{FARM}>/ipds/waf/<$K{WAF}>/actions",
-									 method     => 'POST',
-									 enterprise => 1,
-					 },
+					},
 	},
 
-	'farms-blacklists' => {
-							$V{ ADD } => {
-										   uri    => "/farms/<$K{FARM}>/ipds/blacklists",
-										   method => 'POST',
-										   enterprise          => 1,
-										   params_autocomplete => {
+	'farm-blacklist' => {
+						  $V{ ADD } => {
+										 uri        => "/farms/<$K{FARM}>/ipds/blacklists",
+										 method     => 'POST',
+										 enterprise => 1,
+										 params_autocomplete => {
 																 name => ['ipds', 'blacklists'],
-										   },
-							},
-							$V{ REMOVE } => {
+										 },
+						  },
+						  $V{ REMOVE } => {
 										uri => "/farms/<$K{FARM}>/ipds/blacklists/<$K{BL}>",
 										method     => 'DELETE',
 										enterprise => 1,
-							},
+						  },
 	},
-
-	'farms-dos' => {
-					 $V{ ADD } => {
-									uri                 => "/farms/<$K{FARM}>/ipds/dos",
-									method              => 'POST',
-									params_autocomplete => {
-															 name => ['ipds', 'dos'],
-									},
-									enterprise => 1,
-					 },
-					 $V{ REMOVE } => {
-									   uri        => "/farms/<$K{FARM}>/ipds/dos/<$K{DOS}>",
-									   method     => 'DELETE',
-									   enterprise => 1,
-					 },
+	'farm-dos' => {
+					$V{ ADD } => {
+								   uri                 => "/farms/<$K{FARM}>/ipds/dos",
+								   method              => 'POST',
+								   params_autocomplete => {
+															name => ['ipds', 'dos'],
+								   },
+								   enterprise => 1,
+					},
+					$V{ REMOVE } => {
+									  uri        => "/farms/<$K{FARM}>/ipds/dos/<$K{DOS}>",
+									  method     => 'DELETE',
+									  enterprise => 1,
+					},
 	},
-
-	'farms-rbl' => {
-					 $V{ ADD } => {
-									uri                 => "/farms/<$K{FARM}>/ipds/rbl",
-									method              => 'POST',
-									params_autocomplete => {
-															 name => ['ipds', 'rbl'],
-									},
-									enterprise => 1,
-					 },
-					 $V{ REMOVE } => {
-									   uri        => "/farms/<$K{FARM}>/ipds/rbl/<$K{RBL}>",
-									   method     => 'DELETE',
-									   enterprise => 1,
-					 },
+	'farm-rbl' => {
+					$V{ ADD } => {
+								   uri                 => "/farms/<$K{FARM}>/ipds/rbl",
+								   method              => 'POST',
+								   params_autocomplete => {
+															name => ['ipds', 'rbl'],
+								   },
+								   enterprise => 1,
+					},
+					$V{ REMOVE } => {
+									  uri        => "/farms/<$K{FARM}>/ipds/rbl/<$K{RBL}>",
+									  method     => 'DELETE',
+									  enterprise => 1,
+					},
 	},
 };
 
