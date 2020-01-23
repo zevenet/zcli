@@ -93,10 +93,10 @@ our $Blacklist = {
 						method     => 'GET',
 						enterprise => 1,
 		},
-		$V{ CREATE } => {
-						  uri        => "/ipds/blacklists/<$K{BL}>/sources",
-						  method     => 'POST',
-						  enterprise => 1,
+		$V{ ADD } => {
+					   uri        => "/ipds/blacklists/<$K{BL}>/sources",
+					   method     => 'POST',
+					   enterprise => 1,
 		},
 		$V{ SET } => {
 			 uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::Uri_param_tag",
@@ -109,7 +109,7 @@ our $Blacklist = {
 			 ],
 			 enterprise => 1,
 		},
-		$V{ DELETE } => {
+		$V{ REMOVE } => {
 			  uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::Uri_param_tag",
 			  method    => 'DELETE',
 			  param_uri => [

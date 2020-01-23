@@ -41,10 +41,10 @@ our $Routing = {
 						method     => 'GET',
 						enterprise => 1,
 		},
-		$V{ CREATE } => {
-						  uri        => "/routing/rules",
-						  method     => 'POST',
-						  enterprise => 1,
+		$V{ ADD } => {
+					   uri        => "/routing/rules",
+					   method     => 'POST',
+					   enterprise => 1,
 		},
 		$V{ SET } => {
 					  uri       => "/routing/rules/$Define::Uri_param_tag",
@@ -57,7 +57,7 @@ our $Routing = {
 					  ],
 					  enterprise => 1,
 		},
-		$V{ DELETE } => {
+		$V{ REMOVE } => {
 			 uri       => "/routing/rules/$Define::Uri_param_tag",
 			 method    => 'DELETE',
 			 param_uri => [
@@ -80,10 +80,10 @@ our $Routing = {
 					   method     => 'GET',
 					   enterprise => 1,
 		},
-		$V{ CREATE } => {
-						  uri        => "/routing/tables/<$K{ROUTING_TABLE}>/routes",
-						  method     => 'POST',
-						  enterprise => 1,
+		$V{ ADD } => {
+					   uri        => "/routing/tables/<$K{ROUTING_TABLE}>/routes",
+					   method     => 'POST',
+					   enterprise => 1,
 		},
 		$V{ SET } => {
 			 uri    => "/routing/tables/<$K{ROUTING_TABLE}>/routes/$Define::Uri_param_tag",
@@ -96,7 +96,7 @@ our $Routing = {
 			 ],
 			 enterprise => 1,
 		},
-		$V{ DELETE } => {
+		$V{ REMOVE } => {
 			 uri    => "/routing/tables/<$K{ROUTING_TABLE}>/routes/$Define::Uri_param_tag",
 			 method => 'DELETE',
 			 param_uri => [

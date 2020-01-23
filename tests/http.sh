@@ -32,13 +32,13 @@ echo "setting a farm"
 $ZCLI farm set $FARMNAME -vport $PORT -listener $LISTENER
 
 echo "creating a service"
-$ZCLI farm-service create $FARMNAME -id $SERVICE_NAME
+$ZCLI farm-service add $FARMNAME -id $SERVICE_NAME
 
 echo "setting a service"
 $ZCLI farm-service set $FARMNAME $SERVICE_NAME -vhost $VIRTUAL_HOST -persistence $PERSISTENCE
 
 echo "creating a backend"
-$ZCLI farm-service-backend create $FARMNAME $SERVICE_NAME -ip $BAKEND_IP_INI -port $BAKEND_PORT_INI
+$ZCLI farm-service-backend add $FARMNAME $SERVICE_NAME -ip $BAKEND_IP_INI -port $BAKEND_PORT_INI
 
 echo "setting a backend"
 $ZCLI farm-service-backend set $FARMNAME $SERVICE_NAME $BACKEND_ID -ip $BAKEND_IP -port $BAKEND_PORT

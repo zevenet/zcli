@@ -36,9 +36,9 @@ package Objects;
 
 our $Debug = {
 	'farm-service' => {
-						$V{ CREATE } => {
-										  uri    => "/farms/<$K{FARM}>/services",
-										  method => 'POST',
+						$V{ ADD } => {
+									   uri    => "/farms/<$K{FARM}>/services",
+									   method => 'POST',
 						},
 						$V{ SET } => {
 									   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",

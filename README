@@ -163,11 +163,11 @@ cpan install pp JSON Term::Shell Hash::Merge LWP::Protocol::Https Term::ShellUI 
 
 ##############################################################################
 
-## Generar paquete:
+## Generate the packet:
 
 # doc: https://metacpan.org/pod/pp
 
-# Desde el directorio raiz del repositorio de zcli
+# From the root repo directory, execute:
 pp -c -m -x -I src/ -M ZCLI::Define -M ZCLI::Lib -M ZCLI::Objects -o zcli.exe src/zcli.pl
 
 

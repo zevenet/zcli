@@ -80,16 +80,15 @@ our $Farms = {
 	},
 
 	'farm-service' => {
-						$V{ CREATE } => {
-										  uri    => "/farms/<$K{FARM}>/services",
-										  uri    => "/farms/<$K{FARM}>/services",
-										  method => 'POST',
+						$V{ ADD } => {
+									   uri    => "/farms/<$K{FARM}>/services",
+									   method => 'POST',
 						},
 						$V{ SET } => {
 									   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
 									   method => 'PUT',
 						},
-						$V{ DELETE } => {
+						$V{ REMOVE } => {
 										  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
 										  method => 'DELETE',
 						},
@@ -101,15 +100,15 @@ our $Farms = {
 	},
 
 	'farm-service-backend' => {
-		$V{ CREATE } => {
-						  uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends",
-						  method => 'POST',
+		$V{ ADD } => {
+					   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends",
+					   method => 'POST',
 		},
 		$V{ SET } => {
 					   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>",
 					   method => 'PUT',
 		},
-		$V{ DELETE } => {
+		$V{ REMOVE } => {
 						  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>",
 						  method => 'DELETE',
 		},
@@ -145,17 +144,17 @@ our $Farms = {
 	},
 
 	'farm-zone' => {
-					 $V{ CREATE } => {
-									   uri        => "/farms/<$K{FARM}>/zones",
-									   method     => 'POST',
-									   enterprise => 1,
+					 $V{ ADD } => {
+									uri        => "/farms/<$K{FARM}>/zones",
+									method     => 'POST',
+									enterprise => 1,
 					 },
 					 $V{ SET } => {
 									uri        => "/farms/<$K{FARM}>/zones/<$K{ZONES}>",
 									method     => 'PUT',
 									enterprise => 1,
 					 },
-					 $V{ DELETE } => {
+					 $V{ REMOVE } => {
 									   uri        => "/farms/<$K{FARM}>/zones/<$K{ZONES}>",
 									   method     => 'DELETE',
 									   enterprise => 1,
@@ -168,10 +167,10 @@ our $Farms = {
 						method     => 'GET',
 						enterprise => 1,
 		},
-		$V{ CREATE } => {
-						  uri        => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources",
-						  method     => 'POST',
-						  enterprise => 1,
+		$V{ ADD } => {
+					   uri        => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources",
+					   method     => 'POST',
+					   enterprise => 1,
 		},
 		$V{ SET } => {
 			 uri => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::Uri_param_tag",
@@ -184,7 +183,7 @@ our $Farms = {
 			 ],
 			 enterprise => 1,
 		},
-		$V{ DELETE } => {
+		$V{ REMOVE } => {
 			  uri => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::Uri_param_tag",
 			  method    => 'DELETE',
 			  param_uri => [

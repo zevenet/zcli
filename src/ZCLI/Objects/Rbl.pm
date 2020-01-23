@@ -94,17 +94,17 @@ our $Rbl = {
 													method     => 'GET',
 													enterprise => 1,
 									},
-									$V{ CREATE } => {
-													  uri        => "/ipds/rbl/domains",
-													  method     => 'POST',
-													  enterprise => 1,
+									$V{ ADD } => {
+												   uri        => "/ipds/rbl/domains",
+												   method     => 'POST',
+												   enterprise => 1,
 									},
 									$V{ SET } => {
 												   uri => "/ipds/rbl/domains/<$K{DOMAIN}>",
 												   method     => 'PUT',
 												   enterprise => 1,
 									},
-									$V{ DELETE } => {
+									$V{ REMOVE } => {
 													uri => "/ipds/rbl/domains/<$K{DOMAIN}>",
 													method     => 'DELETE',
 													enterprise => 1,

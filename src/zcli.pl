@@ -34,14 +34,9 @@ use ZCLI::Lib;
 use ZCLI::Objects;
 use ZCLI::Interactive;
 
-# macros
-my %V = %Define::Actions;
-
-my $zcli_dir = $Global::Config_dir;
-
 # Init!
 
-system ( "mkdir -p $zcli_dir" ) if ( !-d $zcli_dir );
+system ( "mkdir -p $Global::Config_dir" ) if ( !-d $Global::Config_dir );
 
 my $opt = &parseOptions( \@ARGV );
 
