@@ -1,5 +1,5 @@
-hosts.ini
-src/hosts.ini
+profiles.ini
+src/profiles.ini
 .zcli-history
 packages/
 workdir/

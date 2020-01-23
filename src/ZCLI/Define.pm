@@ -25,38 +25,37 @@ use strict;
 use warnings;
 
 package Global;
-our $DEBUG = 0;
-our $FIN = ( $DEBUG ) ? "" : "\n";  # This will add the dying line in debug mode
-our $REQ_ZEVEVENET_VERSION = "6.1";
+our $Debug = 0;
+our $Fin = ( $Debug ) ? "" : "\n";  # This will add the dying line in debug mode
 
-our $config_dir   = "$ENV{HOME}/.zcli";
-our $history_path = "$config_dir/zcli-history";
-our $hosts_path   = "$config_dir/hosts.ini";
-our $CONNECTIVITY = 1;    # It is the result of a connectivity test with the lb
+our $Req_zevenet_version = "6.1";
+
+our $Config_dir    = "$ENV{HOME}/.zcli";
+our $History_path  = "$Config_dir/zcli-history";
+our $Profiles_path = "$Config_dir/profiles.ini";
+our $Connectivity = 1;    # It is the result of a connectivity test with the lb
 
 package Env;
-our $INPUT_JSON = 0;    # It is the execution options to run without interactive
-our $SILENCE    = 0;    # It is the execution options to run without interactive
-our $HOST;   # It is the host struct with info to connect with the load balancer
-our
-  $HOST_IDS_TREE;  # It is the tree with the IDs that the load balancer contains
-our $ZCLI_OBJECTS_DEF
-  ;    # It is the the hash with the definition for all the possible commands
-our $ZCLI;        # It is the object TERM used to implement the autocompletation
-our $ZCLI_CMD_ST; # It is the ZCLI commands struct used for the TERM module
-our $ZCLI_OPTIONS;    #
+our $Input_json = 0;    # It is the execution options to run without interactive
+our $Silence    = 0;    # It is the execution options to run without interactive
+our $Profile;    # It is a struct with info to connect with the load balancer
+our $Profile_ids_tree
+  ;              # It is the tree with the IDs that the load balancer contains
+;    # It is the the hash with the definition for all the possible commands
+our $Zcli;        # It is the object TERM used to implement the autocompletation
+our $Zcli_cmd_st; # It is the ZCLI commands struct used for the TERM module
 
 # save the last parameter list to avoid repeat the params zapi call for each tab
-our $CMD_PARAMS_DEF = undef;
+our $Cmd_params_def = undef;
 ; # It is the last parameter object returned by the ZAPI. It is used to autocomplete the command
-our $CMD_STRING = ''
+our $Cmd_string = ''
   ; # It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded
 
 package Define;
 
 our $Description_param =
   "[-param_name_1 param_value_1] [-param_name_2 param_value_2] ...";
-our $L4_SERVICE = "default_service";
+our $L4_service = "default_service";
 
 # object keys
 our %Keys = (
@@ -114,7 +113,7 @@ our %Actions = (
 	QUIT   => 'quit',                      # exit from program
 );
 
-our $UriParamTag =
+our $Uri_param_tag =
   "PARAM_URI";    # is a tag used to replace a parameter of the uri
 
 1;

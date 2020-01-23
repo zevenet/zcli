@@ -42,10 +42,10 @@ Each object follow a format and can contain a list of possible parameters to def
 		# 'uri' is the URI used for the ZAPI request. It can contain two kind of 'parameters' inside:
 		#    '<id>' is a id parameter of the command and has to match with one element of the IDs tree of the load balancer.
 		#		Those parameters are delemited for the characeters '<' and '>'
-		#    '$Define::UriParamTag' is a id_param parameter of the command and it is not implemented in the IDs tree of the load balancer.
+		#    '$Define::Uri_param_tag' is a id_param parameter of the command and it is not implemented in the IDs tree of the load balancer.
 		#       The name for this value is in the key of this hash 'param_uri'.
 		#       The string that defines this parameters is defined in the Define module of ZCLI.
-		uri       => "/system/logs/<$K{LOG}>/lines/$Define::UriParamTag",
+		uri       => "/system/logs/<$K{LOG}>/lines/$Define::Uri_param_tag",
 
 		# 'method' is the HTTP method used to do the ZAPI request.
 		method       => 'PUT',
@@ -117,7 +117,7 @@ Examples:
 						  download_file => undef,
 	  },
 	  $V{ UPLOAD } => {
-			  uri          => "/system/backup/$Define::UriParamTag",
+			  uri          => "/system/backup/$Define::Uri_param_tag",
 			  method       => 'PUT',
 			  content_type => 'application/gzip',
 			  upload_file  => undef,
@@ -138,16 +138,16 @@ Examples:
 It is the module that implement the interactive feature using the Term::ShellUI perl module
 It uses the objects definitions to expand a command tree with the possible actions and required parameters
 
-The expanssion is done using the object '$Objects::Zcli' as template and creating the '$Env::ZCLI_CMD_ST' command struct.
+The expanssion is done using the object '$Objects::Zcli' as template and creating the '$Env::Zcli_cmd_st' command struct.
 
 The functions used follow the following order:
 
--> reload_cmd_struct
--> gen_cmd_struct
--> gen_obj add_ids(recursively) create a temporality description using 'create_description'
+-> reloadCmdStruct
+-> createZcliCmd
+-> createCmdObject add_ids(recursively) create a temporality description using 'create_description'
 -> gen_act:
 	|-> $def->{ args } = create_description
-	|-> $def->{ args } = complete_body_params(): parsing te arguments autocompleting the parameters names and values
+	|-> $def->{ args } = completeArgsBodyParams(): parsing te arguments autocompleting the parameters names and values
 	|					  |-> listParams(): Do a ZAPI request without parameters to get the list of possible body parameters
 	|-> $def->{ proc } = subrutine that executes the ZAPI action
 
@@ -181,4 +181,4 @@ https://stackoverflow.com/questions/8055063/how-to-install-pp-par-packager
 Requisitos:
 - Install Strawberry Perl for windows (I installed strawberry-perl-5.16.3.1-64bit.msi)
 - El binario debe acabar en .exe: "zcli.exe"
-complete_body_params
+completeArgsBodyParams

@@ -39,7 +39,7 @@ use ZCLI::Objects::Rbac;
 
 our $Zcli = {};
 
-if ( $Global::DEBUG > 1 )
+if ( $Global::Debug > 1 )
 {
 	require ZCLI::Objects::Debug;
 	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Debug );

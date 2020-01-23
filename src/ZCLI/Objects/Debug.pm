@@ -66,7 +66,7 @@ our $Debug = {
 											  download_file => undef,
 						  },
 						  $V{ UPLOAD } => {
-								   uri          => "/system/backup/$Define::UriParamTag",
+								   uri          => "/system/backup/$Define::Uri_param_tag",
 								   method       => 'PUT',
 								   content_type => 'application/gzip',
 								   upload_file  => undef,

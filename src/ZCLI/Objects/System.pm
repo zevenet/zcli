@@ -72,7 +72,7 @@ our $System = {
 							 method => 'GET',
 			 },
 			 $V{ GET } => {
-					 uri       => "/system/logs/<$K{LOG}>/lines/$Define::UriParamTag",
+					 uri       => "/system/logs/<$K{LOG}>/lines/$Define::Uri_param_tag",
 					 method    => 'GET',
 					 param_uri => [
 								   {
@@ -88,42 +88,42 @@ our $System = {
 			 },
 	 },
 	 'system-backups' => {
-				 $V{ LIST } => {
-								 uri    => "/system/backup",
-								 method => 'GET',
-				 },
-				 $V{ CREATE } => {
-								   uri    => "/system/backup",
-								   method => 'POST',
-				 },
-				 $V{ DOWNLOAD } => {
-									 uri           => "/system/backup/<$K{BACKUP}>",
-									 method        => 'GET',
-									 download_file => undef,
-				 },
-				 $V{ UPLOAD } => {
-						 uri          => "/system/backup/$Define::UriParamTag",
-						 method       => 'PUT',
-						 content_type => 'application/gzip',
-						 upload_file  => undef,
-						 param_uri    => [
-									   {
-										 name => "name",
-										 desc => "the name which the backup will be saved",
-									   },
-						 ],
-				 },
-				 $V{ DELETE } => {
-								   uri    => "/system/backup/<$K{BACKUP}>",
-								   method => 'DELETE',
-				 },
-				 $V{ APPLY } => {
-								  uri    => "/system/backup/<$K{BACKUP}>/actions",
-								  method => 'POST',
-								  params => {
-											  action => 'apply',
-								  },
-				 },
+						   $V{ LIST } => {
+										   uri    => "/system/backup",
+										   method => 'GET',
+						   },
+						   $V{ CREATE } => {
+											 uri    => "/system/backup",
+											 method => 'POST',
+						   },
+						   $V{ DOWNLOAD } => {
+											   uri    => "/system/backup/<$K{BACKUP}>",
+											   method => 'GET',
+											   download_file => undef,
+						   },
+						   $V{ UPLOAD } => {
+								   uri          => "/system/backup/$Define::Uri_param_tag",
+								   method       => 'PUT',
+								   content_type => 'application/gzip',
+								   upload_file  => undef,
+								   param_uri    => [
+										   {
+											 name => "name",
+											 desc => "the name which the backup will be saved",
+										   },
+								   ],
+						   },
+						   $V{ DELETE } => {
+											 uri    => "/system/backup/<$K{BACKUP}>",
+											 method => 'DELETE',
+						   },
+						   $V{ APPLY } => {
+											uri    => "/system/backup/<$K{BACKUP}>/actions",
+											method => 'POST',
+											params => {
+														action => 'apply',
+											},
+						   },
 	 },
 	 'system-supportsave' => {
 							   $V{ DOWNLOAD } => {

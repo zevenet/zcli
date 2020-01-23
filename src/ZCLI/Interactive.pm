@@ -34,11 +34,9 @@ use ZCLI::Define;
 use ZCLI::Lib;
 use ZCLI::Objects;
 
-my %V   = %Define::Actions;
-my $FIN = $Global::FIN;
+my %V = %Define::Actions;
 
-my $zcli_dir     = $Global::config_dir;
-my $zcli_history = $Global::history_path;
+my $zcli_dir = $Global::Config_dir;
 
 # overwriting methods
 
@@ -56,7 +54,7 @@ my $skip_reload = 0;
 ### definition of functions
 
 =begin nd
-Function: create_zcli
+Function: createZcli
 
 	It creates a Term object that implements the ZCLI. 
 	The object will be available from the variable '$Env::ZCLI'.
@@ -69,49 +67,49 @@ Returns:
 
 =cut
 
-sub create_zcli
+sub createZcli
 {
 	# Execute and exit
 	my @args = ();
-	if ( $Env::SILENCE )
+	if ( $Env::Silence )
 	{
 		&dev( "execute and exit", undef, 1 );
 		@args = @ARGV;
 	}
 
 	# code of ShellUI->run modified
-	# $Env::ZCLI->run(@args); this function is not completed
+	# $Env::Zcli->run(@args); this function is not completed
 	my $incmd = join " ", @args;
 
-	$Env::ZCLI = new Term::ShellUI(
-									commands     => $Env::ZCLI_CMD_ST,
-									history_file => $zcli_history,
+	$Env::Zcli = new Term::ShellUI(
+									commands     => $Env::Zcli_cmd_st,
+									history_file => $Global::History_path,
 									keep_quotes  => 1,
 									token_chars  => '',
 	);
 
 	&printSuccess( "Zevenet Client Line Interface" );
-	$Env::ZCLI->load_history();
-	$Env::ZCLI->getset( 'done', 0 );
+	$Env::Zcli->load_history();
+	$Env::Zcli->getset( 'done', 0 );
 
 	my $err = 0;
-	while ( !$Env::ZCLI->{ done } )
+	while ( !$Env::Zcli->{ done } )
 	{
 		if ( !$skip_reload )
 		{
-			&reload_cmd_struct();
-			&reload_prompt( $err );
+			&reloadCmdStruct();
+			&reloadPrompt( $err );
 		}
 		else
 		{
 			$skip_reload = 0;
 		}
 
-		$err = $Env::ZCLI->process_a_cmd( $incmd );
+		$err = $Env::Zcli->process_a_cmd( $incmd );
 		$err = 1 if not defined $err;
-		$Env::ZCLI->save_history();
+		$Env::Zcli->save_history();
 
-		last if $Env::SILENCE;
+		last if $Env::Silence;
 		last if $incmd;          # only loop if we're prompting for commands
 	}
 
@@ -119,12 +117,12 @@ sub create_zcli
 }
 
 =begin nd
-Function: reload_prompt
+Function: reloadPrompt
 
 	It reloads the prompt line of the ZCLI. The color will change between green (the last command was successful) or 
 	red (the last command finishes with failure).
 
-	The host name will be printed as gray if ZCLI has not connectivity with the load balancer.
+	The profile name will be printed as gray if ZCLI has not connectivity with the load balancer.
 
 Parametes:
 	Error code - It is used to select the prompt color. It expects 0 on success or another value on failure.
@@ -134,11 +132,11 @@ Returns:
 
 =cut
 
-sub reload_prompt
+sub reloadPrompt
 {
-	my $err  = shift // 0;
-	my $conn = $Env::CONNECTIVITY;
-	my $host = $Env::HOST->{ NAME } // "";
+	my $err     = shift // 0;
+	my $conn    = $Env::Connectivity;
+	my $profile = $Env::Profile->{ name } // "";
 
 	my $gray     = "\033[01;90m";
 	my $red      = "\033[01;31m";
@@ -148,12 +146,12 @@ sub reload_prompt
 	my $color      = ( $err )   ? $red  : $green;
 	my $conn_color = ( !$conn ) ? $gray : "";
 
-	my $tag = "zcli($conn_color$host$color)";
-	$Env::ZCLI->prompt( "$no_color$color$tag$no_color: " );
+	my $tag = "zcli($conn_color$profile$color)";
+	$Env::Zcli->prompt( "$no_color$color$tag$no_color: " );
 }
 
 =begin nd
-Function: reload_cmd_struct
+Function: reloadCmdStruct
 
 	It reloads the struct used for ZCLI with the definition of the possible commands
 
@@ -165,29 +163,29 @@ Returns:
 
 =cut
 
-sub reload_cmd_struct
+sub reloadCmdStruct
 {
-	$Env::CONNECTIVITY = &check_connectivity( $Env::HOST );
-	if ( $Env::CONNECTIVITY )
+	$Env::Connectivity = &checkConnectivity( $Env::Profile );
+	if ( $Env::Connectivity )
 	{
-		$Env::HOST_IDS_TREE = &getLBIdsTree( $Env::HOST );
-		if ( !defined $Env::HOST_IDS_TREE )
+		$Env::Profile_ids_tree = &getLBIdsTree( $Env::Profile );
+		if ( !defined $Env::Profile_ids_tree )
 		{
-			$Env::CONNECTIVITY = 0;
+			$Env::Connectivity = 0;
 		}
 	}
-	$Env::ZCLI_CMD_ST = &gen_cmd_struct( $Env::HOST_IDS_TREE );
+	$Env::Zcli_cmd_st = &createZcliCmd( $Env::Profile_ids_tree );
 
-	$Env::ZCLI->commands( $Env::ZCLI_CMD_ST ) if ( defined $Env::ZCLI );
+	$Env::Zcli->commands( $Env::Zcli_cmd_st ) if ( defined $Env::Zcli );
 }
 
 =begin nd
-Function: gen_cmd_struct
+Function: createZcliCmd
 
 	It creates a struct with a tree with the possible values and its expected arguments.
 	There are two kind of commands:
 		* Commands to the load balancer: they only are available when ZCLI has connectivity with the load balancer.
-		* Commands to the ZCLI: they apply action over the ZCLI app. For example: help, history, zcli, hosts
+		* Commands to the ZCLI: they apply action over the ZCLI app. For example: help, history, zcli, profile
 
 Parametes:
 	Ids tree - It is the struct with the tree of IDsS
@@ -210,17 +208,17 @@ Returns:
 
 =cut
 
-sub gen_cmd_struct
+sub createZcliCmd
 {
 	my $ids_tree = shift;
 	my $st;
 
 	# features of the lb
-	if ( $Env::CONNECTIVITY )
+	if ( $Env::Connectivity )
 	{
 		foreach my $cmd ( keys %{ $Objects::Zcli } )
 		{
-			my $obj = &gen_obj( $cmd, $ids_tree );
+			my $obj = &createCmdObject( $cmd, $ids_tree );
 			$st->{ $cmd } = $obj if defined $obj;
 		}
 	}
@@ -246,60 +244,61 @@ sub gen_cmd_struct
 	$st->{ $V{ QUIT } }->{ exclude_from_history } = 1;
 	$st->{ $V{ QUIT } }->{ maxargs }              = 0;
 
-	my $host_st;
-	my @host_list = &listHost();
-	$host_st->{ $V{ LIST } }->{ proc } =
-	  sub { printSuccess( $_, 0 ) for ( &listHost ) };
-	$host_st->{ $V{ LIST } }->{ maxargs }   = 1;
-	$host_st->{ $V{ CREATE } }->{ proc }    = \&setHost;
-	$host_st->{ $V{ CREATE } }->{ maxargs } = 1;
-	$host_st->{ $V{ SET } } = {
-		args    => [sub { \@host_list }],
+	my $profile_st;
+	my @profile_list = &listProfiles();
+	$profile_st->{ $V{ LIST } }->{ proc } =
+	  sub { printSuccess( $_, 0 ) for ( &listProfiles ) };
+	$profile_st->{ $V{ LIST } }->{ maxargs }   = 1;
+	$profile_st->{ $V{ CREATE } }->{ proc }    = \&setProfile;
+	$profile_st->{ $V{ CREATE } }->{ maxargs } = 1;
+	$profile_st->{ $V{ SET } } = {
+		args    => [sub { \@profile_list }],
 		maxargs => 1,
 		proc    => sub {
-			my $new_host = &setHost( $_[0], 0 );
-			my $err = ( defined $new_host ) ? 0 : 1;
+			my $new_profile = &setProfile( $_[0], 0 );
+			my $err = ( defined $new_profile ) ? 0 : 1;
 			if ( !$err )
 			{
-				# reload the host configuration
-				$Env::HOST = $new_host if ( $Env::HOST->{ NAME } eq $new_host->{ NAME } );
-				$err       = 0;
+				# reload the profile configuration
+				$Env::Profile = $new_profile
+				  if ( $Env::Profile->{ name } eq $new_profile->{ name } );
+				$err = 0;
 			}
 
 			( $err );
 		},
 	};
-	$host_st->{ $V{ DELETE } } = {
+	$profile_st->{ $V{ DELETE } } = {
 		proc => sub {
-			if ( $Env::HOST->{ name } eq $_[0] )
+			if ( $Env::Profile->{ name } eq $_[0] )
 			{
-				&printError( "The '$Env::HOST->{NAME}' host is being used" );
+				&printError( "The '$Env::Profile->{name}' profile is being used" );
 			}
 			else
 			{
-				&delHost( @_ );
+				&delProfile( @_ );
 			}
 		},
-		args    => [sub { \@host_list }],
+		args    => [sub { \@profile_list }],
 		maxargs => 1,
 	};
-	$host_st->{ $V{ APPLY } } = {
+	$profile_st->{ $V{ APPLY } } = {
 		proc => sub {
-			$Env::HOST = hostInfo( @_ );
-			( defined $Env::HOST ) ? 0 : 1;
+			$Env::Profile = getProfile( @_ );
+			( defined $Env::Profile ) ? 0 : 1;
 		},
-		args    => [sub { \@host_list }],
+		args    => [sub { \@profile_list }],
 		maxargs => 1,
 	};
-	$st->{ hosts }->{ desc } =
+	$st->{ profile }->{ desc } =
 	  "apply an action about which is the destination load balancer";
-	$st->{ hosts }->{ cmds } = $host_st;
+	$st->{ profile }->{ cmds } = $profile_st;
 
 	return $st;
 }
 
 =begin nd
-Function: gen_obj
+Function: createCmdObject
 
 	It creates the command tree of an object. Modify the Object::Zcli adding it the required IDs.
 	This function uses add_ids to implement the IDs autocompletation.
@@ -313,7 +312,7 @@ Returns:
 
 =cut
 
-sub gen_obj
+sub createCmdObject
 {
 	my $obj_name = shift;
 	my $id_tree  = shift;
@@ -328,7 +327,8 @@ sub gen_obj
 		my $obj_def = dclone( $Objects::Zcli->{ $obj_name }->{ $action } );
 
 		# skip EE features when the load balancer is of type CE
-		next if ( $Env::HOST->{ EDITION } eq 'CE' and exists $obj_def->{ enterprise } );
+		next
+		  if ( $Env::Profile->{ edition } eq 'CE' and exists $obj_def->{ enterprise } );
 
 		my @ids_def = &getIds( $obj_def->{ uri } );
 
@@ -338,9 +338,9 @@ sub gen_obj
 		$obj_def->{ action } = $action;
 
 		# create the Term struct
-		$cmd->{ desc } = &desc_cb( $obj_def );
-		$cmd->{ proc } = sub { &proc_cb( $obj_def, @_ ); };
-		$cmd->{ args } = sub { &args_cb( @_, $obj_def, $id_tree ); };
+		$cmd->{ desc } = &getCmdDescription( $obj_def );
+		$cmd->{ proc } = sub { &geCmdProccessCallback( $obj_def, @_ ); };
+		$cmd->{ args } = sub { &getCmdArgsCallBack( @_, $obj_def, $id_tree ); };
 
 		$object_struct->{ cmds }->{ $action } = $cmd;
 	}
@@ -349,7 +349,7 @@ sub gen_obj
 }
 
 =begin nd
-Function: desc_cb
+Function: getCmdDescription
 
 	It creates a message with the expected format for the command.
 
@@ -361,7 +361,7 @@ Returns:
 
 =cut
 
-sub desc_cb
+sub getCmdDescription
 {
 	my $def = shift;
 	my $obj = $def->{ object };
@@ -417,7 +417,7 @@ sub getMissingParam
 }
 
 =begin nd
-Function: get_args_num
+Function: getCmdArgsNum
 
 	It calculates the number of expected arguments for a command. 
 	This function is only valid for GET methods
@@ -430,7 +430,7 @@ Returns:
 
 =cut
 
-sub get_args_num
+sub getCmdArgsNum
 {
 	my $def = shift;
 
@@ -444,7 +444,7 @@ sub get_args_num
 }
 
 =begin nd
-Function: proc_cb
+Function: geCmdProccessCallback
 
 	It executes the ZAPI request. First, parsing the arguments from the command line, next execute the request and then print the output.
 
@@ -456,7 +456,7 @@ Returns:
 
 =cut
 
-sub proc_cb
+sub geCmdProccessCallback
 {
 	my $obj_def = shift;
 
@@ -464,7 +464,7 @@ sub proc_cb
 	my $err;
 	my @input_args = ( $obj_def->{ object }, $obj_def->{ action }, @_ );
 	eval {
-		$Env::CMD_STRING = "";    # clean string
+		$Env::Cmd_string = "";    # clean string
 
 		my ( $input_parsed, $next_arg, $success ) =
 		  &parseInput( $obj_def, 0, @input_args );
@@ -478,7 +478,7 @@ sub proc_cb
 
 		unless ( $success )
 		{
-			my $desc      = &desc_cb( $obj_def );
+			my $desc      = &getCmdDescription( $obj_def );
 			my $missing_p = &getMissingParam( $desc, \@input_args );
 
 			#		if (!defined $missing_p )
@@ -492,15 +492,15 @@ sub proc_cb
 #		}
 
 			# force reload if params does not exist
-			&listParams( $obj_def, $input_parsed, $Env::HOST )
-			  if ( !defined $Env::CMD_PARAMS_DEF );
+			&listParams( $obj_def, $input_parsed, $Env::Profile )
+			  if ( !defined $Env::Cmd_params_def );
 
-			if ( defined $Env::CMD_PARAMS_DEF )
+			if ( defined $Env::Cmd_params_def )
 			{
 				my $params = "";
-				foreach my $p ( keys %{ $Env::CMD_PARAMS_DEF } )
+				foreach my $p ( keys %{ $Env::Cmd_params_def } )
 				{
-					if ( exists $Env::CMD_PARAMS_DEF->{ $p }->{ required } )
+					if ( exists $Env::Cmd_params_def->{ $p }->{ required } )
 					{
 						$params = "<-$p $p> $params";
 					}
@@ -513,25 +513,25 @@ sub proc_cb
 				$desc =~ s/$pattern/$params/;
 			}
 			&printError( "	[zcli] $desc" );
-			die $FIN;
+			die $Global::Fin;
 		}
 
 		# do not allow sending extra arguments using GET methods
 		if ( $obj_def->{ method } eq 'GET'
-			 and ( scalar ( @input_args ) > &get_args_num( $obj_def ) ) )
+			 and ( scalar ( @input_args ) > &getCmdArgsNum( $obj_def ) ) )
 		{
-			my $desc = &desc_cb( $obj_def );
+			my $desc = &getCmdDescription( $obj_def );
 			&printError(
 						 " There are extra arguments in the command, the expected syntax is:" );
 			&printError( "	[zcli] $desc" );
-			die $FIN;
+			die $Global::Fin;
 		}
 
 		my $request =
-		  &createZapiRequest( $obj_def, $input_parsed, $Env::HOST,
-							  $Env::HOST_IDS_TREE );
+		  &createZapiRequest( $obj_def, $input_parsed, $Env::Profile,
+							  $Env::Profile_ids_tree );
 
-		$resp = &zapi( $request, $Env::HOST );
+		$resp = &zapi( $request, $Env::Profile );
 		$err  = $resp->{ err };
 
 		&printOutput( $resp );
@@ -544,7 +544,7 @@ sub proc_cb
 }
 
 # [ids list] [ids_params list] [file_upload|download] [body_params list]
-sub args_cb
+sub getCmdArgsCallBack
 {
 	my ( undef, $input, $obj_def, $id_tree ) = @_;
 	my $possible_values = [];
@@ -563,11 +563,11 @@ sub args_cb
 				   $obj_def->{ object },
 				   $obj_def->{ action }, @args_used );
 
-	$Env::ZCLI->completemsg( "  ## getting '$next_arg'\n" ) if ( $Global::DEBUG );
+	$Env::Zcli->completemsg( "  ## getting '$next_arg'\n" ) if ( $Global::Debug );
 
 	if ( $next_arg eq 'id' )
 	{
-		$possible_values = &get_next_id( $obj_def, $id_tree, $args_parsed->{ id } );
+		$possible_values = &getIdNext( $obj_def, $id_tree, $args_parsed->{ id } );
 	}
 	elsif ( $next_arg eq 'param_uris' )
 	{
@@ -582,8 +582,8 @@ sub args_cb
 	elsif ( $next_arg eq 'body_params' )
 	{
 		$possible_values =
-		  &complete_body_params( $obj_def,     $args_parsed, \@args_used,
-								 $arg_previus, $id_tree );
+		  &completeArgsBodyParams( $obj_def,     $args_parsed, \@args_used,
+								   $arg_previus, $id_tree );
 	}
 
 	# fin
@@ -595,7 +595,7 @@ sub args_cb
 	return $possible_values;
 }
 
-sub complete_body_params
+sub completeArgsBodyParams
 {
 	my ( $obj_def, $args_parsed, $args_used, $arg_previus, $id_tree ) = @_;
 	my $out;
@@ -608,23 +608,23 @@ sub complete_body_params
 	$previus_param =~ s/^-//;
 
 	# get list or refreshing the parameters list
-	if ( $Env::CMD_STRING eq '' or $Env::CMD_STRING ne $cmd_string )
+	if ( $Env::Cmd_string eq '' or $Env::Cmd_string ne $cmd_string )
 	{
-		$Env::ZCLI->completemsg( "  ## Refreshing params\n" ) if ( $Global::DEBUG );
-		&listParams( $obj_def, $args_parsed, $Env::HOST );
+		$Env::Zcli->completemsg( "  ## Refreshing params\n" ) if ( $Global::Debug );
+		&listParams( $obj_def, $args_parsed, $Env::Profile );
 
 		# refresh values
-		$Env::CMD_STRING = $cmd_string;
+		$Env::Cmd_string = $cmd_string;
 	}
-	my $p_obj = $Env::CMD_PARAMS_DEF;
+	my $p_obj = $Env::Cmd_params_def;
 
-	$Env::ZCLI->completemsg( "  ## prev: $p_obj->{ $previus_param }\n" )
-	  if ( $Global::DEBUG );
+	$Env::Zcli->completemsg( "  ## prev: $p_obj->{ $previus_param }\n" )
+	  if ( $Global::Debug );
 
 	# manage the 'value' of the parameter
 	if ( exists $p_obj->{ $previus_param } )
 	{
-		$Env::ZCLI->completemsg( "  ## getting value\n" ) if ( $Global::DEBUG );
+		$Env::Zcli->completemsg( "  ## getting value\n" ) if ( $Global::Debug );
 		my $p_def = $p_obj->{ $previus_param };
 
 		# list the possible values
@@ -654,7 +654,7 @@ sub complete_body_params
 	# manage the 'key' of the parameter
 	else
 	{
-		$Env::ZCLI->completemsg( "  ## getting key\n" ) if ( $Global::DEBUG );
+		$Env::Zcli->completemsg( "  ## getting key\n" ) if ( $Global::Debug );
 
 		# remove the parameters already exists
 		my @params = ();
@@ -670,10 +670,8 @@ sub complete_body_params
 		if ( !@params )
 		{
 			@params = ();
-			$Env::ZCLI->completemsg(
+			$Env::Zcli->completemsg(
 									 "  ## This command does not expect more parameters\n" );
-
-			#if ( $Global::DEBUG );
 		}
 
 		$out = \@params;
@@ -682,7 +680,7 @@ sub complete_body_params
 	return $out;
 }
 
-sub get_next_id
+sub getIdNext
 {
 	my $obj_def = shift;
 	my $id_tree = shift;
@@ -713,9 +711,7 @@ sub get_next_id
 		my @values = keys %{ $nav_tree };
 		if ( !@values )
 		{
-			# my $msg = "This object is not using the feature '$key'\n";
-			# $Env::ZCLI->completemsg( "  ## $msg\n" ) if ( $Global::DEBUG );
-			$Env::ZCLI->completemsg( "  ## There is no any '$key'\n" );
+			$Env::Zcli->completemsg( "  ## There is no any '$key'\n" );
 		}
 
 		return \@values;

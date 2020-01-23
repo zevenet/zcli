@@ -58,7 +58,7 @@ our $Certificates = {
 										method => 'POST',
 					  },
 					  $V{ UPLOAD } => {
-							  uri          => "/certificates/$Define::UriParamTag",
+							  uri          => "/certificates/$Define::Uri_param_tag",
 							  method       => 'POST',
 							  content_type => 'application/x-pem-file',
 							  upload_file  => undef,

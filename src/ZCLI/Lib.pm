@@ -31,8 +31,6 @@ use Storable qw(dclone);
 use ZCLI::Define;
 use ZCLI::Objects;
 
-my $FIN = $Global::FIN;
-
 ## Global functions
 
 =begin nd
@@ -58,7 +56,7 @@ sub dev
 
 	chomp ( $st );
 
-	return if ( $lvl > $Global::DEBUG );
+	return if ( $lvl > $Global::Debug );
 
 	say "";
 	say ">>>> Debug >>>> $tag" if $tag;
@@ -87,7 +85,7 @@ sub printHelp
 	my $msg = "
 ZCLI can be executed with the following options (the options are available at the moment of the invocation):
 	-help: it prints this ZCLI help.
-	-host <name>: it selects the 'name' as destination load balancer of the command.
+	-profile <name>: it selects the 'name' profile as destination load balancer of the command.
 	-silence, -s: it executes the action without the human interaction.
 	-json, -j: the parameters will be parsed as JSON. The silence flag will be activated automatically if this flag is enabled
 
@@ -145,7 +143,7 @@ sub replaceUrl
 		unless ( $url =~ s/\<[\w -]+\>/$arg/ )
 		{
 			&printError( "The id '$index' could not be replaced" );
-			die $Define::FIN;
+			die $Define::Fin;
 		}
 	}
 
@@ -227,7 +225,7 @@ sub parseInput
 	# adding uri parameters
 	if ( exists $def->{ param_uri } )
 	{
-		my $tag = $Define::UriParamTag;
+		my $tag = $Define::Uri_param_tag;
 		my $uri = $def->{ uri };
 		foreach my $p ( @{ $def->{ param_uri } } )
 		{
@@ -240,7 +238,7 @@ sub parseInput
 				}
 				else
 				{
-					die $FIN;
+					die $Global::Fin;
 				}
 			}
 			else
@@ -283,7 +281,7 @@ sub parseInput
 		 and !exists $def->{ 'download_file' }
 		 and $def->{ method } =~ /POST|PUT/ )
 	{
-		if ( $Env::INPUT_JSON )
+		if ( $Env::Input_json )
 		{
 			my $json_args = join ( '', @args );
 
@@ -291,7 +289,7 @@ sub parseInput
 			if ( $@ )
 			{
 				&printError( "Error decoding the input JSON" );
-				die $FIN;
+				die $Global::Fin;
 			}
 
 		}
@@ -348,7 +346,7 @@ Returns:
 		{
 			help => 1,
 			silence => 1,
-			host => localhost,
+			profile => localhost,
 			json => 1,
 		};
 
@@ -384,9 +382,9 @@ sub parseOptions
 			{
 				$opt_st->{ 'json' } = 1;
 			}
-			elsif ( $opt eq '-host' and $args->[0] !~ /^-/ )
+			elsif ( $opt eq '-profile' and $args->[0] !~ /^-/ )
 			{
-				$opt_st->{ 'host' } = shift @{ $args };
+				$opt_st->{ 'profile' } = shift @{ $args };
 			}
 			else
 			{
@@ -397,8 +395,8 @@ sub parseOptions
 		}
 	}
 
-	$Env::SILENCE    = 1 if exists $opt_st->{ silence };
-	$Env::INPUT_JSON = 1 if exists $opt_st->{ json };
+	$Env::Silence    = 1 if exists $opt_st->{ silence };
+	$Env::Input_json = 1 if exists $opt_st->{ json };
 
 	return $opt_st;
 }
@@ -433,13 +431,13 @@ sub createZapiRequest
 	# getting uri parameters
 	if ( exists $def->{ param_uri } )
 	{
-		my $tag = $Define::UriParamTag;
+		my $tag = $Define::Uri_param_tag;
 		foreach my $p ( @{ $input->{ param_uri } } )
 		{
 			unless ( $call->{ uri } =~ s/$tag/$p/ )
 			{
 				&printError( "Error replacing the param '$p'" );
-				die $FIN;
+				die $Global::Fin;
 			}
 		}
 	}
@@ -481,7 +479,7 @@ Function: getLBIdsTree
 	It gets and modifies the load balancer IDs tree to adapt it to ZCLI. This tree is used to the autocomplete feature of the IDs
 
 Parametes:
-	Host - It is a reference to a host object that contains the information about connecting with the load balancer.
+	Profile - It is a reference to a profile object that contains the information about connecting with the load balancer.
 
 Returns:
 	Hash ref - It is a hash with the IDs tree
@@ -490,13 +488,13 @@ Returns:
 
 sub getLBIdsTree
 {
-	my $host = shift;
+	my $profile = shift;
 
 	my $request = {
 					uri    => "/ids",
 					method => 'GET',
 	};
-	my $resp = &zapi( $request, $host );
+	my $resp = &zapi( $request, $profile );
 
 	#~ &dev(Dumper($resp),"id tree", 2);
 
@@ -505,7 +503,7 @@ sub getLBIdsTree
 	if ( $resp->{ code } == 404 )
 	{
 		&printError(
-			"Error connecting, ZCLI needs a load balancer with the version $Global::REQ_ZEVEVENET_VERSION or higher"
+			"Error connecting, ZCLI needs a load balancer with the version $Global::Req_zevenet_version or higher"
 		);
 	}
 	elsif ( $resp->{ 'json' }->{ 'params' } )
@@ -557,10 +555,10 @@ Parametes:
 		params - It is a hash with the parameters used in the POST or PUT method.
 		upload_file - It is the path to the file is going to be uploaded.
 		download_file - It is the path to the file where save the donwloaded file.
-	Host - It is a hash with information about the host. The possible keys are:
-		HOST - It is the host IP or network hostname.
-		PORT - It is the port of the ZAPI service.
-		ZAPI_VERSION - It is the ZAPI verison used
+	Profile - It is a hash with information about the load balancer. The possible keys are:
+		host - It is the host IP or network hostname.
+		port - It is the port of the ZAPI service.
+		zapi_version - It is the ZAPI verison used
 
 Returns:
 	Hash ref - The output contains the following keys:
@@ -582,22 +580,22 @@ Returns:
 
 sub zapi
 {
-	my $arg  = shift;
-	my $host = shift;
+	my $arg     = shift;
+	my $profile = shift;
 
 	&dev( Dumper( $arg ), 'req', 2 );
 
 	# This is a workaround to manage l4 and datalink services.
-	$arg->{ uri } =~ s|/services/$Define::L4_SERVICE/|/|m;
+	$arg->{ uri } =~ s|/services/$Define::L4_service/|/|m;
 
 	# create URL
 	my $URL =
-	  "https://$host->{HOST}:$host->{PORT}/zapi/v$host->{ZAPI_VERSION}/zapi.cgi$arg->{uri}";
+	  "https://$profile->{host}:$profile->{port}/zapi/v$profile->{zapi_version}/zapi.cgi$arg->{uri}";
 	my $request = HTTP::Request->new( $arg->{ method } => $URL );
 
 	# add zapikey
 	my $ZAPI_KEY_HEADER = 'ZAPI-KEY';
-	$request->header( $ZAPI_KEY_HEADER => $host->{ ZAPI_KEY } );    # auth: key
+	$request->header( $ZAPI_KEY_HEADER => $profile->{ zapi_key } );    # auth: key
 
 	# add body
 	if ( $arg->{ method } eq 'POST' or $arg->{ method } eq 'PUT' )
@@ -682,7 +680,7 @@ sub zapi
 	{
 		$msg = "The authentication failed. Please, review the following settings
 	*) The zapi user is enabled: clicking on Zevenet Webgui 'System > User'.
-	*) The ZCLI zapikey is valid: using the ZCLI command with the arguments 'hosts set $host->{NAME}' to modify it.";
+	*) The ZCLI zapikey is valid: using the ZCLI command with the arguments 'profile set $profile->{name}' to modify it.";
 	}
 
 	# create a enviorement variable with the body of the last zapi result.
@@ -734,8 +732,9 @@ Function: listParams
 	If the definition of the call has some predefined parameter, they are removed before doing de call.
 
 Parametes:
-	Request - It is an request object that need the "zapi" function.
-	Host - It is a host object with the information about connecting with the load balancer
+	Command object - It is an struct with the data to create a zcli command
+	Arguments - It is an array ref with the input arguments
+	Profile - It is a profile object with the information about connecting with the load balancer
 
 Returns:
 	Hash array - The response is an object like the following:
@@ -758,16 +757,17 @@ Returns:
 
 sub listParams
 {
-	my ( $obj_def, $args_parsed, $host ) = @_;
+	my ( $obj_def, $args_parsed, $profile ) = @_;
 
 	# remove predefined values
 	my $predef_params = $obj_def->{ params };
 	delete $obj_def->{ params };
 
 	my $request =
-	  &createZapiRequest( $obj_def, $args_parsed, $host, $Env::HOST_IDS_TREE );
+	  &createZapiRequest( $obj_def, $args_parsed, $profile,
+						  $Env::Profile_ids_tree );
 
-	my $params_ref = &zapi( $request, $host )->{ json }->{ params };
+	my $params_ref = &zapi( $request, $profile )->{ json }->{ params };
 
 	# 		Example:
 	#		$params_ref =  [
@@ -793,22 +793,22 @@ sub listParams
 	# set again the predefined parameters
 	$obj_def->{ params } = $predef_params if ( defined $predef_params );
 
-	$Env::CMD_PARAMS_DEF = undef;
+	$Env::Cmd_params_def = undef;
 	if ( defined $params_ref )
 	{
-		$Env::CMD_PARAMS_DEF = {};
+		$Env::Cmd_params_def = {};
 		foreach my $p ( @{ $params_ref } )
 		{
-			$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ required } = 1
+			$Env::Cmd_params_def->{ $p->{ name } }->{ required } = 1
 			  if ( exists $p->{ options } and grep ( /^required$/, @{ $p->{ options } } ) );
-			$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ exist } = 1;
-			$Env::CMD_PARAMS_DEF->{ $p->{ name } }->{ possible_values } =
+			$Env::Cmd_params_def->{ $p->{ name } }->{ exist } = 1;
+			$Env::Cmd_params_def->{ $p->{ name } }->{ possible_values } =
 			  $p->{ possible_values }
 			  if ( exists $p->{ possible_values } );
 		}
 	}
 
-	return $Env::CMD_PARAMS_DEF;
+	return $Env::Cmd_params_def;
 }
 
 =begin nd
@@ -943,50 +943,53 @@ sub printSuccess
 	my $msg    = shift;
 	my $header = shift // 1;
 
-	&printMsg( $msg, 0 ) unless ( $header and $Env::SILENCE );
+	&printMsg( $msg, 0 ) unless ( $header and $Env::Silence );
 }
 
-## host
+## profile
 
 =begin nd
-Function: setHost
+Function: setProfile
 
-	This function ask the HOST configuration to the user. It has two mode of working, one for creating a new host
-	or another to modify it. The hosts are saved in the config file "$ENV{HOME}/.zcli/hosts.ini"
+	This function ask the PROFILE configuration to the user. It has two mode of working, one for creating a new profile
+	or another to modify it. The profiles are saved in the config file "$ENV{HOME}/.zcli/profiles.ini"
 
-	There is a special host called 'localhost', this host is used when ZCLI is executed from the load balancer.
-	Localhost only has a parameter (zapikey).
+	There is a special profile called 'localhost', this profile is used when ZCLI is executed from the load balancer.
+	Localhost only has a input parameter (zapikey), the others ones are taken from the system.
 
 Parametes:
-	host name - It is the nick of the hostname to create or modify. This parameter is empty if it is executed in creation mode.
-	new host - It is a flag that creates a new host (value 0) or modify a host that exist (value 0). This flag manage which parameters are mandatory and allow to keep the old value.
+	Profile name - It is the nick of the profile is going to be created or modified. This parameter is empty if it is executed in creation mode.
+	new profile - It is a flag that creates a new profile (value 0) or modify a profile that exist (value 0). This flag manage which parameters are mandatory and allow to keep the old value.
 
 Returns:
-	Hash ref - It returns the host struct updated with the new values or undef if there is an error. The keys if the host struct are:
-		ZAPI_VERSION, it is the ZAPI version used
-		NAME, it is a nick name of the load balancer
-		HOST, it is the IP or nameserver or the load balancer
-		PORT, it is the ZAPI management port
+	Hash ref - It returns the profile struct updated with the new values or undef if there is an error. The keys of the profile struct are:
+		zapi_version, it is the ZAPI version used
+		name, it is a nick name of the load balancer
+		host, it is the IP or nameserver or the load balancer
+		port, it is the ZAPI management port
 		ZAPIKEY, it is the user key used for the ZAPI requests
+		edition, it is the Zevenet edition used in the load balancer. The possible values are CE, EE or not exists (if zcli has not connected)
 		
 	Example:
 		$cfg = {
-				 ZAPI_VERSION => "4.0",
-				 NAME         => zevenet-lb-1,
-				 HOST         => 192.168.100.254,
-				 PORT         => 444,
-				 ZAPI_KEY     => v2kl3QK658awg34qaQbaewba3wjnzdkfxGbqbwq4,
+				 zapi_version => "4.0",
+				 name         => zevenet-lb-1,
+				 host         => 192.168.100.254,
+				 port         => 444,
+				 zapi_key     => v2kl3QK658awg34qaQbaewba3wjnzdkfxGbqbwq4,
+				 edition      => EE,
 		}
 =cut
 
-sub setHost
+sub setProfile
 {
-	my $hostname = shift
-	  ; # if there is HOSTNAME, the function will mofidy, else it will create a new one
-	my $new_flag = shift // 1;
-	my $hostfile = $Global::hosts_path;
+	my $name = shift
+	  ; # if name exists, the function will modify it, else it will create a new one
+	my $new_flag  = shift // 1;
+	my $conf_file = $Global::Profiles_path;
 	my $localname =
-	  "localhost";    # it is the reserve word to modify the localhost host settings
+	  "localhost"
+	  ; # it is the reserve word to automaticaly modify the conf when zcli is running in a load balancer
 	my $cfg;
 	my $valid_flag = 1;
 
@@ -996,102 +999,102 @@ sub setHost
 
 	# getting conf
 	my $Config =
-	  ( -e $hostfile ) ? Config::Tiny->read( $hostfile ) : Config::Tiny->new;
+	  ( -e $conf_file ) ? Config::Tiny->read( $conf_file ) : Config::Tiny->new;
 
-	# set values if the host is localhost
-	if ( $hostname eq $localname )
+	# set values if the profile is localhost
+	if ( $name eq $localname )
 	{
 		# overwrite data. Maybe the http server cfg was changed
 		my ( $localip, $localport ) = &getHttpServerConf();
 
 		$cfg = {
-				 ZAPI_VERSION => "4.0",
-				 NAME         => $localname,
-				 HOST         => $localip,
-				 PORT         => $localport,
-				 ZAPI_KEY     => $Config->{ $localname }->{ ZAPI_KEY } // '',
-				 EDITION      => ( eval { require Zevenet::ELoad; } ) ? 'EE' : 'CE',
+				 zapi_version => "4.0",
+				 name         => $localname,
+				 host         => $localip,
+				 port         => $localport,
+				 zapi_key     => $Config->{ $localname }->{ zapi_key } // '',
+				 edition      => ( eval { require Zevenet::ELoad; } ) ? 'EE' : 'CE',
 		};
 	}
 
 	# validating
 	elsif ( !$new_flag )
 	{
-		if ( !exists $Config->{ $hostname } )
+		if ( !exists $Config->{ $name } )
 		{
-			if ( !defined $hostname )
+			if ( !defined $name )
 			{
-				&printError( "A host name is required" );
+				&printError( "A profile name is required" );
 			}
 			else
 			{
-				&printError( "The '$hostname' host does not exist" );
+				&printError( "The '$name' profile does not exist" );
 			}
 			return undef;
 		}
-		$cfg = $Config->{ $hostname };
+		$cfg = $Config->{ $name };
 	}
 
 	## Get parameters
 	# get name
-	if ( $new_flag and $hostname ne $localname )
+	if ( $new_flag and $name ne $localname )
 	{
 		do
 		{
-			&printMsg( "Load balancer host name: " );
+			&printMsg( "Load balancer profile name: " );
 			$valid_flag = 1;
-			$hostname   = <STDIN>;
-			chomp $hostname;
-			$cfg->{ NAME } = $hostname;
-			if ( $hostname !~ /\S+/ )
+			$name       = <STDIN>;
+			chomp $name;
+			$cfg->{ name } = $name;
+			if ( $name !~ /\S+/ )
 			{
 				$valid_flag = 0;
 				&printError(
-							 "Invalid name. It expects a string with the load balancer host name" );
+						"Invalid 'name'. It expects a string with the load balancer profile name" );
 			}
-			elsif ( exists $Config->{ $hostname } )
+			elsif ( exists $Config->{ $name } )
 			{
 				$valid_flag = 0;
-				&printError( "Invalid name. The '$hostname' host already exist" );
+				&printError( "Invalid name. The '$name' profile already exist" );
 			}
 		} while ( !$valid_flag );
 	}
 
 	# get IP
-	if ( $hostname ne $localname )
+	if ( $name ne $localname )
 	{
 		do
 		{
 			&printMsg( "Load balancer management IP: " );
-			&printMsg( "[$set_msg: $cfg->{HOST}] " ) if not $new_flag;
+			&printMsg( "[$set_msg: $cfg->{host}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
-			$cfg->{ HOST } = $val unless ( $val eq "" and not $new_flag );
-			unless ( $cfg->{ HOST } =~ /$ip_regex/ )
+			$cfg->{ host } = $val unless ( $val eq "" and not $new_flag );
+			unless ( $cfg->{ host } =~ /$ip_regex/ )
 			{
 				$valid_flag = 0;
-				&printError( "Invalid IP for load balancer. It expects an IP v4 or v6" );
+				&printError( "Invalid 'host' for load balancer. It expects an IP v4 or v6" );
 			}
 		} while ( !$valid_flag );
 	}
 
 	# get port
-	if ( $hostname ne $localname )
+	if ( $name ne $localname )
 	{
 		do
 		{
 			&printMsg( "Load balancer management port: " );
-			&printMsg( "[$set_msg: $cfg->{PORT}] " ) if not $new_flag;
+			&printMsg( "[$set_msg: $cfg->{port}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
-			$cfg->{ PORT } = $val unless ( $val eq "" and not $new_flag );
-			unless ( $cfg->{ PORT } > 0 and $cfg->{ PORT } <= 65535 )
+			$cfg->{ port } = $val unless ( $val eq "" and not $new_flag );
+			unless ( $cfg->{ port } > 0 and $cfg->{ port } <= 65535 )
 			{
 				$valid_flag = 0;
 				&printError(
-						  "Invalid PORT for load balancer. It expects a port between 1 and 65535" );
+						 "Invalid 'port for load balancer. It expects a port between 1 and 65535" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1100,12 +1103,12 @@ sub setHost
 	do
 	{
 		&printMsg( "Load balancer zapi key: " );
-		&printMsg( "[$set_msg: $cfg->{ZAPI_KEY}] " ) if not $new_flag;
+		&printMsg( "[$set_msg: $cfg->{zapi_key}] " ) if not $new_flag;
 		$valid_flag = 1;
 		my $val = <STDIN>;
 		chomp $val;
-		$cfg->{ ZAPI_KEY } = $val unless ( $val eq "" and not $new_flag );
-		unless ( $cfg->{ ZAPI_KEY } =~ /\S+/ )
+		$cfg->{ zapi_key } = $val unless ( $val eq "" and not $new_flag );
+		unless ( $cfg->{ zapi_key } =~ /\S+/ )
 		{
 			$valid_flag = 0;
 			&printError( "Invalid zapi key. It expects a string with the zapi key" );
@@ -1117,72 +1120,71 @@ sub setHost
 #	{
 #		&printMsg ( "Load balancer zapi version: " );
 #		$valid_flag = 1;
-#		$cfg->{ ZAPI_VERSION } = <STDIN>;
-#		chomp $cfg->{ ZAPI_VERSION };
-#		unless ( $cfg->{ ZAPI_VERSION } =~ /^(4.0)$/ )
+#		$cfg->{ zapi_version } = <STDIN>;
+#		chomp $cfg->{ zapi_version };
+#		unless ( $cfg->{ zapi_version } =~ /^(4.0)$/ )
 #		{
 #			$valid_flag = 0;
 #			&printError ( "Invalid zapi version. It expects once of the following versions: 4.0" );
 #		}
 #	} while ( !$valid_flag );
-	$cfg->{ ZAPI_VERSION } = "4.0";
+	$cfg->{ zapi_version } = "4.0";
 
 	# Get Edition
-	my $edition = &updateHostEdition( $cfg );
-	$cfg->{ EDITION } = $edition if ( defined $edition );
+	my $edition = &updateProfileEdition( $cfg );
+	$cfg->{ edition } = $edition if ( defined $edition );
 
-	$Config->{ $hostname } = $cfg;
+	$Config->{ $name } = $cfg;
 
 	# set the default
-	if ( !defined $Config->{ _ }->{ default_host } )
+	if ( !defined $Config->{ _ }->{ default_profile } )
 	{
-		$Config->{ _ }->{ default_host } = $hostname;
+		$Config->{ _ }->{ default_profile } = $name;
 		&printSuccess( "Saved as default profile", 0 );
 	}
-	elsif ( $Config->{ _ }->{ default_host } ne $hostname )
+	elsif ( $Config->{ _ }->{ default_profile } ne $name )
 	{
-		&printMsg( "Do you wish set this host as the default one? [yes|no=default]: " );
+		&printMsg(
+			"Do you wish set this load balancer profile as the default one? [yes|no=default]: "
+		);
 		my $confirmation = <STDIN>;
 		chomp $confirmation;
 		if ( $confirmation =~ /^(y|yes)$/i )
 		{
-			$Config->{ _ }->{ default_host } = $hostname;
+			$Config->{ _ }->{ default_profile } = $name;
 			&printSuccess( "Saved as default profile" );
 		}
 	}
 	&printSuccess( "" );
 
-	$Config->write( $hostfile );
+	$Config->write( $conf_file );
 
-	return $Config->{ $hostname };
+	return $Config->{ $name };
 }
 
 =begin nd
-Function: getHostEdition
+Function: getProfileEdition
 
 	It does a zapi call to get the zevenet edition
 
 Parametes:
-	Host - It is a struct with host information.
-
-Parametes:
-	Host - It is a struct with host information.
+	Profile - It is a struct with profile information.
 
 Returns:
 	String - It returns 'EE' if Zevenet is entreprise, 'CE' if it is community or 'undef' if there was an error
 		
 =cut
 
-sub getHostEdition
+sub getProfileEdition
 {
-	my $host = shift;
+	my $profile = shift;
 
 	my $req = {
 				uri    => '/system/info',
 				method => 'GET'
 	};
 
-	my $resp = &zapi( $req, $host );
+	my $resp = &zapi( $req, $profile );
 
 	my $edition = $resp->{ json }->{ params }->{ edition };
 	if ( defined $edition )
@@ -1194,12 +1196,12 @@ sub getHostEdition
 }
 
 =begin nd
-Function: updateHostEdition
+Function: updateProfileEdition
 
-	It saves the Zevenet edition (enterprise or community) in the host configuration
+	It saves the Zevenet edition (enterprise or community) in the load balancer profile configuration
 
 Parametes:
-	Host - It is the host name used to save the configuration
+	Profile name - It is the profile name used to save the configuration
 	Edtiion - It expects 'EE' for enterprise or 'CE' for community
 
 Returns:
@@ -1207,22 +1209,22 @@ Returns:
 		
 =cut
 
-sub updateHostEdition
+sub updateProfileEdition
 {
-	my $hostname = shift;
-	my $edition  = shift;
+	my $name    = shift;
+	my $edition = shift;
 
 	use Config::Tiny;
-	my $hostfile = $Global::hosts_path;
+	my $file = $Global::Profiles_path;
 
-	my $Config = Config::Tiny->read( $hostfile );
-	$Config->{ $hostname }->{ EDITION } = $edition;
+	my $Config = Config::Tiny->read( $file );
+	$Config->{ $name }->{ edition } = $edition;
 
-	$Config->write( $hostfile );
+	$Config->write( $file );
 }
 
 =begin nd
-Function: refreshLocalHost
+Function: updateProfileLocal
 
 	This function is used when the ZCLI is used from a load balancer. It overwrites the IP and port where the ZAPI is listening.
 
@@ -1234,126 +1236,128 @@ Returns:
 		
 =cut
 
-sub refreshLocalHost
+sub updateProfileLocal
 {
-	my $localname = "localhost";
-	my $hostfile  = $Global::hosts_path;
-	my $Config    = ( -e $hostfile ) ? Config::Tiny->read( $hostfile ) : die $FIN;
+	my $localname = "local";
+	my $prof_file = $Global::Profiles_path;
+	my $Config =
+	  ( -e $prof_file ) ? Config::Tiny->read( $prof_file ) : die $Global::Fin;
 
 	# overwrite data. Maybe the http server cfg was changed
 	my ( $localip, $localport ) = &getHttpServerConf();
-	$Config->{ $localname }->{ HOST } = $localip;
-	$Config->{ $localname }->{ PORT } = $localport;
+	$Config->{ $localname }->{ host } = $localip;
+	$Config->{ $localname }->{ port } = $localport;
 
-	$Config->write( $hostfile );
+	$Config->write( $prof_file );
 }
 
 =begin nd
-Function: delHost
+Function: delProfile
 
-	It removes a host from the configuration file.
+	It removes a profile from the configuration file.
 
 Parametes:
-	host name - It is the host nick name that is going to be deleted.
+	Profile name - It is the profile nick name that is going to be deleted.
 
 Returns:
 	Integer - Error code: 0 on success or another value on failure.
 		
 =cut
 
-sub delHost
+sub delProfile
 {
 	my $name = shift;
 	my $Config;
-	my $hostfile = $Global::hosts_path;
-	my $err      = 1;
-	if ( -e $hostfile )
+	my $file = $Global::Profiles_path;
+	my $err  = 1;
+	if ( -e $file )
 	{
-		$Config = Config::Tiny->read( $hostfile );
+		$Config = Config::Tiny->read( $file );
 		if ( exists $Config->{ $name } )
 		{
-			delete $Config->{ _ }->{ default_host }
-			  if $Config->{ _ }->{ default_host } eq $name;
+			delete $Config->{ _ }->{ default_profile }
+			  if $Config->{ _ }->{ default_profile } eq $name;
 
 			delete $Config->{ $name };
-			$Config->write( $hostfile );
+			$Config->write( $file );
 			$err = 0;
-			&printSuccess( "The '$name' host was unregistered from zcli", 0 );
+			&printSuccess( "The '$name' profile was unregistered from zcli", 0 );
 		}
 	}
 
-	&printError( "The '$name' host was not found" ) if $err;
+	&printError( "The '$name' profile was not found" ) if $err;
 
 	return $err;
 }
 
 =begin nd
-Function: listHost
+Function: listProfiles
 
-	It returns a list of the registered host names.
+	It returns a list of the registered profile names.
 
 Parametes:
 	none - .
 
 Returns:
-	Array - It is a list with the host names.
+	Array - It is a list with the profile names.
 		
 =cut
 
-sub listHost
+sub listProfiles
 {
-	my $hostfile = $Global::hosts_path;
+	my $file = $Global::Profiles_path;
 
 	use Config::Tiny;
-	my $Config = Config::Tiny->read( $hostfile );
+	my $Config = Config::Tiny->read( $file );
 
 	return grep ( !/^_$/, keys %{ $Config } );
 }
 
 =begin nd
-Function: hostInfo
+Function: getProfile
 
-	It retrieves the configuration of a host.
+	It retrieves the configuration of a profile.
 
 Parametes:
-	Host name - It is the name used to identify the host.
+	Profile name - It is the name used to identify the profile.
 
 Returns:
-	Hash ref - Struct with the host info. If the host does not exist, the function will return undef
+	Hash ref - Struct with the profile info. If the profile does not exist, the function will return undef
 		{
-			HOST => 192.168.100.241
-			NAME => devcano
-			PORT => 444
-			ZAPI_KEY => root
-			ZAPI_VERSION => 4.0
+			host => 192.168.100.241
+			name => devcano
+			port => 444
+			zapi_key => root
+			zapi_version => 4.0
+			edition => EE
 		}
 
 =cut
 
-sub hostInfo
+sub getProfile
 {
-	my $host_name = shift;
-	my $hostfile  = $Global::hosts_path;
+	my $profile_name = shift;
+	my $conf_file    = $Global::Profiles_path;
 
 	use Config::Tiny;
-	my $Config = Config::Tiny->read( $hostfile );
+	my $Config = Config::Tiny->read( $conf_file );
 
-	if ( !defined $host_name )
+	if ( !defined $profile_name )
 	{
-		$host_name = $Config->{ _ }->{ default_host };
-		if ( !defined $host_name )
+		$profile_name = $Config->{ _ }->{ default_profile };
+		if ( !defined $profile_name )
 		{
-			&dev( "Warning, there is no default host set\n" );
+			&dev( "Warning, there is no default profile set\n" );
 			return undef;
 		}
 	}
-	elsif ( !exists $Config->{ $host_name } )
+	elsif ( !exists $Config->{ $profile_name } )
 	{
-		print "The host selected does not exist\n";
+		print "The profile selected does not exist\n";
 		return undef;
 	}
 
-	return $Config->{ $host_name };
+	return $Config->{ $profile_name };
 }
 
 =begin nd
@@ -1407,40 +1411,39 @@ sub getHttpServerConf
 }
 
 =begin nd
-Function: check_connectivity
+Function: checkConnectivity
 
-	It checks if the host where is running ZCLI is a Zevenet load balancer.
-	It looks at in the system if the zevenet package is installed.
-	The Zevenet version must be upper than 'REQUIRED_ZEVEVENET_VERSION'.
+	It check if the ZCLI has connectivity with the load balancer using the credential of the profile
 
 Parametes:
-	Host - Host reference. The host struct must contains the following keys:
-		NAME - Nick name of the load balancer.
-		HOST - It is the management IP used to connect with the load balancer.
-		PORT - It is the management port used to connect with the load balancer.
+	Profile struct - Profile struct reference. The profile struct must contains the following keys:
+		name - Nick name of the load balancer.
+		host - It is the management IP used to connect with the load balancer.
+		port - It is the management port used to connect with the load balancer.
 
 Returns:
 	Integer - It returns: 1 if ZCLI has connectivity with the load balancer or 0 if it doesn't.
 
 =cut
 
-sub check_connectivity
+sub checkConnectivity
 {
-	my $host = shift;
+	my $profile = shift;
 
 	require IO::Socket::INET;
 
 	# test connectivity:
 	my $sock = IO::Socket::INET->new(
-									  PeerAddr => $host->{ HOST },
-									  PeerPort => $host->{ PORT },
+									  PeerAddr => $profile->{ host },
+									  PeerPort => $profile->{ port },
 									  Proto    => 'tcp',
 									  Timeout  => 8
 	  )
 	  or do
 	{
 		&printError(
-			  "The '$host->{NAME}' host ($host->{HOST}:$host->{PORT}) cannot be reached." );
+			"The '$profile->{name}' profile ($profile->{host}:$profile->{port}) cannot be reached."
+		);
 		return 0;
 	};
 
@@ -1448,9 +1451,9 @@ sub check_connectivity
 }
 
 =begin nd
-Function: check_is_lb
+Function: isLoadBalancer
 
-	It checks if the host where is running ZCLI is a Zevenet load balancer.
+	It checks if the host (where is running ZCLI) is a Zevenet load balancer.
 	It looks at in the system if the zevenet package is installed.
 	The Zevenet version must be upper than 'REQUIRED_ZEVEVENET_VERSION'.
 
@@ -1462,13 +1465,13 @@ Returns:
 
 =cut
 
-sub check_is_lb
+sub isLoadBalancer
 {
 	my $cmd =
 	  'dpkg -l 2>/dev/null |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3';
 	my $version = `$cmd`;
 
-	return ( !$version or $version < $Global::REQ_ZEVEVENET_VERSION ) ? 0 : 1;
+	return ( !$version or $version < $Global::Req_zevenet_version ) ? 0 : 1;
 }
 
 1;

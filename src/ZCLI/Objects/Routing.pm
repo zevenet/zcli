@@ -47,7 +47,7 @@ our $Routing = {
 						  enterprise => 1,
 		},
 		$V{ SET } => {
-					  uri       => "/routing/rules/$Define::UriParamTag",
+					  uri       => "/routing/rules/$Define::Uri_param_tag",
 					  method    => 'PUT',
 					  param_uri => [
 							  {
@@ -58,7 +58,7 @@ our $Routing = {
 					  enterprise => 1,
 		},
 		$V{ DELETE } => {
-			 uri       => "/routing/rules/$Define::UriParamTag",
+			 uri       => "/routing/rules/$Define::Uri_param_tag",
 			 method    => 'DELETE',
 			 param_uri => [
 						   {
@@ -86,26 +86,26 @@ our $Routing = {
 						  enterprise => 1,
 		},
 		$V{ SET } => {
-			   uri    => "/routing/tables/<$K{ROUTING_TABLE}>/routes/$Define::UriParamTag",
-			   method => 'PUT',
-			   param_uri => [
-							{
-							  name => "id",
-							  desc => "the route id of the route that is going to be modified",
-							},
-			   ],
-			   enterprise => 1,
+			 uri    => "/routing/tables/<$K{ROUTING_TABLE}>/routes/$Define::Uri_param_tag",
+			 method => 'PUT',
+			 param_uri => [
+						   {
+							 name => "id",
+							 desc => "the route id of the route that is going to be modified",
+						   },
+			 ],
+			 enterprise => 1,
 		},
 		$V{ DELETE } => {
-			   uri    => "/routing/tables/<$K{ROUTING_TABLE}>/routes/$Define::UriParamTag",
-			   method => 'DELETE',
-			   param_uri => [
-							{
-							  name => "id",
-							  desc => "the route id of the route that is going to be modified",
-							},
-			   ],
-			   enterprise => 1,
+			 uri    => "/routing/tables/<$K{ROUTING_TABLE}>/routes/$Define::Uri_param_tag",
+			 method => 'DELETE',
+			 param_uri => [
+						   {
+							 name => "id",
+							 desc => "the route id of the route that is going to be modified",
+						   },
+			 ],
+			 enterprise => 1,
 		},
 	},
 	'network-routing-tables-unmanaged' => {
@@ -120,8 +120,8 @@ our $Routing = {
 					   enterprise => 1,
 		},
 		$V{ REMOVE } => {
-			uri    => "/routing/tables/<$K{ROUTING_TABLE}>/unmanaged/$Define::UriParamTag",
-			method => 'DELETE',
+			uri => "/routing/tables/<$K{ROUTING_TABLE}>/unmanaged/$Define::Uri_param_tag",
+			method    => 'DELETE',
 			param_uri => [
 					  {
 						name => "interface",

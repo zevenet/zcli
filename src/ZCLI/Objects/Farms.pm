@@ -174,8 +174,8 @@ our $Farms = {
 						  enterprise => 1,
 		},
 		$V{ SET } => {
-			 uri    => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
-			 method => 'PUT',
+			 uri => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::Uri_param_tag",
+			 method    => 'PUT',
 			 param_uri => [
 						   {
 							 name => "resource ID",
@@ -185,7 +185,7 @@ our $Farms = {
 			 enterprise => 1,
 		},
 		$V{ DELETE } => {
-			  uri => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::UriParamTag",
+			  uri => "/farms/<$K{FARM}>/zones/<$K{ZONES}>/resources/$Define::Uri_param_tag",
 			  method    => 'DELETE',
 			  param_uri => [
 							{

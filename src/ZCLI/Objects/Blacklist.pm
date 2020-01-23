@@ -99,7 +99,7 @@ our $Blacklist = {
 						  enterprise => 1,
 		},
 		$V{ SET } => {
-			 uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
+			 uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::Uri_param_tag",
 			 method    => 'PUT',
 			 param_uri => [
 						   {
@@ -110,7 +110,7 @@ our $Blacklist = {
 			 enterprise => 1,
 		},
 		$V{ DELETE } => {
-			  uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::UriParamTag",
+			  uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::Uri_param_tag",
 			  method    => 'DELETE',
 			  param_uri => [
 							{

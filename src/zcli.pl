@@ -35,11 +35,9 @@ use ZCLI::Objects;
 use ZCLI::Interactive;
 
 # macros
-my %V   = %Define::Actions;
-my $FIN = $Define::FIN;
+my %V = %Define::Actions;
 
-my $zcli_dir     = $Global::config_dir;
-my $zcli_history = $Global::history_path;
+my $zcli_dir = $Global::Config_dir;
 
 # Init!
 
@@ -50,46 +48,46 @@ my $opt = &parseOptions( \@ARGV );
 &printHelp() if ( $opt->{ 'help' } );
 
 # add local lb if it exists
-my $localhost = &hostInfo( $opt->{ 'host' } );
-if ( &check_is_lb() )
+my $local_profile = &getProfile( $opt->{ 'profile' } );
+if ( &isLoadBalancer() )
 {
-	if ( !defined $localhost )
+	if ( !defined $local_profile )
 	{
 		&printSuccess( "Type the zapi key for the current load balancer", 0 );
-		&setHost( "localhost", 1 );
+		&setProfile( "local_profile", 1 );
 	}
 
 	# refresh ip and port. Maybe they were modified
 	else
 	{
-		&refreshLocalHost();
+		&updateProfileLocal();
 	}
 }
 
-$Env::HOST = &hostInfo( $opt->{ 'host' } );
-if ( !$Env::HOST )
+$Env::Profile = &getProfile( $opt->{ 'profile' } );
+if ( !$Env::Profile )
 {
 	if ( $opt->{ 'silence' } )
 	{
-		&printError( "The silence mode needs a host profile" );
+		&printError( "It is necessary to select a 'profile' to use the silence mode" );
 		exit 1;
 	}
 }
 
-if ( !$Env::HOST )
+if ( !$Env::Profile )
 {
 	&printSuccess(
-				 "Not found the host info, try to configure the default host profile" );
-	$Env::HOST = &setHost();
+			   "No profile found, try to configure the default load balancer profile" );
+	$Env::Profile = &setProfile();
 }
 
 # update the Zevenet version if it does not exit
-if ( !exists $Env::HOST->{ edition } )
+if ( !exists $Env::Profile->{ edition } )
 {
-	my $edition = &getHostEdition( $Env::HOST );
-	&updateHostEdition( $Env::HOST->{ NAME }, $edition ) if ( defined $edition );
+	my $edition = &getProfileEdition( $Env::Profile );
+	&getProfileEdition( $Env::Profile->{ name }, $edition ) if ( defined $edition );
 }
 
 # Use interactive
-my $err = &create_zcli();
+my $err = &createZcli();
 exit $err;
