@@ -295,7 +295,7 @@ sub parseInput
 		}
 		else
 		{
-			$parsed_completed = 0 if ( !exists $def->{ params } );
+			$parsed_completed = 0 if ( !defined $def->{ params } );
 
 			$final_step = $steps->{ body_params };
 
@@ -324,6 +324,8 @@ sub parseInput
 					return ( $input, $final_step, $parsed_completed );
 				}
 			}
+
+			$parsed_completed = 0 if ( !defined $input->{ params } );
 		}
 	}
 

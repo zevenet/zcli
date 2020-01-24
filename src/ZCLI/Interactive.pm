@@ -393,9 +393,7 @@ sub getCmdDescription
 		$msg .= " <file_path>";
 		$params = 0;
 	}
-	if (     $def->{ method } =~ /^(POST|PUT)$/
-		 and not exists $def->{ params }
-		 and $params )
+	if ( $def->{ method } =~ /^(POST|PUT)$/ and $params )
 	{
 		$msg .= " $Define::Description_param";
 	}
@@ -410,7 +408,11 @@ sub getMissingParam
 	my $it = 0;
 	foreach my $p ( split ( ' ', $desc ) )
 	{
-		return $p if !defined $input_args->[$it];
+		if ( !defined $input_args->[$it] )
+		{
+			return undef if ( $p eq '[-param_name_1' );
+			return $p;
+		}
 		$it++;
 	}
 
