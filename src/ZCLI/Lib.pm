@@ -162,17 +162,17 @@ Function: parseInput
 	For this task, the last argument is remove to get again the list of possible values for that item.
 
 	The parse is done always following the same order. The order or the command arguments are:
-	zcli [object] [action] [ids list] [ids_params list] [file_upload|download] [body_params lists]
+	zcli [object] [action] [ids list] [ids_params list] [file_upload|download] [param_body lists]
 
 Parametes:
 	Object definition - It is a object hash with the parameters that defines a zapi call.
 	Autocomplete - It is a flag to parses the arguments in the autocomplete step or when the zapi request is going to be done. The possible values are 1 or 0.
-	Arguments - The rest of parameters are the input command arguments, the first one must be the 'object', next the 'action' and following the others arguments (IDS, param_uris, files and body_params).
+	Arguments - The rest of parameters are the input command arguments, the first one must be the 'object', next the 'action' and following the others arguments (IDS, param_uri, files and param_body).
 
 Returns:
 	Array - The first position is a hash with the arguments grouped by type.
 			The second position is an string with the key of the folloing kind of required argument.
-			The third position is a flag to return if the command was totally parsed. It the case than the command accepts body_params, the last phase will be the 'body_params'.
+			The third position is a flag to return if the command was totally parsed. It the case than the command accepts param_body, the last phase will be the 'param_body'.
 
 =cut
 
@@ -187,10 +187,10 @@ sub parseInput
 
 	my $steps = {
 				  uri_id        => 'id',
-				  param_uri     => 'param_uris',
+				  param_uri     => 'param_uri',
 				  download_file => 'download_file',
 				  upload_file   => 'upload_file',
-				  body_params   => 'body_params',
+				  param_body    => 'param_body',
 				  end           => 'end',
 	};
 	my $parsed_completed = 0;
@@ -297,7 +297,7 @@ sub parseInput
 		{
 			$parsed_completed = 0 if ( !defined $def->{ params } );
 
-			$final_step = $steps->{ body_params };
+			$final_step = $steps->{ param_body };
 
 			# json params
 			my $param_flag = 0;
@@ -765,9 +765,12 @@ sub listParams
 	my $predef_params = $obj_def->{ params };
 	delete $obj_def->{ params };
 
+	my $args = {};
+	$args->{ id }        = $args_parsed->{ id };
+	$args->{ param_uri } = $args_parsed->{ param_uri };
+
 	my $request =
-	  &createZapiRequest( $obj_def, $args_parsed, $profile,
-						  $Env::Profile_ids_tree );
+	  &createZapiRequest( $obj_def, $args, $profile, $Env::Profile_ids_tree );
 
 	my $params_ref = &zapi( $request, $profile )->{ json }->{ params };
 

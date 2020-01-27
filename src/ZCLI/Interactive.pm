@@ -547,7 +547,7 @@ sub geCmdProccessCallback
 	( $err );
 }
 
-# [ids list] [ids_params list] [file_upload|download] [body_params list]
+# [ids list] [ids_params list] [file_upload|download] [param_body list]
 sub getCmdArgsCallBack
 {
 	my ( undef, $input, $obj_def, $id_tree ) = @_;
@@ -573,7 +573,7 @@ sub getCmdArgsCallBack
 	{
 		$possible_values = &getIdNext( $obj_def, $id_tree, $args_parsed->{ id } );
 	}
-	elsif ( $next_arg eq 'param_uris' )
+	elsif ( $next_arg eq 'param_uri' )
 	{
 		my $uri_index = scalar @{ $args_parsed->{ param_uri } };
 		$possible_values = "<$obj_def->{param_uri}->[$uri_index]->{name}>";
@@ -583,7 +583,7 @@ sub getCmdArgsCallBack
 		$possible_values = shift->complete_files( $input );
 	}
 
-	elsif ( $next_arg eq 'body_params' )
+	elsif ( $next_arg eq 'param_body' )
 	{
 		$possible_values =
 		  &completeArgsBodyParams( $obj_def,     $args_parsed, \@args_used,
@@ -658,7 +658,7 @@ sub completeArgsBodyParams
 	# manage the 'key' of the parameter
 	else
 	{
-		$Env::Zcli->completemsg( "  ## getting key\n" ) if ( $Global::Debug );
+		$Env::Zcli->completemsg( "  ## getting key \n" ) if ( $Global::Debug );
 
 		# remove the parameters already exists
 		my @params = ();

@@ -5,7 +5,7 @@
 - Building a command.
 
 The command syntasis:
-zcli [object] [action] [ids list] [ids_params list] [file_upload|download] [body_params list|json]
+zcli [object] [action] [ids list] [ids_params list] [file_upload|download] [param_body list|json]
          |       |       |                 |               |                      |
          |       |       ---------------------------------------------------------------> They are arguments
          -------------------------------------------------------------------------------> Defines the command
@@ -15,11 +15,11 @@ action: it is the verb is going to be executed
 ids list: they are the identifiers that refer to the object. It is used to make the URI. If the object is really a subobject (f.e. service) the previous keys are mandatories (f.e. farmname)
 ids_params list: they are ids mandatories that cannot be parsed from id tree. It is used to make the URI. Example: Number of lines to show in a log
 file_upload and file_download: it is a local file to upload/download to/from.
-body_params: They are the json parameters that are sent in the ZAPI request. The parameter name is indicated using the format -name followed by the value (-vip 192.168.100.144).
+param_body: They are the json parameters that are sent in the ZAPI request. The parameter name is indicated using the format -name followed by the value (-vip 192.168.100.144).
              This field can use a json from a file and send it.
 
 Example:
-zcli [        object        ] [action] [       ids list        ] [ids_params list] [file_upload|download] [ body_params list   ]
+zcli [        object        ] [action] [       ids list        ] [ids_params list] [file_upload|download] [ param_body list   ]
 zcli  farms-services-backend   modify   farm1 service1 backend1                                            -ip 1.1.1.1 -port 80
 
 
