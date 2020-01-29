@@ -1,5 +1,5 @@
 Package: zcli
-Version: 0.1
+Version: 0.1.0
 Maintainer: ZEVENET Company SL <support@zevenet.com>
 Architecture: amd64
 Section: admin
