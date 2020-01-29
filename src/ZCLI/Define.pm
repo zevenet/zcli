@@ -49,7 +49,8 @@ our $Zcli_cmd_st; # It is the ZCLI commands struct used for the TERM module
 our $Cmd_params_def = undef;
 ; # It is the last parameter object returned by the ZAPI. It is used to autocomplete the command
 our $Cmd_string = ''
-  ; # It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded
+  ; # It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded.
+  # This string contains the string without the parameters
 
 package Define;
 

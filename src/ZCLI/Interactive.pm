@@ -57,7 +57,7 @@ my $skip_reload = 0;
 =begin nd
 Function: createZcli
 
-	It creates a Term object that implements the ZCLI. 
+	It creates a Term object that implements the ZCLI.
 	The object will be available from the variable '$Env::ZCLI'.
 
 Parametes:
@@ -120,7 +120,7 @@ sub createZcli
 =begin nd
 Function: reloadPrompt
 
-	It reloads the prompt line of the ZCLI. The color will change between green (the last command was successful) or 
+	It reloads the prompt line of the ZCLI. The color will change between green (the last command was successful) or
 	red (the last command finishes with failure).
 
 	The profile name will be printed as gray if ZCLI has not connectivity with the load balancer.
@@ -195,7 +195,7 @@ Returns:
 	Hash ref - It is a struct with the following format:
 		{
 			'$object' : {				# name of the object
-				cmds: {					
+				cmds: {
 					'$action' : {		# action to apply
 						desc : "",		# description for the command
 						proc : sub {}.	# Reference to the function that process the command. The last condition of the proc function has to returns 0 on success
@@ -422,7 +422,7 @@ sub getMissingParam
 =begin nd
 Function: getCmdArgsNum
 
-	It calculates the number of expected arguments for a command. 
+	It calculates the number of expected arguments for a command.
 	This function is only valid for GET methods
 
 Parametes:
@@ -606,6 +606,7 @@ sub completeArgsBodyParams
 
 	# command that is being executing
 	my $cmd_string = "$obj_def->{object} $obj_def->{action}";
+	$cmd_string .= " $_" for (@{$args_parsed->{id}});
 
 	# get the previous completed parameter that was used
 	my $previus_param = $arg_previus;
