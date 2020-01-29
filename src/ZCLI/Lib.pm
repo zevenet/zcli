@@ -100,7 +100,7 @@ A ZCLI command uses the following arguments:
 ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command
 If the autocomplete does not list more options, press <intro> to get further information
 
-ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation: 
+ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation:
 https://www.zevenet.com/zapidocv4.0/
 
 Examples:
@@ -567,9 +567,9 @@ Returns:
 		code, it is an integer with the HTTP code that the ZAPI returns.
 		msg, it is the message of the JSON response returned by the ZAPI.
 		err, it returns 0 if the response contains a 2xx code, else it will return the value 1.
-		json, it is a JSON object with the reponse body, this parameter will appear if the response uses the header "content-type: application/json". 
+		json, it is a JSON object with the reponse body, this parameter will appear if the response uses the header "content-type: application/json".
 		txt, it is an string with the body response, this parameter will appear if the response uses the header "content-type: text/plain".
-		
+
 			{
 				'code' => $response->code,
 				'json' => $json_dec,
@@ -974,7 +974,7 @@ Returns:
 		port, it is the ZAPI management port
 		ZAPIKEY, it is the user key used for the ZAPI requests
 		edition, it is the Zevenet edition used in the load balancer. The possible values are CE, EE or not exists (if zcli has not connected)
-		
+
 	Example:
 		$cfg = {
 				 zapi_version => "4.0",
@@ -1029,11 +1029,11 @@ sub setProfile
 		{
 			if ( !defined $name )
 			{
-				&printError( "A profile name is required" );
+				print( "A profile name is required\n" );
 			}
 			else
 			{
-				&printError( "The '$name' profile does not exist" );
+				print( "The '$name' profile does not exist\n" );
 			}
 			return undef;
 		}
@@ -1046,7 +1046,7 @@ sub setProfile
 	{
 		do
 		{
-			&printMsg( "Load balancer profile name: " );
+			print( "Load balancer profile name: " );
 			$valid_flag = 1;
 			$name       = <STDIN>;
 			chomp $name;
@@ -1054,13 +1054,13 @@ sub setProfile
 			if ( $name !~ /\S+/ )
 			{
 				$valid_flag = 0;
-				&printError(
-						"Invalid 'name'. It expects a string with the load balancer profile name" );
+				print(
+						"Invalid 'name'. It expects a string with the load balancer profile name\n" );
 			}
 			elsif ( exists $Config->{ $name } )
 			{
 				$valid_flag = 0;
-				&printError( "Invalid name. The '$name' profile already exist" );
+				print( "Invalid name. The '$name' profile already exist\n" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1070,8 +1070,8 @@ sub setProfile
 	{
 		do
 		{
-			&printMsg( "Load balancer management IP: " );
-			&printMsg( "[$set_msg: $cfg->{host}] " ) if not $new_flag;
+			print( "Load balancer management IP: " );
+			print( "[$set_msg: $cfg->{host}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
@@ -1079,7 +1079,7 @@ sub setProfile
 			unless ( $cfg->{ host } =~ /$ip_regex/ )
 			{
 				$valid_flag = 0;
-				&printError( "Invalid 'host' for load balancer. It expects an IP v4 or v6" );
+				print( "Invalid 'host' for load balancer. It expects an IP v4 or v6\n" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1089,8 +1089,8 @@ sub setProfile
 	{
 		do
 		{
-			&printMsg( "Load balancer management port: " );
-			&printMsg( "[$set_msg: $cfg->{port}] " ) if not $new_flag;
+			print( "Load balancer management port: " );
+			print( "[$set_msg: $cfg->{port}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
@@ -1098,8 +1098,8 @@ sub setProfile
 			unless ( $cfg->{ port } > 0 and $cfg->{ port } <= 65535 )
 			{
 				$valid_flag = 0;
-				&printError(
-						 "Invalid 'port for load balancer. It expects a port between 1 and 65535" );
+				print(
+						 "Invalid 'port for load balancer. It expects a port between 1 and 65535\n" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1107,8 +1107,8 @@ sub setProfile
 	# get zapi key
 	do
 	{
-		&printMsg( "Load balancer zapi key: " );
-		&printMsg( "[$set_msg: $cfg->{zapi_key}] " ) if not $new_flag;
+		print( "Load balancer zapi key: " );
+		print( "[$set_msg: $cfg->{zapi_key}] " ) if not $new_flag;
 		$valid_flag = 1;
 		my $val = <STDIN>;
 		chomp $val;
@@ -1116,27 +1116,27 @@ sub setProfile
 		unless ( $cfg->{ zapi_key } =~ /\S+/ )
 		{
 			$valid_flag = 0;
-			&printError( "Invalid zapi key. It expects a string with the zapi key" );
+			print ( "Invalid zapi key. It expects a string with the zapi key\n" );
 		}
 	} while ( !$valid_flag );
 
 # get zapi version
 #	do
 #	{
-#		&printMsg ( "Load balancer zapi version: " );
+#		print ( "Load balancer zapi version: " );
 #		$valid_flag = 1;
 #		$cfg->{ zapi_version } = <STDIN>;
 #		chomp $cfg->{ zapi_version };
 #		unless ( $cfg->{ zapi_version } =~ /^(4.0)$/ )
 #		{
 #			$valid_flag = 0;
-#			&printError ( "Invalid zapi version. It expects once of the following versions: 4.0" );
+#			print ( "Invalid zapi version. It expects once of the following versions: 4.0\n" );
 #		}
 #	} while ( !$valid_flag );
 	$cfg->{ zapi_version } = "4.0";
 
 	# Get Edition
-	my $edition = &updateProfileEdition( $cfg );
+	my $edition = &getProfileEdition( $cfg );
 	$cfg->{ edition } = $edition if ( defined $edition );
 
 	$Config->{ $name } = $cfg;
@@ -1145,11 +1145,11 @@ sub setProfile
 	if ( !defined $Config->{ _ }->{ default_profile } )
 	{
 		$Config->{ _ }->{ default_profile } = $name;
-		&printSuccess( "Saved as default profile", 0 );
+		print( "Saved as default profile\n" );
 	}
 	elsif ( $Config->{ _ }->{ default_profile } ne $name )
 	{
-		&printMsg(
+		print(
 			"Do you wish set this load balancer profile as the default one? [yes|no=default]: "
 		);
 		my $confirmation = <STDIN>;
@@ -1157,10 +1157,10 @@ sub setProfile
 		if ( $confirmation =~ /^(y|yes)$/i )
 		{
 			$Config->{ _ }->{ default_profile } = $name;
-			&printSuccess( "Saved as default profile" );
+			print( "Saved as default profile\n" );
 		}
 	}
-	&printSuccess( "" );
+	print ( "\n" );
 
 	$Config->write( $conf_file );
 
@@ -1177,7 +1177,7 @@ Parametes:
 
 Returns:
 	String - It returns 'EE' if Zevenet is entreprise, 'CE' if it is community or 'undef' if there was an error
-		
+
 =cut
 
 sub getProfileEdition
@@ -1211,7 +1211,7 @@ Parametes:
 
 Returns:
 	none - .
-		
+
 =cut
 
 sub updateProfileEdition
@@ -1238,7 +1238,7 @@ Parametes:
 
 Returns:
 	none - .
-		
+
 =cut
 
 sub updateProfileLocal
@@ -1266,7 +1266,7 @@ Parametes:
 
 Returns:
 	Integer - Error code: 0 on success or another value on failure.
-		
+
 =cut
 
 sub delProfile
@@ -1305,7 +1305,7 @@ Parametes:
 
 Returns:
 	Array - It is a list with the profile names.
-		
+
 =cut
 
 sub listProfiles
