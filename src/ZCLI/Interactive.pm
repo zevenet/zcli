@@ -38,19 +38,23 @@ my %V = %Define::Actions;
 
 my $zcli_dir = $Global::Config_dir;
 
-# overwriting methods
-
-# It is overwritten to print using the error output
-*Term::ShellUI::error = sub {
-	&printError( "$_[1]" );
-};
-
-# skip reload when the input is a blank line
 my $skip_reload = 0;
-*Term::ShellUI::blank_line = sub {
-	$skip_reload = 1;
-	undef;    # the command used is the last execution of this function
-};
+
+# overwriting methods
+{
+	no warnings 'redefine';
+
+	# It is overwritten to print using the error output
+	*Term::ShellUI::error = sub {
+		&printError( "$_[1]" );
+	};
+
+	# skip reload when the input is a blank line
+	*Term::ShellUI::blank_line = sub {
+		$skip_reload = 1;
+		undef;    # the command used is the last execution of this function
+	};
+}
 
 ### definition of functions
 
@@ -257,7 +261,7 @@ sub createZcliCmd
 		maxargs => 1,
 		proc    => sub {
 			my $new_profile = &setProfile( $_[0], 0 );
-			my $err = ( defined $new_profile ) ? 0 : 1;
+			my $err         = ( defined $new_profile ) ? 0 : 1;
 			if ( !$err )
 			{
 				# reload the profile configuration
@@ -606,7 +610,7 @@ sub completeArgsBodyParams
 
 	# command that is being executing
 	my $cmd_string = "$obj_def->{object} $obj_def->{action}";
-	$cmd_string .= " $_" for (@{$args_parsed->{id}});
+	$cmd_string .= " $_" for ( @{ $args_parsed->{ id } } );
 
 	# get the previous completed parameter that was used
 	my $previus_param = $arg_previus;
@@ -691,8 +695,7 @@ sub getIdNext
 	my $id_tree = shift;
 	my $args    = shift;    # input arguments
 
-	my @possible_values = ();
-	my $url             = $obj_def->{ uri };    # copy data from def
+	my $url = $obj_def->{ uri };    # copy data from def
 
 	# replace the obtained ids untill getting the next arg key
 	$url = &replaceUrl( $url, $args );
@@ -700,7 +703,7 @@ sub getIdNext
 	# getting next args
 	if ( $url =~ /([^\<]+)\<([\w -]+)\>/ )
 	{
-		my $sub_url = $1;    # Getting the url keys to be used in the IDs tree
+		my $sub_url = $1;           # Getting the url keys to be used in the IDs tree
 		my $key     = $2;
 
 		my @keys_list = split ( '/', $sub_url );

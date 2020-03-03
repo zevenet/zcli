@@ -143,7 +143,7 @@ sub replaceUrl
 		unless ( $url =~ s/\<[\w -]+\>/$arg/ )
 		{
 			&printError( "The id '$index' could not be replaced" );
-			die $Define::Fin;
+			die $Global::Fin;
 		}
 	}
 
@@ -227,7 +227,7 @@ sub parseInput
 	{
 		my $tag = $Define::Uri_param_tag;
 		my $uri = $def->{ uri };
-		foreach my $p ( @{ $def->{ param_uri } } )
+		for ( @{ $def->{ param_uri } } )
 		{
 			my $val = shift @args;
 			if ( defined $val )
@@ -301,7 +301,6 @@ sub parseInput
 
 			# json params
 			my $param_flag = 0;
-			my $index      = 0;
 			for ( my $ind = 0 ; $ind <= $#args ; $ind++ )
 			{
 				if ( $args[$ind] =~ s/^\-// )
@@ -1029,11 +1028,11 @@ sub setProfile
 		{
 			if ( !defined $name )
 			{
-				print( "A profile name is required\n" );
+				print ( "A profile name is required\n" );
 			}
 			else
 			{
-				print( "The '$name' profile does not exist\n" );
+				print ( "The '$name' profile does not exist\n" );
 			}
 			return undef;
 		}
@@ -1046,7 +1045,7 @@ sub setProfile
 	{
 		do
 		{
-			print( "Load balancer profile name: " );
+			print ( "Load balancer profile name: " );
 			$valid_flag = 1;
 			$name       = <STDIN>;
 			chomp $name;
@@ -1054,13 +1053,13 @@ sub setProfile
 			if ( $name !~ /\S+/ )
 			{
 				$valid_flag = 0;
-				print(
-						"Invalid 'name'. It expects a string with the load balancer profile name\n" );
+				&print(
+					  "Invalid 'name'. It expects a string with the load balancer profile name\n" );
 			}
 			elsif ( exists $Config->{ $name } )
 			{
 				$valid_flag = 0;
-				print( "Invalid name. The '$name' profile already exist\n" );
+				print ( "Invalid name. The '$name' profile already exist\n" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1070,8 +1069,8 @@ sub setProfile
 	{
 		do
 		{
-			print( "Load balancer management IP: " );
-			print( "[$set_msg: $cfg->{host}] " ) if not $new_flag;
+			print ( "Load balancer management IP: " );
+			print ( "[$set_msg: $cfg->{host}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
@@ -1079,7 +1078,7 @@ sub setProfile
 			unless ( $cfg->{ host } =~ /$ip_regex/ )
 			{
 				$valid_flag = 0;
-				print( "Invalid 'host' for load balancer. It expects an IP v4 or v6\n" );
+				print ( "Invalid 'host' for load balancer. It expects an IP v4 or v6\n" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1089,8 +1088,8 @@ sub setProfile
 	{
 		do
 		{
-			print( "Load balancer management port: " );
-			print( "[$set_msg: $cfg->{port}] " ) if not $new_flag;
+			print ( "Load balancer management port: " );
+			print ( "[$set_msg: $cfg->{port}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
@@ -1098,8 +1097,8 @@ sub setProfile
 			unless ( $cfg->{ port } > 0 and $cfg->{ port } <= 65535 )
 			{
 				$valid_flag = 0;
-				print(
-						 "Invalid 'port for load balancer. It expects a port between 1 and 65535\n" );
+				&print(
+					   "Invalid 'port for load balancer. It expects a port between 1 and 65535\n" );
 			}
 		} while ( !$valid_flag );
 	}
@@ -1107,8 +1106,8 @@ sub setProfile
 	# get zapi key
 	do
 	{
-		print( "Load balancer zapi key: " );
-		print( "[$set_msg: $cfg->{zapi_key}] " ) if not $new_flag;
+		print ( "Load balancer zapi key: " );
+		print ( "[$set_msg: $cfg->{zapi_key}] " ) if not $new_flag;
 		$valid_flag = 1;
 		my $val = <STDIN>;
 		chomp $val;
@@ -1145,11 +1144,11 @@ sub setProfile
 	if ( !defined $Config->{ _ }->{ default_profile } )
 	{
 		$Config->{ _ }->{ default_profile } = $name;
-		print( "Saved as default profile\n" );
+		print ( "Saved as default profile\n" );
 	}
 	elsif ( $Config->{ _ }->{ default_profile } ne $name )
 	{
-		print(
+		&print(
 			"Do you wish set this load balancer profile as the default one? [yes|no=default]: "
 		);
 		my $confirmation = <STDIN>;
@@ -1157,7 +1156,7 @@ sub setProfile
 		if ( $confirmation =~ /^(y|yes)$/i )
 		{
 			$Config->{ _ }->{ default_profile } = $name;
-			print( "Saved as default profile\n" );
+			print ( "Saved as default profile\n" );
 		}
 	}
 	print ( "\n" );
@@ -1438,11 +1437,11 @@ sub checkConnectivity
 	require IO::Socket::INET;
 
 	# test connectivity:
-	my $sock = IO::Socket::INET->new(
-									  PeerAddr => $profile->{ host },
-									  PeerPort => $profile->{ port },
-									  Proto    => 'tcp',
-									  Timeout  => 8
+	IO::Socket::INET->new(
+						   PeerAddr => $profile->{ host },
+						   PeerPort => $profile->{ port },
+						   Proto    => 'tcp',
+						   Timeout  => 8
 	  )
 	  or do
 	{
