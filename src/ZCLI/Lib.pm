@@ -324,7 +324,8 @@ sub parseInput
 				}
 			}
 
-			$parsed_completed = 0 if ( !defined $input->{ params } );
+		    # Parsed is not complete if there aren't parameters in the cmd definition or input arguments
+			$parsed_completed = 0 if ( !defined $input->{ params } and !defined $def->{ params } );
 		}
 	}
 
