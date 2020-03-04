@@ -289,8 +289,16 @@ sub createZcliCmd
 	};
 	$profile_st->{ $V{ APPLY } } = {
 		proc => sub {
-			$Env::Profile = getProfile( @_ );
-			( defined $Env::Profile ) ? 0 : 1;
+			my $prof = $_[0];
+			if ( grep ( /^$prof$/, @profile_list ) )
+			{
+				$Env::Profile = &getProfile( @_ );
+				( defined $Env::Profile ) ? 0 : 1;
+			}
+			else
+			{
+				&printError( "The '$prof' profile was not found" );
+			}
 		},
 		args    => [sub { \@profile_list }],
 		maxargs => 1,
