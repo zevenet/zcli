@@ -59,9 +59,18 @@ sub dev
 	return if ( $lvl > $Global::Debug );
 
 	say "";
-	say ">>>> Debug >>>> $tag" if $tag;
+	if ( $tag )
+	{
+		say ">>>> $tag >>>>";
+	}
+	else
+	{
+		say ">>>> Debug >>>>";
+	}
 	print "$st\n";
-	say "<<<<<<<<<<<<<<< $tag" if $tag;
+	say "<<<<<<<<<<<<<<< ";
+
+	#~ say "<<<<<<<<<<<<<<< $tag" if $tag;
 	say "";
 }
 
@@ -83,11 +92,15 @@ sub printHelp
 	my $err = shift // 0;
 
 	my $msg = "
+SYNTAXIS:
+	zcli [options] <object> <action> [params]
+
 ZCLI can be executed with the following options (the options are available at the moment of the invocation):
-	-help: it prints this ZCLI help.
-	-profile <name>: it selects the 'name' profile as destination load balancer of the command.
-	-silence, -s: it executes the action without the human interaction.
-	-json, -j: the parameters will be parsed as JSON. The silence flag will be activated automatically if this flag is enabled
+	--help | -h: it prints this ZCLI help.
+	--profile | -p <name>: it selects the 'name' profile as destination load balancer of the command.
+	--silence | -s: it executes the action without the human interaction.
+	--json | -j: the input parameters will be parsed as JSON. The silence flag will be activated automatically if this flag is enabled
+	--debug | -d: it enables the debug level.
 
 A ZCLI command uses the following arguments:
 <object> <action> <id> <id2>... -param1 value [-param2 value]
@@ -101,7 +114,7 @@ ZCLI has an autocomplete feature. Pressing double <tab> to list the possible opt
 If the autocomplete does not list more options, press <intro> to get further information
 
 ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation:
-https://www.zevenet.com/zapidocv4.0/
+$Define::Zapi_doc_uri
 
 Examples:
 farms set gslbfarm -vport 53 -vip 10.0.0.20
@@ -111,9 +124,12 @@ farms -j set gslbfarm '{\"vport\":53,\"vip\":\"10.0.0.20\"}'
 network-virtual create -name eth0:srv -ip 192.168.100.32
 network-virtual create '{\"name\":\"eth0:srv\",\"ip\":\"192.168.100.32\"}'
 	This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32
+
 ";
 
 	&printMsg( $msg, $err );
+
+	return 0;
 }
 
 =begin nd
@@ -359,11 +375,10 @@ sub parseOptions
 	my $args   = $_[0];
 	my $opt_st = {};
 
-	# get options
 	# the options are the parameters before object
-	foreach my $o ( @{ $args } )
+	while ( @{ $args } )
 	{
-		if ( $o !~ /^-/ )
+		if ( $args->[0] !~ /^-/ )
 		{
 			# Run in silence mode if there are arguments in the execution
 			$opt_st->{ silence } = 1;
@@ -372,33 +387,49 @@ sub parseOptions
 		else
 		{
 			my $opt = shift @{ $args };
-			if ( $opt eq '-help' )
+			if ( $opt eq '--help' or $opt eq '-h' )
 			{
 				$opt_st->{ 'help' } = 1;
+				&printHelp( 0 );
+				exit 0;
 			}
-			elsif ( $opt eq '-silence' or $opt eq '-s' )
+			elsif ( $opt eq '--silence' or $opt eq '-s' )
 			{
 				$opt_st->{ 'silence' } = 1;
 			}
-			elsif ( $opt eq '-json' or $opt eq '-j' )
+			elsif ( $opt eq '--json' or $opt eq '-j' )
 			{
 				$opt_st->{ 'json' } = 1;
 			}
-			elsif ( $opt eq '-profile' and $args->[0] !~ /^-/ )
+			elsif ( ( $opt eq '--profile' or $opt eq '-p' ) and $args->[0] !~ /^-/ )
 			{
 				$opt_st->{ 'profile' } = shift @{ $args };
 			}
+			elsif ( $opt eq '--debug' or $opt eq '-d' )
+			{
+				$opt_st->{ 'debug' } = 1;
+			}
+			elsif ( $opt eq '--debug-2' or $opt eq '-d2' )
+			{
+				$opt_st->{ 'debug' } = 2;
+			}
 			else
 			{
-				&printError( "The '$o' option is not recognized." );
+				&printError( "The '$opt' option is not recognized." );
 				&printHelp( 1 );
 				exit 1;
 			}
 		}
 	}
 
-	$Env::Silence    = 1 if exists $opt_st->{ silence };
-	$Env::Input_json = 1 if exists $opt_st->{ json };
+	$Global::Debug   = $opt_st->{ 'debug' } if exists $opt_st->{ 'debug' };
+	$Env::Silence    = 1                    if exists $opt_st->{ silence };
+	$Env::Input_json = 1                    if exists $opt_st->{ json };
+
+	if ( %{ $opt_st } )
+	{
+		&dev( Dumper( $opt_st ), "Execution options: " );
+	}
 
 	return $opt_st;
 }

@@ -54,6 +54,7 @@ our $Cmd_string = ''
 
 package Define;
 
+our $Zapi_doc_uri = "https://www.zevenet.com/zapidocv4.0/";
 our $Description_param =
   "[-param_name_1 param_value_1] [-param_name_2 param_value_2] ...";
 our $L4_service = "default_service";
