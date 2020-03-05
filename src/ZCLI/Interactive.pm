@@ -143,6 +143,11 @@ sub reloadPrompt
 	my $conn    = $Env::Connectivity;
 	my $profile = $Env::Profile->{ name } // "";
 
+	# the strings '\001' and '\002' are used to avoid garbage in the prompt line
+	# when a histroy command is recovered
+	my $ig_start = "\001";
+	my $ig_stop  = "\002";
+
 	my $gray     = "\033[01;90m";
 	my $red      = "\033[01;31m";
 	my $green    = "\033[01;32m";
@@ -151,8 +156,9 @@ sub reloadPrompt
 	my $color      = ( $err )   ? $red  : $green;
 	my $conn_color = ( !$conn ) ? $gray : "";
 
-	my $tag = "zcli($conn_color$profile$color)";
-	$Env::Zcli->prompt( "$no_color$color$tag$no_color: " );
+	my $tag = "zcli($ig_start$conn_color$ig_stop$profile$ig_start$color$ig_stop)";
+	$Env::Zcli->prompt(
+				   "$ig_start$no_color$color$ig_stop$tag$ig_start$no_color$ig_stop: " );
 }
 
 =begin nd
