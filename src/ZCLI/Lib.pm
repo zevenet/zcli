@@ -95,16 +95,15 @@ sub printHelp
 SYNTAXIS:
   zcli [options] <object> <action> <id> [parameters]
 
-[args] arguments between the characters ‘[]’ will be mandatories.
-<args> arguments between the characters ‘<>’ will be optional.
+[args] arguments between characters ‘[]’ are mandatories.
+<args> arguments between characters ‘<>’ are optional.
 
 
 Options:
-ZCLI can be executed with the following options (the options are available at the moment of the invocation):
-  --help, -h: it prints this ZCLI help.
+ZCLI can be executed with the following options:
+  --help, -h: show this ZCLI help.
   --version, -v: it prints the ZCLI version.
-  --profile, -p <name>: it selects the 'name' profile as the destination load balancer of the command.
-  --silence, -s: it executes the action without the human interaction and discarding the information messages. In the case that ZCLI is executed without arguments, it will finish after executing the first command.
+  --profile, -p <name>: choose the 'name' profile as the destination load balancer of the command.
   --json, -j: the input parameters will be parsed as JSON. The silence flag will be activated automatically if this flag is enabled.
   --no-color, -nc: it disables the color for JSON outputs.
   --debug, -d: it enables the debug level.
@@ -113,63 +112,63 @@ ZCLI can be executed with the following options (the options are available at th
 ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command.
 If the autocomplete does not list more options, press <intro> to get further information.
 The minimum number of expected arguments to execute a command are 2, the ‘object’ and the ‘action’ arguments. The ‘id’ and ‘parameter’ arguments will depend on the object and action.
-
+If zcli is executed followed by argument, then zcli will exit once the action is done. 
 
 Objects:
-  It selects the module of Zevenet where the command is going to do the action. The object name uses the character hyphen '-' to navigate for the submodules.
-  There are some commands that ZCLI always has available, they apply the actions directly in the ZCLI:
-  *) help, it lists the ZCLI help.
-  *) profile, it manages the load balancer profiles. (See ’profile’ section for further help).
-  *) history, it lists the last commands.
-  *) reload, it reloads the ZCLI without exit. It is useful to reload the load balancer objects if there were changes that were not applied by ZCLI.
-  *) quit, it exits from the ZCLI.
+  It selects the Zevenet module where the command is going to do the action. 
+  ZLI can be executed from command line with the following objects:
+  *) help, list the ZCLI help.
+  *) profile, manage the load balancer profiles. (See ’profile’ section for further help).
+  *) history, list the last commands.
+  *) reload, reload the ZCLI without exiting. It is useful to sync information against the load balancer.
+  *) quit, exit from the ZCLI.
 
-  The other objects require connectivity with the load balancer and they interact directly with the load balancer.
+  The other objects require connectivity with the load balancer and they interact directly with it.
   The list of available objects are:
   $objs
 
 
 Actions:
-  The action field sets the verb is going to be applied.
-  The list of available actions are:
+  It sets the verb executed for the selected object.
+  The available actions are:
   $actions
 
 
 IDs:
-  The IDs select the load balancer items (of the object selected previously) which will be used in the command. A command can require more than one id, for example, to apply an action in a backend, the farm name, the service name and the backend id will be required. The IDs needed for a command can be shown tabulating or pressing intro once the object and the actions have been chosen.
+  The IDs identify items for the selected object. The needed IDs for a action can be shown pressing tab or pressing enter once the object and the action have been chosen.
 
 
 Parameters:
-  Parameters are used to set values of the command, some can be optional and other mandatories.
-  The parameters of each command are listed once the previous values (object, action and ids) have been set. This ZCLI tool is based on the ZAPI (Zevenet API), so, parameters share the same documentation, it can be checked in the link: $Define::Zapi_doc_uri
+  It sets values of the command.
+  The parameters of each command are listed once the previous values (object, action and ids) have been set. This ZCLI tool is based on the ZAPI (Zevenet API), so, the parameter names are the same than the ZAPI, if further information about the availablie parameters for each ID is required, then you can check the ZAPI documentation in the following link: $Define::Zapi_doc_uri
 
-  Parameters are set using a key and value combination. The key is set using the character '-' previously to the name and the value will be the following string. An example is: -farmname webserver, where farmname is the parameter key and webserver is the parameter value.
+  Parameters are set using a key and value combination. The key name is set using the character '-' previously to the name, followed by the value. An example is: -vip 192.168.100.100 -vport 80, where vip and vport are parameter keys and 192.168.100.100 and 80 are parameter values.
 
 
 EXAMPLES:
   # The following command sets the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm
-  farms set gslbfarm -vport 53 -vip 10.0.0.20
-  # Same command but executed from command line and setting the parameters in JSON format.
-  zcli -j farms set gslbfarm '{\"vport\":53,\"vip\":\"10.0.0.20\"}'
+  	> zcli farm set gslbfarm -vport 53 -vip 10.0.0.20
+  # The following command sets the same action that previously but in JSON format.
+  	> zcli -j farms set gslbfarm '{\"vport\":53,\"vip\":\"10.0.0.20\"}'
 
-  # The following command creates a virtual interface called eth0:srv that uses the IP 192.168.100.32
-  network-virtual create -name eth0:srv -ip 192.168.100.32
-  # Same command but executed from command line and setting the parameters in JSON format.
-  zcli -j network-virtual create '{\"name\":\"eth0:srv\",\"ip\":\"192.168.100.32\"}'
+  # The following command creates a virtual interface named eth0:srv using the IP 192.168.100.32
+  	> zcli network-virtual create -name eth0:srv -ip 192.168.100.32
+  # The following command sets the same action than previously but in JSON format.
+  	> zcli -j network-virtual create '{\"name\":\"eth0:srv\",\"ip\":\"192.168.100.32\"}'
 
 
 PROFILES:
-  ZCLI can store several load balancer profiles. Each profile contains information about the load balancer network settings and the user zapikey. This information is saved in the file ‘$Global::Config_dir’ in the user home directory.
-  To manage the load balancer profiles the ZCLI command ‘profile’ can be used, this allows creating, setting, switch, delete and more options related to the profiles.
-  The default profile is used as a primary profile when the ZCLI is executed. The option ‘--profile’ can be used to change the profile in the execution time
-  ZCLI can be used locally in a load balancer, it automatically set a profile called $Define::Profile_local. It is necessary to set the root zapikey to have full control of the load balancer.
+  ZCLI can store several load balancer profiles. Each profile contains information about the load balancer network settings and the connection credentials (user's ZAPI key). This information is saved in the file ‘$Global::Config_dir’, the user home directory.
+  In order to manage the load balancer profiles the ZCLI command ‘profile’ can be used.
+  In case that zcli command is executed without any profile then the default profile is going to be loaded. If the zcli command is executed with the option ‘--profile’ then the connection will be done to the selected profile.
+  ZCLI can be used locally in a load balancer, it automatically set a profile called $Define::Profile_local. It is necessary to set the root ZAPI key to enable full control of the load balancer, RBAC users also can be used for this, in case that the RBAC user doesn't have permissions to execute the action then a permission error will be shown by the zcli command.  
 
 
 PROMPT:
-  The ZCLI prompt looks like ‘zcli (profile)’. It will change the color in according to the error code of the executed commands. Green color indicates the last command was successful and Red color means that was failed.
-  The profile name will change to gray color when ZCLI won’t be able to connect with the load balancer. This could be caused by a bad networking setting or an issue in the zapikey, so, it is useful to review the profile configuration in those cases. While the load balancer cannot be reached, the commands that apply directly to it will not be available.
+  The ZCLI prompt looks like ‘zcli (profile)’, It will change the color in according to the error code of the executed commands, green color indicates that the last command was successfuly and red color means that last command failed.
+  The profile name will change to gray color if ZCLI is not able to connect to the selected load balancer, this could be related to a connectivity issue or ZAPI credential problem.
 
-";
+"/;
 
 	# print the help paged
 	{
