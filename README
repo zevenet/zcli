@@ -72,10 +72,10 @@ Each object follow a format and can contain a list of possible parameters to def
 		params => {
 			'action' => 'stop',
 		}
-		
+
 		# The option 'enterprise' is set to '1' when that call is exclusive of EE
 		enterprise => 1,
-		
+
 		# 'params_autocomplete' defines how to autocomplete a parameter
 		params_autocomplete => {
 				name =>		# name of the parameter to autocomplete
@@ -158,7 +158,7 @@ The functions used follow the following order:
 ##############################################################################
 
 ## CPAN deps:
-cpan install pp JSON Term::Shell Hash::Merge LWP::Protocol::Https Term::ShellUI Config::Tiny IO:Socket:Ssl
+cpan install pp JSON Term::Shell Hash::Merge LWP::Protocol::Https Term::ShellUI Config::Tiny IO:Socket:Ssl JSON::Color IO::Pager
 
 
 ##############################################################################
@@ -180,5 +180,5 @@ https://stackoverflow.com/questions/8055063/how-to-install-pp-par-packager
 
 Requisitos:
 - Install Strawberry Perl for windows (I installed strawberry-perl-5.16.3.1-64bit.msi)
-- El binario debe acabar en .exe: "zcli.exe"
+- The bin has to end with ".exe": "zcli.exe"
 completeArgsBodyParams

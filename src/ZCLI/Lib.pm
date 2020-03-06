@@ -69,8 +69,6 @@ sub dev
 	}
 	print "$st\n";
 	say "<<<<<<<<<<<<<<< ";
-
-	#~ say "<<<<<<<<<<<<<<< $tag" if $tag;
 	say "";
 }
 
@@ -89,45 +87,97 @@ Returns:
 
 sub printHelp
 {
-	my $err = shift // 0;
+	my $objs    = join ( ', ', sort keys %{ $Objects::Zcli } );
+	my $actions = join ( ', ', sort values ( %Define::Actions ) );
 
+	# tab is 2 spaces
 	my $msg = "
 SYNTAXIS:
-	zcli [options] <object> <action> [params]
+  zcli [options] <object> <action> <id> [parameters]
 
+[args] arguments between the characters ‘[]’ will be mandatories.
+<args> arguments between the characters ‘<>’ will be optional.
+
+
+Options:
 ZCLI can be executed with the following options (the options are available at the moment of the invocation):
-	--help | -h: it prints this ZCLI help.
-	--profile | -p <name>: it selects the 'name' profile as destination load balancer of the command.
-	--silence | -s: it executes the action without the human interaction.
-	--json | -j: the input parameters will be parsed as JSON. The silence flag will be activated automatically if this flag is enabled
-	--debug | -d: it enables the debug level.
+  --help, -h: it prints this ZCLI help.
+  --profile, -p <name>: it selects the 'name' profile as the destination load balancer of the command.
+  --silence, -s: it executes the action without the human interaction and discarding the information messages. In the case that ZCLI is executed without arguments, it will finish after executing the first command.
+  --json, -j: the input parameters will be parsed as JSON. The silence flag will be activated automatically if this flag is enabled.
+  --no-color, -nc: it disables the color for JSON outputs.
+  --debug, -d: it enables the debug level.
 
-A ZCLI command uses the following arguments:
-<object> <action> <id> <id2>... -param1 value [-param2 value]
-    'object' is the load balancer module over the command is going to be executed
-    'action' is the verb is going to be used. Each object has itself actions
-	      'id' specify a object name inside of a module. For example a farm name, an interface name or blacklist name.
-	           To execute some commands, it is necessary use more than one 'ids', to refer several objects that take part in the command.
-	      'param value' some command need parameters. Theese parameters are indicated using the hyphen symbol '-' following with the param name, a black space and the param value.
 
-ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command
-If the autocomplete does not list more options, press <intro> to get further information
+ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command.
+If the autocomplete does not list more options, press <intro> to get further information.
+The minimum number of expected arguments to execute a command are 2, the ‘object’ and the ‘action’ arguments. The ‘id’ and ‘parameter’ arguments will depend on the object and action.
 
-ZCLI is created using ZAPI (Zevenet API), so, to get descrition about the parameters, you can check the official documentation:
-$Define::Zapi_doc_uri
 
-Examples:
-farms set gslbfarm -vport 53 -vip 10.0.0.20
-farms -j set gslbfarm '{\"vport\":53,\"vip\":\"10.0.0.20\"}'
-  	This command is setting the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm
+Objects:
+  It selects the module of Zevenet where the command is going to do the action. The object name uses the character hyphen '-' to navigate for the submodules.
+  There are some commands that ZCLI always has available, they apply the actions directly in the ZCLI:
+  *) help, it lists the ZCLI help.
+  *) profile, it manages the load balancer profiles. (See ’profile’ section for further help).
+  *) history, it lists the last commands.
+  *) reload, it reloads the ZCLI without exit. It is useful to reload the load balancer objects if there were changes that were not applied by ZCLI.
+  *) quit, it exits from the ZCLI.
 
-network-virtual create -name eth0:srv -ip 192.168.100.32
-network-virtual create '{\"name\":\"eth0:srv\",\"ip\":\"192.168.100.32\"}'
-	This command is creating a virtual interface called eth0:srv that is using the IP 192.168.100.32
+  The other objects require connectivity with the load balancer and they interact directly with the load balancer.
+  The list of available objects are:
+  $objs
+
+
+Actions:
+  The action field sets the verb is going to be applied.
+  The list of available actions are:
+  $actions
+
+
+IDs:
+  The IDs select the load balancer items (of the object selected previously) which will be used in the command. A command can require more than one id, for example, to apply an action in a backend, the farm name, the service name and the backend id will be required. The IDs needed for a command can be shown tabulating or pressing intro once the object and the actions have been chosen.
+
+
+Parameters:
+  Parameters are used to set values of the command, some can be optional and other mandatories.
+  The parameters of each command are listed once the previous values (object, action and ids) have been set. This ZCLI tool is based on the ZAPI (Zevenet API), so, parameters share the same documentation, it can be checked in the link: $Define::Zapi_doc_uri
+
+  Parameters are set using a key and value combination. The key is set using the character '-' previously to the name and the value will be the following string. An example is: -farmname webserver, where farmname is the parameter key and webserver is the parameter value.
+
+
+EXAMPLES:
+  # The following command sets the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm
+  farms set gslbfarm -vport 53 -vip 10.0.0.20
+  # Same command but executed from command line and setting the parameters in JSON format.
+  zcli -j farms set gslbfarm '{\"vport\":53,\"vip\":\"10.0.0.20\"}'
+
+  # The following command creates a virtual interface called eth0:srv that uses the IP 192.168.100.32
+  network-virtual create -name eth0:srv -ip 192.168.100.32
+  # Same command but executed from command line and setting the parameters in JSON format.
+  zcli -j network-virtual create '{\"name\":\"eth0:srv\",\"ip\":\"192.168.100.32\"}'
+
+
+PROFILES:
+  ZCLI can store several load balancer profiles. Each profile contains information about the load balancer network settings and the user zapikey. This information is saved in the file ‘$Global::Config_dir’ in the user home directory.
+  To manage the load balancer profiles the ZCLI command ‘profile’ can be used, this allows creating, setting, switch, delete and more options related to the profiles.
+  The default profile is used as a primary profile when the ZCLI is executed. The option ‘--profile’ can be used to change the profile in the execution time
+  ZCLI can be used locally in a load balancer, it automatically set a profile called localhost. It is necessary to set the root zapikey to have full control of the load balancer.
+
+
+PROMPT:
+  The ZCLI prompt looks like ‘zcli (profile)’. It will change the color in according to the error code of the executed commands. Green color indicates the last command was successful and Red color means that was failed.
+  The profile name will change to gray color when ZCLI won’t be able to connect with the load balancer. This could be caused by a bad networking setting or an issue in the zapikey, so, it is useful to review the profile configuration in those cases. While the load balancer cannot be reached, the commands that apply directly to it will not be available.
 
 ";
 
-	&printMsg( $msg, $err );
+	# print the help paged
+	{
+		require IO::Pager;
+		{
+			IO::Pager::open( my $fh ) or warn ( $! );
+			print $fh $msg;
+		}
+	}
 
 	return 0;
 }
@@ -187,7 +237,7 @@ Parametes:
 
 Returns:
 	Array - The first position is a hash with the arguments grouped by type.
-			The second position is an string with the key of the folloing kind of required argument.
+			The second position is an string with the key of the following kind of required argument.
 			The third position is a flag to return if the command was totally parsed. It the case than the command accepts param_body, the last phase will be the 'param_body'.
 
 =cut
@@ -312,8 +362,7 @@ sub parseInput
 		else
 		{
 			$parsed_completed = 0 if ( !defined $def->{ params } );
-
-			$final_step = $steps->{ param_body };
+			$final_step       = $steps->{ param_body };
 
 			# json params
 			my $param_flag = 0;
@@ -340,8 +389,9 @@ sub parseInput
 				}
 			}
 
-		    # Parsed is not complete if there aren't parameters in the cmd definition or input arguments
-			$parsed_completed = 0 if ( !defined $input->{ params } and !defined $def->{ params } );
+# Parsed is not complete if there aren't parameters in the cmd definition or input arguments
+			$parsed_completed = 0
+			  if ( !defined $input->{ params } and !defined $def->{ params } );
 		}
 	}
 
@@ -401,6 +451,10 @@ sub parseOptions
 			{
 				$opt_st->{ 'json' } = 1;
 			}
+			elsif ( $opt eq '--no-color' or $opt eq '-nc' )
+			{
+				$opt_st->{ 'nocolor' } = 1;
+			}
 			elsif ( ( $opt eq '--profile' or $opt eq '-p' ) and $args->[0] !~ /^-/ )
 			{
 				$opt_st->{ 'profile' } = shift @{ $args };
@@ -425,6 +479,7 @@ sub parseOptions
 	$Global::Debug   = $opt_st->{ 'debug' } if exists $opt_st->{ 'debug' };
 	$Env::Silence    = 1                    if exists $opt_st->{ silence };
 	$Env::Input_json = 1                    if exists $opt_st->{ json };
+	$Env::Color      = 0                    if exists $opt_st->{ nocolor };
 
 	if ( %{ $opt_st } )
 	{
@@ -529,14 +584,16 @@ sub getLBIdsTree
 	};
 	my $resp = &zapi( $request, $profile );
 
-	#~ &dev(Dumper($resp),"id tree", 2);
-
 	my $tree;
 
+	if ( exists $resp->{ msg } )
+	{
+		&printError( $resp->{ msg } );
+	}
 	if ( $resp->{ code } == 404 )
 	{
 		&printError(
-			"Error connecting, ZCLI needs a load balancer with the version $Global::Req_zevenet_version or higher"
+			"Error connecting to the load balancer, ZCLI can be used from the version $Global::Req_ee_zevenet_version of Enterprise or $Global::Req_ce_zevenet_version of The Community."
 		);
 	}
 	elsif ( $resp->{ 'json' }->{ 'params' } )
@@ -896,9 +953,22 @@ sub printOutput
 		{
 			delete $resp->{ msg } if exists $resp->{ msg };
 			my $json_enc = "";
-			eval {
-				$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
-			};
+			if ( !$Env::Color )
+			{
+				eval {
+					require JSON;
+					$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
+				};
+			}
+			else
+			{
+				eval {
+					require JSON::Color;
+					$json_enc = JSON::Color::encode_json( $resp->{ json }, { pretty => 1 } );
+				};
+			}
+			&dev( $@ ) if ( $@ );
+
 			&printSuccess( "$json_enc", 0 ) if ( $json_enc );
 		}
 	}
@@ -1085,7 +1155,7 @@ sub setProfile
 			if ( $name !~ /\S+/ )
 			{
 				$valid_flag = 0;
-				&print(
+				print (
 					  "Invalid 'name'. It expects a string with the load balancer profile name\n" );
 			}
 			elsif ( exists $Config->{ $name } )
@@ -1129,7 +1199,7 @@ sub setProfile
 			unless ( $cfg->{ port } > 0 and $cfg->{ port } <= 65535 )
 			{
 				$valid_flag = 0;
-				&print(
+				print (
 					   "Invalid 'port for load balancer. It expects a port between 1 and 65535\n" );
 			}
 		} while ( !$valid_flag );
@@ -1180,7 +1250,7 @@ sub setProfile
 	}
 	elsif ( $Config->{ _ }->{ default_profile } ne $name )
 	{
-		&print(
+		print (
 			"Do you wish set this load balancer profile as the default one? [yes|no=default]: "
 		);
 		my $confirmation = <STDIN>;
@@ -1506,8 +1576,19 @@ sub isLoadBalancer
 	my $cmd =
 	  'dpkg -l 2>/dev/null |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3';
 	my $version = `$cmd`;
+	my $success = 0;
+	if ( $version )
+	{
+		$cmd = 'dpkg -l 2>/dev/null |grep -E "\szevenet\s"';
+		my $edition = `$cmd`;
+		if (   ( $edition =~ 'Enterprise' and $version < $Global::Req_zevenet_version )
+			or ( $edition =~ 'Community' and $version < $Global::Req_zevenet_version ) )
+		{
+			$success = 1;
+		}
+	}
 
-	return ( !$version or $version < $Global::Req_zevenet_version ) ? 0 : 1;
+	return $success;
 }
 
 1;

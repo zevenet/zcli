@@ -129,6 +129,21 @@ our $Farms = {
 		},
 	},
 
+	'farm-session' => {
+						$V{ ADD } => {
+									   uri    => "/farms/<$K{FARM}>/sessions",
+									   method => 'POST',
+						},
+						$V{ REMOVE } => {
+										  uri => "/farms/<$K{FARM}>/sessions/<$K{SESSION}>",
+										  method => 'DELETE',
+						},
+						$V{ LIST } => {
+										uri    => "/farms/<$K{FARM}>/sessions",
+										method => 'GET',
+						},
+	},
+
 	'farm-service-farmguardian' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg",

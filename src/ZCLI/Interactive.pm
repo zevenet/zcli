@@ -93,7 +93,22 @@ sub createZcli
 									token_chars  => '',
 	);
 
-	&printSuccess( "Zevenet Client Line Interface" );
+	my $logo = "
+  ___________ _      _____
+ |___  / ____| |    |_   _|
+    / / |    | |      | |
+   / /| |    | |      | |
+  / /_| |____| |____ _| |_
+ /_____\\_____|______|_____|
+";
+	my $welcome = "${Color::Green}$logo${Color::Clean}
+
+Welcome to the Zevenet Command Line Interface.
+
+The extendend information can be displayed using the 'help' command.";
+
+	&printSuccess( $welcome );
+
 	$Env::Zcli->load_history();
 	$Env::Zcli->getset( 'done', 0 );
 
@@ -143,22 +158,14 @@ sub reloadPrompt
 	my $conn    = $Env::Connectivity;
 	my $profile = $Env::Profile->{ name } // "";
 
-	# the strings '\001' and '\002' are used to avoid garbage in the prompt line
-	# when a histroy command is recovered
-	my $ig_start = "\001";
-	my $ig_stop  = "\002";
+	my $color      = ( $err )   ? $Color::Red  : $Color::Green;
+	my $conn_color = ( !$conn ) ? $Color::Gray : "";
+	$color      = $Color::Init . $color . $Color::End;
+	$conn_color = $Color::Init . $conn_color . $Color::End;
 
-	my $gray     = "\033[01;90m";
-	my $red      = "\033[01;31m";
-	my $green    = "\033[01;32m";
-	my $no_color = "\033[0m";
+	my $tag = "zcli($conn_color$profile$color)";
+	$Env::Zcli->prompt( "${Color::Reset}$color$tag${Color::Reset}: " );
 
-	my $color      = ( $err )   ? $red  : $green;
-	my $conn_color = ( !$conn ) ? $gray : "";
-
-	my $tag = "zcli($ig_start$conn_color$ig_stop$profile$ig_start$color$ig_stop)";
-	$Env::Zcli->prompt(
-				   "$ig_start$no_color$color$ig_stop$tag$ig_start$no_color$ig_stop: " );
 }
 
 =begin nd
@@ -230,7 +237,10 @@ sub createZcliCmd
 		foreach my $cmd ( keys %{ $Objects::Zcli } )
 		{
 			my $obj = &createCmdObject( $cmd, $ids_tree );
-			$st->{ $cmd } = $obj if defined $obj;
+			if ( defined $obj )
+			{
+				$st->{ $cmd } = $obj;
+			}
 		}
 	}
 
@@ -259,8 +269,11 @@ sub createZcliCmd
 	my @profile_list = &listProfiles();
 	$profile_st->{ $V{ LIST } }->{ proc } =
 	  sub { printSuccess( $_, 0 ) for ( &listProfiles ) };
-	$profile_st->{ $V{ LIST } }->{ maxargs }   = 1;
-	$profile_st->{ $V{ CREATE } }->{ proc }    = \&setProfile;
+	$profile_st->{ $V{ LIST } }->{ maxargs } = 1;
+	$profile_st->{ $V{ CREATE } }->{ proc }  = sub {
+		my $out = &setProfile;
+		( !defined $out );
+	};
 	$profile_st->{ $V{ CREATE } }->{ maxargs } = 1;
 	$profile_st->{ $V{ SET } } = {
 		args    => [sub { \@profile_list }],
@@ -428,7 +441,7 @@ sub getMissingParam
 	{
 		if ( !defined $input_args->[$it] )
 		{
-			return undef if ( $p eq '[-param_name_1' );
+			return undef if ( $p eq '[-param_1' );
 			return $p;
 		}
 		$it++;
@@ -482,7 +495,7 @@ sub geCmdProccessCallback
 	my $obj_def = shift;
 
 	my $resp;
-	my $err;
+	my $err        = 0;
 	my @input_args = ( $obj_def->{ object }, $obj_def->{ action }, @_ );
 	eval {
 		$Env::Cmd_string = "";    # clean string
@@ -524,11 +537,11 @@ sub geCmdProccessCallback
 				{
 					if ( exists $Env::Cmd_params_def->{ $p }->{ required } )
 					{
-						$params = "<-$p $p> $params";
+						$params = "<-$p value> $params";
 					}
 					else
 					{
-						$params .= "[-$p $p] ";
+						$params .= "[-$p value] ";
 					}
 				}
 				my $pattern = quotemeta ( $Define::Description_param );
@@ -553,6 +566,7 @@ sub geCmdProccessCallback
 		  &createZapiRequest( $obj_def, $input_parsed, $Env::Profile,
 							  $Env::Profile_ids_tree );
 
+		&dev( "calling zapi" );
 		$resp = &zapi( $request, $Env::Profile );
 		$err  = $resp->{ err };
 
@@ -560,6 +574,8 @@ sub geCmdProccessCallback
 
 	};
 	&printError( $@ ) if $@;
+
+	#~ $err = ( $@ or $err ) ? 1 : 0 if ($Env::Silence);
 	$err = ( $@ or $err ) ? 1 : 0;
 
 	( $err );

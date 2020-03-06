@@ -1,3 +1,10 @@
+-- bugs --
+
+añadir la extension de los backups
+
+modulo: JSON::Color
+
+
 
 --- Tests ---
 Completar
@@ -26,6 +33,10 @@ Completar
 									'values'    => ["drain", "cut"],
 			};
 		}
+
+- filtrar permitir en el get la opcion de mostrar solo el campo solicitado
+
+- mostrar salida en formato columnas
 
 - completar funcionalidades:
 	farms-add/rem headers
