@@ -1098,8 +1098,6 @@ sub setProfile
 	my $valid_flag = 1;
 
 	my $set_msg = "Press 'intro' to keep the value";
-	my $ip_regex =
-	  '((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))';
 
 	# getting conf
 	my $Config =
@@ -1164,21 +1162,21 @@ sub setProfile
 		} while ( !$valid_flag );
 	}
 
-	# get IP
+	# get Host
 	if ( $name ne $Define::Profile_local )
 	{
 		do
 		{
-			print ( "Load balancer management IP: " );
+			print ( "Load balancer management IP or its network name: " );
 			print ( "[$set_msg: $cfg->{host}] " ) if not $new_flag;
 			$valid_flag = 1;
 			my $val = <STDIN>;
 			chomp $val;
 			$cfg->{ host } = $val unless ( $val eq "" and not $new_flag );
-			unless ( $cfg->{ host } =~ /$ip_regex/ )
+			unless ( $cfg->{ host } =~ /^\S+$/ )
 			{
 				$valid_flag = 0;
-				print ( "Invalid 'host' for load balancer. It expects an IP v4 or v6\n" );
+				print ( "Invalid 'host' for load balancer. It an IP or a network name\n" );
 			}
 		} while ( !$valid_flag );
 	}
