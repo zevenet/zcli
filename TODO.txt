@@ -1,12 +1,11 @@
 -- bugs --
 
-mostrar version
+Añadir que IP pueda ser un hostname
 
 añadir la extension de los backups
 
 añadir variable lib '.' a use para que tome los ficheros del directorio local
 
-recalcular IP origen
 
 
 

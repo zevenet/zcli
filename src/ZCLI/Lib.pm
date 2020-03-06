@@ -28,6 +28,7 @@ use JSON;
 
 use Storable qw(dclone);
 
+use lib '..';
 use ZCLI::Define;
 use ZCLI::Objects;
 
@@ -1494,7 +1495,7 @@ sub getHttpServerConf
 		if ( $line =~ /^\s*$ip_directive/ )
 		{
 			$params++;
-			my ( undef, $ip ) = split ( "=", $line );
+			( undef, $ip ) = split ( "=", $line );
 			$ip =~ s/\s//g;
 			chomp ( $ip );
 		}

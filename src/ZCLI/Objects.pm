@@ -24,6 +24,8 @@
 use strict;
 use warnings;
 use Hash::Merge;
+
+use lib '..';
 use ZCLI::Define;
 
 package Objects;

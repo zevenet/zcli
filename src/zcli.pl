@@ -29,6 +29,7 @@ use POSIX qw(_exit);
 # https://metacpan.org/pod/Term::ShellUI
 use Term::ShellUI;
 
+use lib '.';
 use ZCLI::Define;
 use ZCLI::Lib;
 use ZCLI::Objects;
