@@ -32,8 +32,8 @@ function die() {
 
 #### Initial setup ####
 
-INST_PATH_LIB="workdir/usr/share/perl5"
-INST_PATH_BIN="workdir/usr/bin"
+INST_PATH_LIB="usr/share/perl5"
+INST_PATH_BIN="usr/bin"
 
 
 # Setup a clean environment
@@ -42,17 +42,18 @@ msg "Setting up a clean environment..."
 rm -rf workdir
 mkdir workdir
 cp -r DEBIAN workdir/
-mkdir -p "$INST_PATH_LIB"
-mkdir -p "$INST_PATH_BIN"
-cp -r src/ZCLI "$INST_PATH_LIB"
-cp -r src/zcli.pl "$INST_PATH_BIN/zcli"
+mkdir -p "workdir/$INST_PATH_LIB"
+mkdir -p "workdir/$INST_PATH_BIN"
+cp -r src/ZCLI "workdir/$INST_PATH_LIB"
+cp -r src/zcli.pl "workdir/$INST_PATH_BIN/zcli"
 cd workdir
 
 
 # Set version and package name
-version=$(grep "Version:" DEBIAN/control | cut -d " " -f 2)
+version=$(grep '$Version' ${INST_PATH_LIB}/ZCLI/Define.pm | sed -E 's/[^\.0-1]//g')
+sed -i "s/#VERSION#/$version/" DEBIAN/control
 pkgname_prefix="zcli_${version}_${arch}"
-pkgname=${pkgname_prefix}_DEV_${distribution}_${DATE}.deb
+pkgname=${pkgname_prefix}_${DATE}.deb
 
 #### Package preparation ####
 

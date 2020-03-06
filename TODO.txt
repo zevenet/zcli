@@ -4,9 +4,10 @@ mostrar version
 
 añadir la extension de los backups
 
-modulo: JSON::Color
-
 añadir variable lib '.' a use para que tome los ficheros del directorio local
+
+recalcular IP origen
+
 
 
 --- Tests ---

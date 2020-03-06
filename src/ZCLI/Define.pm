@@ -25,7 +25,9 @@ use strict;
 use warnings;
 
 package Global;
-our $Debug = 0;
+
+our $Version = "1.0.0";
+our $Debug   = 0;
 our $Fin = ( $Debug ) ? "" : "\n";  # This will add the dying line in debug mode
 
 our $Req_ee_zevenet_version = "6.1";

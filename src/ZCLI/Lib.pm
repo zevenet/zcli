@@ -102,6 +102,7 @@ SYNTAXIS:
 Options:
 ZCLI can be executed with the following options (the options are available at the moment of the invocation):
   --help, -h: it prints this ZCLI help.
+  --version, -v: it prints the ZCLI version.
   --profile, -p <name>: it selects the 'name' profile as the destination load balancer of the command.
   --silence, -s: it executes the action without the human interaction and discarding the information messages. In the case that ZCLI is executed without arguments, it will finish after executing the first command.
   --json, -j: the input parameters will be parsed as JSON. The silence flag will be activated automatically if this flag is enabled.
@@ -439,13 +440,13 @@ sub parseOptions
 			my $opt = shift @{ $args };
 			if ( $opt eq '--help' or $opt eq '-h' )
 			{
-				$opt_st->{ 'help' } = 1;
 				&printHelp( 0 );
 				exit 0;
 			}
-			elsif ( $opt eq '--silence' or $opt eq '-s' )
+			elsif ( $opt eq '--version' or $opt eq '-v' )
 			{
-				$opt_st->{ 'silence' } = 1;
+				&printSuccess( "ZCLI version $Global::Version" );
+				exit 0;
 			}
 			elsif ( $opt eq '--json' or $opt eq '-j' )
 			{
