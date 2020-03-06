@@ -1,8 +1,8 @@
 Package: zcli
-Version: 0.1.0
+Version: 1.0.0
 Maintainer: ZEVENET Company SL <support@zevenet.com>
 Architecture: amd64
 Section: admin
 Priority: optional
 Description: Zevenet client line interface
-Depends: libterm-readline-gnu-perl, libjson-perl, libhash-merge-perl, liblwp-protocol-https-perl, libterm-shellui-perl, libconfig-tiny-perl, libio-socket-ssl-perl, libio-pager-perl
+Depends: libterm-readline-gnu-perl, libjson-perl, libhash-merge-perl, liblwp-protocol-https-perl, libterm-shellui-perl, libconfig-tiny-perl, libio-socket-ssl-perl, libio-pager-perl, libjson-color-perl

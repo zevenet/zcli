@@ -49,7 +49,7 @@ if ( &isLoadBalancer() )
 	if ( !defined $local_profile )
 	{
 		&printSuccess( "Type the zapi key for the current load balancer", 0 );
-		&setProfile( "local_profile", 1 );
+		&setProfile( $Define::Profile_local, 1 );
 	}
 
 	# refresh ip and port. Maybe they were modified

@@ -161,7 +161,7 @@ PROFILES:
   ZCLI can store several load balancer profiles. Each profile contains information about the load balancer network settings and the user zapikey. This information is saved in the file ‘$Global::Config_dir’ in the user home directory.
   To manage the load balancer profiles the ZCLI command ‘profile’ can be used, this allows creating, setting, switch, delete and more options related to the profiles.
   The default profile is used as a primary profile when the ZCLI is executed. The option ‘--profile’ can be used to change the profile in the execution time
-  ZCLI can be used locally in a load balancer, it automatically set a profile called localhost. It is necessary to set the root zapikey to have full control of the load balancer.
+  ZCLI can be used locally in a load balancer, it automatically set a profile called $Define::Profile_local. It is necessary to set the root zapikey to have full control of the load balancer.
 
 
 PROMPT:
@@ -1093,9 +1093,6 @@ sub setProfile
 	  ; # if name exists, the function will modify it, else it will create a new one
 	my $new_flag  = shift // 1;
 	my $conf_file = $Global::Profiles_path;
-	my $localname =
-	  "localhost"
-	  ; # it is the reserve word to automaticaly modify the conf when zcli is running in a load balancer
 	my $cfg;
 	my $valid_flag = 1;
 
@@ -1108,17 +1105,17 @@ sub setProfile
 	  ( -e $conf_file ) ? Config::Tiny->read( $conf_file ) : Config::Tiny->new;
 
 	# set values if the profile is localhost
-	if ( $name eq $localname )
+	if ( $name eq $Define::Profile_local )
 	{
 		# overwrite data. Maybe the http server cfg was changed
 		my ( $localip, $localport ) = &getHttpServerConf();
 
 		$cfg = {
 				 zapi_version => "4.0",
-				 name         => $localname,
+				 name         => $Define::Profile_local,
 				 host         => $localip,
 				 port         => $localport,
-				 zapi_key     => $Config->{ $localname }->{ zapi_key } // '',
+				 zapi_key     => $Config->{ $Define::Profile_local }->{ zapi_key } // '',
 				 edition      => ( eval { require Zevenet::ELoad; } ) ? 'EE' : 'CE',
 		};
 	}
@@ -1143,7 +1140,7 @@ sub setProfile
 
 	## Get parameters
 	# get name
-	if ( $new_flag and $name ne $localname )
+	if ( $new_flag and $name ne $Define::Profile_local )
 	{
 		do
 		{
@@ -1167,7 +1164,7 @@ sub setProfile
 	}
 
 	# get IP
-	if ( $name ne $localname )
+	if ( $name ne $Define::Profile_local )
 	{
 		do
 		{
@@ -1186,7 +1183,7 @@ sub setProfile
 	}
 
 	# get port
-	if ( $name ne $localname )
+	if ( $name ne $Define::Profile_local )
 	{
 		do
 		{
@@ -1344,15 +1341,14 @@ Returns:
 
 sub updateProfileLocal
 {
-	my $localname = "local";
 	my $prof_file = $Global::Profiles_path;
 	my $Config =
 	  ( -e $prof_file ) ? Config::Tiny->read( $prof_file ) : die $Global::Fin;
 
 	# overwrite data. Maybe the http server cfg was changed
 	my ( $localip, $localport ) = &getHttpServerConf();
-	$Config->{ $localname }->{ host } = $localip;
-	$Config->{ $localname }->{ port } = $localport;
+	$Config->{ $Define::Profile_local }->{ host } = $localip;
+	$Config->{ $Define::Profile_local }->{ port } = $localport;
 
 	$Config->write( $prof_file );
 }
@@ -1581,8 +1577,8 @@ sub isLoadBalancer
 	{
 		$cmd = 'dpkg -l 2>/dev/null |grep -E "\szevenet\s"';
 		my $edition = `$cmd`;
-		if (   ( $edition =~ 'Enterprise' and $version < $Global::Req_zevenet_version )
-			or ( $edition =~ 'Community' and $version < $Global::Req_zevenet_version ) )
+		if (   ( $edition =~ 'Enterprise' and $version >= $Global::Req_zevenet_version )
+			or ( $edition =~ 'Community' and $version >= $Global::Req_zevenet_version ) )
 		{
 			$success = 1;
 		}
