@@ -131,16 +131,19 @@ our $Farms = {
 
 	'farm-session' => {
 						$V{ ADD } => {
-									   uri    => "/farms/<$K{FARM}>/sessions",
-									   method => 'POST',
+									   uri        => "/farms/<$K{FARM}>/sessions",
+									   method     => 'POST',
+									   enterprise => 1,
 						},
 						$V{ REMOVE } => {
 										  uri => "/farms/<$K{FARM}>/sessions/<$K{SESSION}>",
-										  method => 'DELETE',
+										  method     => 'DELETE',
+										  enterprise => 1,
 						},
 						$V{ LIST } => {
-										uri    => "/farms/<$K{FARM}>/sessions",
-										method => 'GET',
+										uri        => "/farms/<$K{FARM}>/sessions",
+										method     => 'GET',
+										enterprise => 1,
 						},
 	},
 

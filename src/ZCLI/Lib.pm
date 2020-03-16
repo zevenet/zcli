@@ -113,10 +113,10 @@ ZCLI can be executed with the following options:
 ZCLI has an autocomplete feature. Pressing double <tab> to list the possible options for the current command.
 If the autocomplete does not list more options, press <intro> to get further information.
 The minimum number of expected arguments to execute a command are 2, the ‘object’ and the ‘action’ arguments. The ‘id’ and ‘parameter’ arguments will depend on the object and action.
-If zcli is executed followed by argument, then zcli will exit once the action is done. 
+If zcli is executed followed by argument, then zcli will exit once the action is done.
 
 Objects:
-  It selects the Zevenet module where the command is going to do the action. 
+  It selects the Zevenet module where the command is going to do the action.
   ZLI can be executed from command line with the following objects:
   *) help, list the ZCLI help.
   *) profile, manage the load balancer profiles. (See ’profile’ section for further help).
@@ -162,14 +162,14 @@ PROFILES:
   ZCLI can store several load balancer profiles. Each profile contains information about the load balancer network settings and the connection credentials (user's ZAPI key). This information is saved in the file ‘$Global::Config_dir’, the user home directory.
   In order to manage the load balancer profiles the ZCLI command ‘profile’ can be used.
   In case that zcli command is executed without any profile then the default profile is going to be loaded. If the zcli command is executed with the option ‘--profile’ then the connection will be done to the selected profile.
-  ZCLI can be used locally in a load balancer, it automatically set a profile called $Define::Profile_local. It is necessary to set the root ZAPI key to enable full control of the load balancer, RBAC users also can be used for this, in case that the RBAC user doesn't have permissions to execute the action then a permission error will be shown by the zcli command.  
+  ZCLI can be used locally in a load balancer, it automatically set a profile called $Define::Profile_local. It is necessary to set the root ZAPI key to enable full control of the load balancer, RBAC users also can be used for this, in case that the RBAC user doesn't have permissions to execute the action then a permission error will be shown by the zcli command.
 
 
 PROMPT:
   The ZCLI prompt looks like ‘zcli (profile)’, It will change the color in according to the error code of the executed commands, green color indicates that the last command was successfuly and red color means that last command failed.
   The profile name will change to gray color if ZCLI is not able to connect to the selected load balancer, this could be related to a connectivity issue or ZAPI credential problem.
 
-"/;
+";
 
 	# print the help paged
 	{
