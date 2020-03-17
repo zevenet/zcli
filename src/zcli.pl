@@ -81,7 +81,8 @@ if ( !$Env::Profile )
 if ( !exists $Env::Profile->{ edition } )
 {
 	my $edition = &getProfileEdition( $Env::Profile );
-	&getProfileEdition( $Env::Profile->{ name }, $edition ) if ( defined $edition );
+	&updateProfileEdition( $Env::Profile->{ name }, $edition )
+	  if ( defined $edition );
 }
 
 # Use interactive
