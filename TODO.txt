@@ -2,9 +2,6 @@
 
 añadir la extension de los backups
 
-añadir variable lib '.' a use para que tome los ficheros del directorio local
-
-
 
 
 --- Tests ---
@@ -43,3 +40,6 @@ Completar
 	farms-add/rem headers
 	# configurar scheduler de tiempo
 	# asignar y desasignar recursos de un grupo RBAC
+
+-
+libscalar-util-looksLikeNumber para diferenciar json entre numeros y string

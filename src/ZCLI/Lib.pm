@@ -908,7 +908,9 @@ sub listParams
 =begin nd
 Function: printOutput
 
-	This function will print the output of the zapi, previously, giving it format
+	This function will print the output of the zapi, previously, giving it format.
+	The color scheme is defined in the variable %JSON::Color::theme using the colors of Term::ANSIColor:
+	https://perldoc.perl.org/Term/ANSIColor.html
 
 Parametes:
 	Response - It is a hash ref with the response of the zapi. The keys of the has are:
@@ -965,6 +967,39 @@ sub printOutput
 			{
 				eval {
 					require JSON::Color;
+					use Term::ANSIColor qw(:constants);
+					use Term::ANSIColor qw(:constants256);
+
+					my $zgreen = RGB150;
+					my $grey   = RGB444;
+
+					my $key    = $grey;
+					my $string = $zgreen;
+					my $number = BRIGHT_YELLOW;
+					my $null   = BRIGHT_CYAN;
+
+					my %color_scheme = (
+									 start_quote             => $string,
+									 end_quote               => RESET,
+									 start_string            => $string,
+									 end_string              => RESET,
+									 start_string_escape     => RESET . $string,
+									 end_string_escape       => RESET . $string,    # back to string
+									 start_number            => $number,
+									 end_number              => RESET,
+									 start_bool              => $null,
+									 end_bool                => RESET,
+									 start_null              => BOLD . $null,
+									 end_null                => RESET,
+									 start_object_key        => $key,
+									 end_object_key          => RESET,
+									 start_object_key_escape => BOLD,
+									 end_object_key_escape   => RESET . $key,       # back to object key
+									 start_linum             => REVERSE . WHITE,
+									 end_linum               => RESET,
+					);
+
+					%JSON::Color::theme = %color_scheme;
 					$json_enc = JSON::Color::encode_json( $resp->{ json }, { pretty => 1 } );
 				};
 			}
