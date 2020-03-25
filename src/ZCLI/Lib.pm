@@ -587,7 +587,7 @@ sub getLBIdsTree
 
 	my $tree;
 
-	if ( exists $resp->{ msg } )
+	if ( defined $resp->{ msg } )
 	{
 		&printError( $resp->{ msg } );
 	}
