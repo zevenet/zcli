@@ -1149,14 +1149,14 @@ sub setProfile
 		my ( $localip, $localport ) = &getHttpServerConf();
 
 		$cfg = {
-				 zapi_version => "4.0",
-				 name         => $Define::Profile_local,
-				 description =>
-				   "This profile is the root admin to manage the current load balancer",
-				 host     => $localip,
-				 port     => $localport,
-				 zapi_key => $Config->{ $Define::Profile_local }->{ zapi_key } // '',
-				 edition  => ( eval { require Zevenet::ELoad; } ) ? 'EE' : 'CE',
+			zapi_version => "4.0",
+			name         => $Define::Profile_local,
+			description =>
+			  "This profile is the root admin that is used to manage the current load balancer",
+			host     => $localip,
+			port     => $localport,
+			zapi_key => $Config->{ $Define::Profile_local }->{ zapi_key } // '',
+			edition  => ( eval { require Zevenet::ELoad; } ) ? 'EE' : 'CE',
 		};
 	}
 
@@ -1274,6 +1274,7 @@ sub setProfile
 	$cfg->{ zapi_version } = "4.0";
 
 	# get a description
+	if ( $name ne $Define::Profile_local )
 	{
 		print ( "Do you want to add a description to the profile?: " );
 		print ( "[$set_msg: $cfg->{description}] " ) if not $new_flag;
