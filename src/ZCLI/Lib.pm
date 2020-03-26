@@ -459,6 +459,8 @@ sub parseOptions
 			elsif ( ( $opt eq '--profile' or $opt eq '-p' ) and $args->[0] !~ /^-/ )
 			{
 				$opt_st->{ 'profile' } = shift @{ $args };
+				my $prof = &getProfile( $opt_st->{ 'profile' } );
+				exit 1 if ( !defined $prof );
 			}
 			elsif ( $opt eq '--debug' or $opt eq '-d' )
 			{
@@ -1489,7 +1491,7 @@ sub getProfile
 	}
 	elsif ( !exists $Config->{ $profile_name } )
 	{
-		print "The profile selected does not exist\n";
+		print "The profile selected '$profile_name' does not exist\n";
 		return undef;
 	}
 
