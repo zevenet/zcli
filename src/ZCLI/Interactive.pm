@@ -553,7 +553,7 @@ sub geCmdProccessCallback
 		}
 
 		# do not allow sending extra arguments using GET methods
-		if ( $obj_def->{ method } eq 'GET'
+		if ( $obj_def->{ method } =~ /^(?:GET|DELETE)$/
 			 and ( scalar ( @input_args ) > &getCmdArgsNum( $obj_def ) ) )
 		{
 			my $desc = &getCmdDescription( $obj_def );
