@@ -268,8 +268,16 @@ sub createZcliCmd
 
 	my $profile_st;
 	my @profile_list = &listProfiles();
-	$profile_st->{ $V{ LIST } }->{ proc } =
-	  sub { printSuccess( $_, 0 ) for ( &listProfiles ) };
+	$profile_st->{ $V{ LIST } }->{ proc } = sub {
+		for ( &listProfiles )
+		{
+			my $st   = $_;
+			my $desc = &getProfile( $_ )->{ description };
+			$st .= "  -  $desc";
+			printSuccess( $st, 0 );
+		}
+
+	};
 	$profile_st->{ $V{ LIST } }->{ maxargs } = 1;
 	$profile_st->{ $V{ CREATE } }->{ proc }  = sub {
 		my $out = &setProfile;

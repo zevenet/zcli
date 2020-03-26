@@ -1111,17 +1111,19 @@ Returns:
 		name, it is a nick name of the load balancer
 		host, it is the IP or nameserver or the load balancer
 		port, it is the ZAPI management port
-		ZAPIKEY, it is the user key used for the ZAPI requests
+		zapikey, it is the user key used for the ZAPI requests
 		edition, it is the Zevenet edition used in the load balancer. The possible values are CE, EE or not exists (if zcli has not connected)
+		description, it is a description mesage about the profile. This message is a line.
 
 	Example:
 		$cfg = {
 				 zapi_version => "4.0",
-				 name         => zevenet-lb-1,
-				 host         => 192.168.100.254,
+				 name         => "zevenet-lb-1",
+				 host         => "192.168.100.254",
 				 port         => 444,
-				 zapi_key     => v2kl3QK658awg34qaQbaewba3wjnzdkfxGbqbwq4,
-				 edition      => EE,
+				 zapi_key     => "v2kl3QK658awg34qaQbaewba3wjnzdkfxGbqbwq4",
+				 edition      => "EE",
+				 description  => "Monitoring user to test lb1",
 		}
 =cut
 
@@ -1149,10 +1151,12 @@ sub setProfile
 		$cfg = {
 				 zapi_version => "4.0",
 				 name         => $Define::Profile_local,
-				 host         => $localip,
-				 port         => $localport,
-				 zapi_key     => $Config->{ $Define::Profile_local }->{ zapi_key } // '',
-				 edition      => ( eval { require Zevenet::ELoad; } ) ? 'EE' : 'CE',
+				 description =>
+				   "This profile is the root admin to manage the current load balancer",
+				 host     => $localip,
+				 port     => $localport,
+				 zapi_key => $Config->{ $Define::Profile_local }->{ zapi_key } // '',
+				 edition  => ( eval { require Zevenet::ELoad; } ) ? 'EE' : 'CE',
 		};
 	}
 
@@ -1269,6 +1273,16 @@ sub setProfile
 #	} while ( !$valid_flag );
 	$cfg->{ zapi_version } = "4.0";
 
+	# get a description
+	{
+		print ( "Do you want to add a description to the profile?: " );
+		print ( "[$set_msg: $cfg->{description}] " ) if not $new_flag;
+		$valid_flag = 1;
+		my $val = <STDIN>;
+		chomp $val;
+		$cfg->{ description } = $val;
+	}
+
 	# Get Edition
 	my $edition = &getProfileEdition( $cfg );
 	$cfg->{ edition } = $edition if ( defined $edition );
@@ -1284,7 +1298,7 @@ sub setProfile
 	elsif ( $Config->{ _ }->{ default_profile } ne $name )
 	{
 		print (
-			"Do you wish set this load balancer profile as the default one? [yes|no=default]: "
+			"Do you want to set this load balancer profile as the default one? [yes|no=default]: "
 		);
 		my $confirmation = <STDIN>;
 		chomp $confirmation;
@@ -1462,12 +1476,13 @@ Parametes:
 Returns:
 	Hash ref - Struct with the profile info. If the profile does not exist, the function will return undef
 		{
-			host => 192.168.100.241
-			name => devcano
-			port => 444
-			zapi_key => root
-			zapi_version => 4.0
-			edition => EE
+			host => 192.168.100.241,
+			name => devcano,
+			port => 444,
+			zapi_key => root,
+			zapi_version => 4.0,
+			edition => EE,
+			description  => "Monitoring user to test lb1",
 		}
 
 =cut
