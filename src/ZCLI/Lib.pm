@@ -791,6 +791,34 @@ sub zapi
 }
 
 =begin nd
+Function: getDefaultDownloadFile
+
+	It creates a default file name using the element name that is going to be downloaded
+
+Parametes:
+	Def object - the object that defines the zapi request
+	object name - It is the name of the object that will be downloaded
+
+Returns:
+	String - It returns the file path with its extension.
+
+=cut
+
+sub getDefaultDownloadFile
+{
+	my $arg  = shift;
+	my $file = shift;
+
+	# add extension to backups
+	if ( $arg->{ uri } =~ '^/system/backup/' and $file !~ /\.tar\.gz/ )
+	{
+		$file .= '.tar.gz';
+	}
+
+	return $file;
+}
+
+=begin nd
 Function: getIds
 
 	It receives an URI and it looks for the parameters that expects the URI.
@@ -1192,7 +1220,7 @@ sub setProfile
 			if ( $name !~ /\S+/ )
 			{
 				$valid_flag = 0;
-				print (
+				&print(
 					  "Invalid 'name'. It expects a string with the load balancer profile name\n" );
 			}
 			elsif ( exists $Config->{ $name } )

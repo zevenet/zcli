@@ -515,7 +515,8 @@ sub geCmdProccessCallback
 		# if there isn't a path to download the file, it is used the same name
 		if ( !$success and ( $next_arg eq 'download_file' ) )
 		{
-			$input_parsed->{ download_file } = $input_args[-1];
+			$input_parsed->{ download_file } =
+			  &getDefaultDownloadFile( $obj_def, $input_args[-1] );
 			$success = 1;
 		}
 
