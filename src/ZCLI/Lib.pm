@@ -249,7 +249,7 @@ sub parseInput
 	my $autocomplete = shift;    # 'autocomplete' = 1, 'check' = 0
 	my @args         = @_;
 
-	die "The variable 'autocomplete' in the function 'parseInput is invalid"
+	die "The variable 'autocomplete' in the function 'parseInput' is invalid"
 	  if ( $autocomplete != 0 and $autocomplete != 1 );
 
 	my $steps = {
@@ -392,7 +392,8 @@ sub parseInput
 
 # Parsed is not complete if there aren't parameters in the cmd definition or input arguments
 			$parsed_completed = 0
-			  if ( !defined $input->{ params } and !defined $def->{ params } );
+			  if (     !defined $input->{ params }
+				   and !( defined $def->{ params } and %{ $def->{ params } } ) );
 		}
 	}
 
@@ -933,6 +934,45 @@ sub listParams
 	}
 
 	return $Env::Cmd_params_def;
+}
+
+=begin nd
+Function: refreshParameters
+
+	It checks if the input command has changed and lunch a listParams to refresh
+	the struct of expecting parameters.
+
+	The new input command is saved in the variable: $Env::Cmd_string
+
+Parametes:
+	Command object - It is an struct with the data to create a zcli command
+	Arguments - It is an array ref with the input arguments
+	Profile - It is a profile object with the information about connecting with the load balancer
+
+Returns:
+	none - .
+
+=cut
+
+sub refreshParameters
+{
+	my ( $obj_def, $args_parsed, $profile ) = @_;
+
+	&dev( "Checking refreshing paramters list" );
+
+	# command that is being executed
+	my $cmd_string = "$obj_def->{object} $obj_def->{action}";
+	$cmd_string .= " $_" for ( @{ $args_parsed->{ id } } );
+
+	# get list or refreshing the parameters list
+	if ( $Env::Cmd_string eq '' or $Env::Cmd_string ne $cmd_string )
+	{
+		&dev( "Executing refreshing paramters list" );
+		&listParams( $obj_def, $args_parsed, $profile );
+
+		# refresh values
+		$Env::Cmd_string = $cmd_string;
+	}
 }
 
 =begin nd

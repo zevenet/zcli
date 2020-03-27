@@ -522,6 +522,10 @@ sub geCmdProccessCallback
 
 		unless ( $success )
 		{
+			&dev( "The parameter list is not complete" );
+
+			&refreshParameters( $obj_def, $input_parsed, $Env::Profile );
+
 			my $desc      = &getCmdDescription( $obj_def );
 			my $missing_p = &getMissingParam( $desc, \@input_args );
 
@@ -535,10 +539,6 @@ sub geCmdProccessCallback
 					"Some parameters are missing, it failed getting '$missing_p'. The expected syntax is:"
 				);
 			}
-
-			# force reload if params does not exist
-			&listParams( $obj_def, $input_parsed, $Env::Profile )
-			  if ( !defined $Env::Cmd_params_def );
 
 			if ( defined $Env::Cmd_params_def )
 			{
@@ -648,23 +648,12 @@ sub completeArgsBodyParams
 	my ( $obj_def, $args_parsed, $args_used, $arg_previus, $id_tree ) = @_;
 	my $out;
 
-	# command that is being executing
-	my $cmd_string = "$obj_def->{object} $obj_def->{action}";
-	$cmd_string .= " $_" for ( @{ $args_parsed->{ id } } );
+	&refreshParameters( $obj_def, $args_parsed, $Env::Profile );
 
 	# get the previous completed parameter that was used
 	my $previus_param = $arg_previus;
 	$previus_param =~ s/^-//;
 
-	# get list or refreshing the parameters list
-	if ( $Env::Cmd_string eq '' or $Env::Cmd_string ne $cmd_string )
-	{
-		$Env::Zcli->completemsg( "  ## Refreshing params\n" ) if ( $Global::Debug );
-		&listParams( $obj_def, $args_parsed, $Env::Profile );
-
-		# refresh values
-		$Env::Cmd_string = $cmd_string;
-	}
 	my $p_obj = $Env::Cmd_params_def;
 
 	$Env::Zcli->completemsg( "  ## prev: $p_obj->{ $previus_param }\n" )
