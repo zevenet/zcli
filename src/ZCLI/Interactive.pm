@@ -748,7 +748,7 @@ sub getIdNext
 		my @values = keys %{ $nav_tree };
 		if ( !@values )
 		{
-			$Env::Zcli->completemsg( "  ## There is no any '$key'\n" );
+			$Env::Zcli->completemsg( "  ## There is not any '$key'\n" );
 		}
 
 		return \@values;
