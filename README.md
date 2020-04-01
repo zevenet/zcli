@@ -13,14 +13,6 @@ ZCLI is a wrapper of the ZAPI (Zevenet Application Programming Interface), it ha
 
 The ZCLI user guide is in the following link, [guide](????).
 
-The ZCLI help is available through the command: `zcli help`.
-
-
-# How to install
-
-ZCLI is available in the Zevenet APT repositories (Debian users can check the [zlb](https://github.com/zevenet/zlb) project to get the sources). It can be downloaded in a Zevenet load balancer using:
-
-`apt-get update && apt-get install zcli`
 
 
 
