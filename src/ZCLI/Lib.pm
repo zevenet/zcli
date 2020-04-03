@@ -603,7 +603,9 @@ sub getLBIdsTree
 	elsif ( $resp->{ 'json' }->{ 'params' } )
 	{
 		$tree = $resp->{ 'json' }->{ 'params' };
+
 		$tree->{ 'monitoring' }->{ 'fg' } = $tree->{ 'farmguardians' };
+		$tree->{ 'stats' }->{ 'farms' }   = $tree->{ 'farms' };
 	}
 
 	return $tree;
