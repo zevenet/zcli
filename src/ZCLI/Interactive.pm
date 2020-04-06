@@ -701,6 +701,9 @@ sub completeArgsBodyParams
 			# not show the parameters that are predefined
 			next if ( exists $obj_def->{ params }->{ $p } );
 
+			# not show parameters that expects arrays or hashes values
+			next if ( exists $Env::Cmd_params_def->{ $p }->{ ref } );
+
 			push @params, "-$p" if ( !grep ( /^-$p$/, @{ $args_used } ) );
 		}
 
