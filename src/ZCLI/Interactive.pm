@@ -536,7 +536,7 @@ sub geCmdProccessCallback
 			else
 			{
 				&printError(
-					"Some parameters are missing, it failed getting '$missing_p'. The expected syntax is:"
+					"Some parameters are missing, it failed getting $missing_p. The expected syntax is:"
 				);
 			}
 

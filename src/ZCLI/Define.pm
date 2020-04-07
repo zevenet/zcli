@@ -72,7 +72,7 @@ package Define;
 our $Profile_local = "localhost"
   ; # it is the reserve word to automaticaly modify the conf when zcli is running in a load balancer
 our $Zapi_doc_uri      = "https://www.zevenet.com/zapidocv4.0/";
-our $Description_param = "[-param_1 value] [-param_2 value] ...";
+our $Description_param = "[-param_1 value] [-param_2 value]";
 our $L4_service        = "default_service";
 
 # object keys
