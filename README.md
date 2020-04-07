@@ -1,4 +1,5 @@
 
+
 # What is ZCLI
 
 ZCLI is the acronym of Zevenet Command Line Interface. This tool allows managing multiple load balancers from a command line or automatizes load balancer actions in the operation scripts.
@@ -15,21 +16,22 @@ The ZCLI user guide is in the following link, [guide](????).
 
 
 
+## How to install
+
+Downloading the code:
+
+`git clone https://github.com/zevenet/zcli`
+
+Installing depencencies and deploying in the system:
+
+`cd zcli && sudo ./install.sh`
 
 
-# How to build
+## How to update
 
-Those are the perl modules dependencies and the steps to create the package for different distributions.
+The way to update the code is getting the last changes of the git repository:
 
-## CPAN dependencies
-
-`cpan install JSON Term::Shell Hash::Merge LWP::Protocol::Https Term::ShellUI Config::Tiny IO:Socket:Ssl JSON::Color IO::Pager`
-
-
-## Debian
-
-- Install cpan dependences.
-- Execute **gen_pkg.sh** script: `./gen_pkg.sh`
+`git pull`
 
 
 ## Windows

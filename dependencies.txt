@@ -1,0 +1,1 @@
+JSON Term::Shell Hash::Merge LWP::Protocol::Https Term::ShellUI Config::Tiny IO:Socket:SSL JSON::Color IO::Pager
