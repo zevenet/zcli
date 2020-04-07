@@ -136,9 +136,15 @@ our $Farms = {
 									   enterprise => 1,
 						},
 						$V{ REMOVE } => {
-										  uri => "/farms/<$K{FARM}>/sessions/<$K{SESSION}>",
-										  method     => 'DELETE',
-										  enterprise => 1,
+								 uri => "/farms/<$K{FARM}>/sessions/$Define::Uri_param_tag",
+								 param_uri => [
+											   {
+												 name => "session",
+												 desc => "session to delete",
+											   },
+								 ],
+								 method     => 'DELETE',
+								 enterprise => 1,
 						},
 						$V{ LIST } => {
 										uri        => "/farms/<$K{FARM}>/sessions",
