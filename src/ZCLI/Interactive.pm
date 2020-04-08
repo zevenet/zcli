@@ -266,6 +266,26 @@ sub createZcliCmd
 	$st->{ $V{ QUIT } }->{ exclude_from_history } = 1;
 	$st->{ $V{ QUIT } }->{ maxargs }              = 0;
 
+	$st->{ profile } = &createCmdObjectProfile();
+
+	return $st;
+}
+
+=begin nd
+Function: createCmdObjectProfile
+
+	It creates a struct with profile command object
+
+Parametes:
+	none - .
+
+Returns:
+	Hash ref - object to expand the profile command
+
+=cut
+
+sub createCmdObjectProfile
+{
 	my $profile_st;
 	my @profile_list = &listProfiles();
 	$profile_st->{ $V{ LIST } }->{ proc } = sub {
@@ -279,11 +299,16 @@ sub createZcliCmd
 
 	};
 	$profile_st->{ $V{ LIST } }->{ maxargs } = 1;
-	$profile_st->{ $V{ CREATE } }->{ proc }  = sub {
+	$profile_st->{ $V{ LIST } }->{ desc }    = "It lists the ZCLI saved profiles";
+
+	$profile_st->{ $V{ CREATE } }->{ proc } = sub {
 		my $out = &setProfile;
 		( !defined $out );
 	};
 	$profile_st->{ $V{ CREATE } }->{ maxargs } = 1;
+	$profile_st->{ $V{ CREATE } }->{ desc } =
+	  "It executes the profile creation assistant";
+
 	$profile_st->{ $V{ SET } } = {
 		args    => [sub { \@profile_list }],
 		maxargs => 1,
@@ -300,7 +325,10 @@ sub createZcliCmd
 
 			( $err );
 		},
+		desc =>
+		  "It modifies the parameters of a profile to connect with the load balancer",
 	};
+
 	$profile_st->{ $V{ DELETE } } = {
 		proc => sub {
 			if ( $Env::Profile->{ name } eq $_[0] )
@@ -314,7 +342,9 @@ sub createZcliCmd
 		},
 		args    => [sub { \@profile_list }],
 		maxargs => 1,
+		desc    => "It removes a load balancer profile from ZCLI",
 	};
+
 	$profile_st->{ $V{ APPLY } } = {
 		proc => sub {
 			my $prof = $_[0];
@@ -330,12 +360,15 @@ sub createZcliCmd
 		},
 		args    => [sub { \@profile_list }],
 		maxargs => 1,
+		desc    => "It changes the current profile",
 	};
-	$st->{ profile }->{ desc } =
-	  "apply an action about which is the destination load balancer";
-	$st->{ profile }->{ cmds } = $profile_st;
 
-	return $st;
+	my $cmd = {};
+	$cmd->{ desc } =
+	  "It applies an action about which is the destination load balancer";
+	$cmd->{ cmds } = $profile_st;
+
+	return $cmd;
 }
 
 =begin nd
