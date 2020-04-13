@@ -145,6 +145,8 @@ Parameters:
 
   Parameters are set using a key and value combination. The key name is set using the character '-' previously to the name, followed by the value. An example is: -vip 192.168.100.100 -vport 80, where vip and vport are parameter keys and 192.168.100.100 and 80 are parameter values.
 
+  The parameter '-filter' can be used in the actions 'list' and 'get' in order to filter the output command and get only a list of determinated parameters (see the below examples section).
+
 
 EXAMPLES:
   # The following command sets the virtual port 53 and the virtual IP 10.0.0.20 in a farm named gslbfarm
@@ -157,6 +159,8 @@ EXAMPLES:
   # The following command sets the same action than previously but in JSON format.
   	> zcli -j network-virtual create '{\"name\":\"eth0:srv\",\"ip\":\"192.168.100.32\"}'
 
+  # The following command shows only the paramters farmname and status in the farm list
+  	> zcli farm list -filter farmname,status
 
 PROFILES:
   ZCLI can store several load balancer profiles. Each profile contains information about the load balancer network settings and the connection credentials (user's ZAPI key). This information is saved in the file ‘$Global::Config_dir’, the user home directory.
@@ -257,6 +261,7 @@ sub parseInput
 				  param_uri     => 'param_uri',
 				  download_file => 'download_file',
 				  upload_file   => 'upload_file',
+				  output_filter => 'output_filter',
 				  param_body    => 'param_body',
 				  end           => 'end',
 	};
@@ -272,6 +277,7 @@ sub parseInput
 				  param_uri     => [],
 				  download_file => undef,
 				  upload_file   => undef,
+				  output_filter => undef,
 				  params        => undef,
 	};
 
@@ -343,6 +349,35 @@ sub parseInput
 
 	my $final_step = $steps->{ end };
 	$parsed_completed = 1;
+
+	# output cmd
+	@Env::OutputFilter = ();
+	if ( $def->{ action } =~ /^(?:$Define::Actions{LIST}|$Define::Actions{GET})$/ )
+	{
+		$final_step = $steps->{ output_filter };
+
+		my $param = shift @args;
+		if ( defined $param and $param ne '' )
+		{
+			if ( $param eq $Define::Options{ FILTER } )
+			{
+				$parsed_completed = 0;
+
+				my $str = shift @args;
+				if ( !$str or !defined $str )
+				{
+					&dev( "Error parsing filter" );
+				}
+				else
+				{
+					@Env::OutputFilter        = split ( ',', $str );
+					$input->{ output_filter } = \@Env::OutputFilter;
+					$parsed_completed         = 1;
+					$final_step               = $steps->{ end };
+				}
+			}
+		}
+	}
 
 	if (     !exists $def->{ 'upload_file' }
 		 and !exists $def->{ 'download_file' }
@@ -1045,7 +1080,11 @@ sub printOutput
 			&printSuccess( "$resp->{txt}", 0 );
 		}
 
-		if ( %{ $resp->{ json } } )
+		if ( @Env::OutputFilter )
+		{
+			$resp->{ json } = &filterHashParams( $resp->{ json }, \@Env::OutputFilter );
+		}
+		if ( defined $resp->{ json } and %{ $resp->{ json } } )
 		{
 			delete $resp->{ msg } if exists $resp->{ msg };
 			my $json_enc = "";
@@ -1101,6 +1140,58 @@ sub printOutput
 			&printSuccess( "$json_enc", 0 ) if ( $json_enc );
 		}
 	}
+}
+
+=begin nd
+Function: filterHashParams
+
+	This funtion filters a hash keeping only the wanted hash keys.
+	It will keep the hash struct (arrays ref and nest hashes).
+
+Parametes:
+	input hash - It is a hash reference that is going to be filtered.
+	keys - It is an array reference with the keys to filter.
+
+Returns:
+	Hash ref - It is the input hash only with the wanted keys.
+
+=cut
+
+sub filterHashParams
+{
+	my $in   = shift;
+	my $keys = shift;
+	my $out;
+
+	foreach my $k ( keys %{ $in } )
+	{
+		if ( grep ( /^$k$/, @{ $keys } ) )
+		{
+			$out->{ $k } = $in->{ $k };
+		}
+		elsif ( ref $in->{ $k } eq 'HASH' )
+		{
+			my $var = &filterHashParams( $in->{ $k }, $keys );
+			$out->{ $k } = $var if ( defined $var );
+		}
+		elsif ( ref $in->{ $k } eq 'ARRAY' )
+		{
+			foreach my $it ( @{ $in->{ $k } } )
+			{
+				if ( ref $it eq 'HASH' )
+				{
+					my $var = &filterHashParams( $it, $keys );
+					if ( defined $var )
+					{
+						$out->{ $k } = [] if !exists $out->{ $k };
+						push @{ $out->{ $k } }, $var;
+					}
+				}
+			}
+		}
+	}
+
+	return $out;
 }
 
 =begin nd

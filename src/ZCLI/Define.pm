@@ -39,9 +39,11 @@ our $Profiles_path = "$Config_dir/profiles.ini";
 our $Connectivity = 1;    # It is the result of a connectivity test with the lb
 
 package Env;
-our $Input_json = 0;    # It is the execution options to run without interactive
-our $Silence    = 0;    # It is the execution options to run without interactive
-our $Color      = 1;    # It is the execution options to run without interactive
+our $Input_json   = 0;  # It is the execution options to run without interactive
+our @OutputFilter = ()
+  ; # it is an array reference with the parameters that must be listed in the output
+our $Silence = 0;    # It is the execution options to run without interactive
+our $Color   = 1;    # It is the execution options to run without interactive
 our $Profile;    # It is a struct with info to connect with the load balancer
 our $Profile_ids_tree
   ;              # It is the tree with the IDs that the load balancer contains
@@ -74,6 +76,8 @@ our $Profile_local = "localhost"
 our $Zapi_doc_uri      = "https://www.zevenet.com/zapidocv4.0/";
 our $Description_param = "[params list]";
 our $L4_service        = "default_service";
+
+our %Options = ( FILTER => '-filter', );
 
 # object keys
 our %Keys = (
