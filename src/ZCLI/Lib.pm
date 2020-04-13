@@ -1101,7 +1101,6 @@ sub printOutput
 			&printSuccess( "$json_enc", 0 ) if ( $json_enc );
 		}
 	}
-	&printSuccess( "" );    # extra new line
 }
 
 =begin nd
