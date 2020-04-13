@@ -500,7 +500,7 @@ sub getMissingParam
 Function: getCmdArgsNum
 
 	It calculates the number of expected arguments for a command.
-	This function is only valid for GET methods
+	This function is only valid for GET and DELETE methods
 
 Parametes:
 	object struct - It is a hash ref with the required argments for the command
@@ -519,6 +519,9 @@ sub getCmdArgsNum
 	$num += 2;                                 # the object and the action
 	$num += scalar &getIds( $def->{ uri } );
 	$num += scalar @{ $def->{ param_uri } } if ( exists $def->{ param_uri } );
+
+	# a filter was added
+	$num += 2 if ( @Env::OutputFilter );
 
 	return $num;
 }
@@ -561,6 +564,14 @@ sub geCmdProccessCallback
 		{
 			&dev( "The parameter list is not complete" );
 
+			if ( $next_arg eq 'output_filter' )
+			{
+				&printError(
+					"The output filter is empty. It expects a parameter list to filter, i.e. 'name,status'."
+				);
+				die $Global::Fin;
+			}
+
 			&refreshParameters( $obj_def, $input_parsed, $Env::Profile );
 
 			my $desc      = &getCmdDescription( $obj_def );
@@ -598,7 +609,7 @@ sub geCmdProccessCallback
 			die $Global::Fin;
 		}
 
-		# do not allow sending extra arguments using GET methods
+		# do not allow sending extra arguments using GET or DELETE methods
 		if ( $obj_def->{ method } =~ /^(?:GET|DELETE)$/
 			 and ( scalar ( @input_args ) > &getCmdArgsNum( $obj_def ) ) )
 		{
@@ -643,7 +654,7 @@ sub getCmdArgsCallBack
 	# get the previous completed parameter that was used
 	my $arg_previus = $args_used[$input->{ argno } - 1];
 
-	my ( $args_parsed, $next_arg ) =
+	my ( $args_parsed, $next_arg, $success ) =
 	  &parseInput( $obj_def, 1,
 				   $obj_def->{ object },
 				   $obj_def->{ action }, @args_used );
@@ -663,12 +674,22 @@ sub getCmdArgsCallBack
 	{
 		$possible_values = shift->complete_files( $input );
 	}
-
 	elsif ( $next_arg eq 'param_body' )
 	{
 		$possible_values =
 		  &completeArgsBodyParams( $obj_def,     $args_parsed, \@args_used,
 								   $arg_previus, $id_tree );
+	}
+	elsif ( $next_arg eq 'output_filter' )
+	{
+		if ( $arg_previus ne $Define::Options{ FILTER } )
+		{
+			$possible_values = [$Define::Options{ FILTER }];
+		}
+		else
+		{
+			$possible_values = "<item1[,item2]>";
+		}
 	}
 
 	# fin
