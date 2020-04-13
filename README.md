@@ -144,11 +144,17 @@ Module key used in ZCLI commands
                 desc => "the name which the backup will be saved",
             },
         ],
+
         # 'params' is a hash with pre-defined parameters. They are useful to create macros of command that does not need to modify
         #      its values as 'restart', 'stop'... Each element of this hash uses as key the parameter name and as value the value name.
         params => {
             'action' => 'stop',
         }
+
+        # Optional parameters is a hash with API request parameters and the list of possible values.
+        params_opt => {
+			mode => ['drain','cut']
+        },
 
         # The option 'enterprise' is set to '1' when that call is exclusive of EE
         enterprise => 1,
