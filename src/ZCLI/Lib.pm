@@ -940,6 +940,16 @@ sub listParams
 		}
 	}
 
+	# Add options defined in the cmd object
+	if ( defined $obj_def->{ params_opt } )
+	{
+		foreach my $p ( keys %{ $obj_def->{ params_opt } } )
+		{
+			$Env::Cmd_params_def->{ $p }->{ possible_values } =
+			  $obj_def->{ params_opt }->{ $p };
+		}
+	}
+
 	return $Env::Cmd_params_def;
 }
 

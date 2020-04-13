@@ -117,8 +117,10 @@ our $Farms = {
 				method => 'PUT',
 				params => {
 							action => 'maintenance',
-							mode   => 'drain',
-				}
+				},
+				params_opt => {
+								mode => ['drain', 'cut'],
+				},
 		},
 		$V{ NON_MAINTENANCE } => {
 				uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/backends/<$K{BK}>/maintenance",
