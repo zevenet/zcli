@@ -56,6 +56,18 @@ our $System = {
 										  enterprise => 1,
 						  },
 	 },
+	 'system-global' => {
+						  $V{ GET } => {
+										 uri        => "/system/global",
+										 method     => 'GET',
+										 enterprise => 1,
+						  },
+						  $V{ SET } => {
+										 uri        => "/system/global",
+										 method     => 'POST',
+										 enterprise => 1,
+						  },
+	 },
 	 'system-user' => {
 						$V{ GET } => {
 									   uri    => "/system/users",
