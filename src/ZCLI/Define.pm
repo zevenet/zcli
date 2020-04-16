@@ -24,21 +24,12 @@
 use strict;
 use warnings;
 
-package Global;
+use File::HomeDir;
+use File::Spec;
 
-our $Version = "1.0.1";
-our $Debug   = 0;
-our $Fin = ( $Debug ) ? "" : "\n";  # This will add the dying line in debug mode
-
-our $Req_ee_zevenet_version = "6.1";
-our $Req_ce_zevenet_version = "5.10.3";
-
-our $Config_dir    = "$ENV{HOME}/.zcli";
-our $History_path  = "$Config_dir/zcli-history";
-our $Profiles_path = "$Config_dir/profiles.ini";
-our $Connectivity = 1;    # It is the result of a connectivity test with the lb
 
 package Env;
+our $OS = ($^O=~/win/i) ? 'win' : "linux";	# It is the SO where the ZCLI is running
 our $Input_json   = 0;  # It is the execution options to run without interactive
 our @OutputFilter = ()
   ; # it is an array reference with the parameters that must be listed in the output
@@ -58,17 +49,38 @@ our $Cmd_string = ''
   ; # It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded.
     # This string contains the string without the parameters
 
+
+package Global;
+
+our $Version = "1.0.1";
+our $Debug   = 0;
+our $Fin = ( $Debug ) ? "" : "\n";  # This will add the dying line in debug mode
+
+our $Req_ee_zevenet_version = "6.1";
+our $Req_ce_zevenet_version = "5.10.3";
+
+my $home = File::HomeDir->my_home;
+
+our $Config_dir    = File::Spec->catdir( $home, ".zcli" );
+our $History_path  = File::Spec->catdir( $home, "zcli-history" );
+our $Profiles_path = File::Spec->catdir( $home, "profiles.ini" );
+our $Connectivity = 1;    # It is the result of a connectivity test with the lb
+
+
 package Color;
 
 # the strings '\001' and '\002' are used to avoid garbage in the prompt line
 # when a histroy command is recovered
+
 our $Init  = "\001";
 our $End   = "\002";
+
 our $Gray  = "\033[01;90m";
 our $Red   = "\033[01;31m";
 our $Green = "\033[01;32m";
 our $Clean = "\033[0m";
 our $Reset = "$Init\033[0m$End";
+
 
 package Define;
 our $Profile_local = "localhost"
