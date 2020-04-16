@@ -27,9 +27,9 @@ use warnings;
 use File::HomeDir;
 use File::Spec;
 
-
 package Env;
-our $OS = ($^O=~/win/i) ? 'win' : "linux";	# It is the SO where the ZCLI is running
+our $OS =
+  ( $^O =~ /win/i ) ? 'win' : "linux";  # It is the SO where the ZCLI is running
 our $Input_json   = 0;  # It is the execution options to run without interactive
 our @OutputFilter = ()
   ; # it is an array reference with the parameters that must be listed in the output
@@ -49,7 +49,6 @@ our $Cmd_string = ''
   ; # It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded.
     # This string contains the string without the parameters
 
-
 package Global;
 
 our $Version = "1.0.1";
@@ -61,26 +60,66 @@ our $Req_ce_zevenet_version = "5.10.3";
 
 my $home = File::HomeDir->my_home;
 
-our $Config_dir    = File::Spec->catdir( $home, ".zcli" );
-our $History_path  = File::Spec->catdir( $home, "zcli-history" );
-our $Profiles_path = File::Spec->catdir( $home, "profiles.ini" );
+our $Config_dir    = File::Spec->catdir( $home,       ".zcli" );
+our $History_path  = File::Spec->catdir( $Config_dir, "zcli-history" );
+our $Profiles_path = File::Spec->catdir( $Config_dir, "profiles.ini" );
 our $Connectivity = 1;    # It is the result of a connectivity test with the lb
-
 
 package Color;
 
 # the strings '\001' and '\002' are used to avoid garbage in the prompt line
 # when a histroy command is recovered
 
-our $Init  = "\001";
-our $End   = "\002";
+use Term::ANSIColor qw(:constants);
+use Term::ANSIColor qw(:constants256);
 
-our $Gray  = "\033[01;90m";
-our $Red   = "\033[01;31m";
-our $Green = "\033[01;32m";
-our $Clean = "\033[0m";
-our $Reset = "$Init\033[0m$End";
+my $Gray  = "\033[01;90m";
+my $Red   = "\033[01;31m";
+my $Green = "\033[01;32m";
 
+my $Zgreen = RGB150;
+my $Zgray  = RGB444;
+
+our $Init = "\001";
+our $End  = "\002";
+
+our $Clean = RESET;
+our $Reset = "$Init$Clean$End";
+
+# logo
+our $Logo = $Green;
+
+# prompt
+our $Error      = $Red;
+our $Success    = $Green;
+our $Disconnect = $Gray;
+
+# json
+my $Json_key    = $Zgray;
+my $Json_string = $Zgreen;
+my $Json_number = BRIGHT_YELLOW;
+my $Json_null   = BRIGHT_CYAN;
+
+our %Json = (
+		   start_quote             => $Json_string,
+		   end_quote               => $Clean,
+		   start_string            => $Json_string,
+		   end_string              => $Clean,
+		   start_string_escape     => $Clean . $Json_string,
+		   end_string_escape       => $Clean . $Json_string,    # back to string
+		   start_number            => $Json_number,
+		   end_number              => $Clean,
+		   start_bool              => $Json_null,
+		   end_bool                => $Clean,
+		   start_null              => BOLD . $Json_null,
+		   end_null                => $Clean,
+		   start_object_key        => $Json_key,
+		   end_object_key          => $Clean,
+		   start_object_key_escape => BOLD,
+		   end_object_key_escape   => $Clean . $Json_key,       # back to object key
+		   start_linum             => REVERSE . WHITE,
+		   end_linum               => $Clean,
+);
 
 package Define;
 our $Profile_local = "localhost"

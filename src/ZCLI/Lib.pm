@@ -518,7 +518,7 @@ sub parseOptions
 	$Global::Debug   = $opt_st->{ 'debug' } if exists $opt_st->{ 'debug' };
 	$Env::Silence    = 1                    if exists $opt_st->{ silence };
 	$Env::Input_json = 1                    if exists $opt_st->{ json };
-	$Env::Color      = 0                    if exists $opt_st->{ nocolor } or $Env::OS eq 'win';
+	$Env::Color = 0 if exists $opt_st->{ nocolor } or $Env::OS eq 'win';
 
 	if ( %{ $opt_st } )
 	{
@@ -1099,39 +1099,7 @@ sub printOutput
 			{
 				eval {
 					require JSON::Color;
-					use Term::ANSIColor qw(:constants);
-					use Term::ANSIColor qw(:constants256);
-
-					my $zgreen = RGB150;
-					my $grey   = RGB444;
-
-					my $key    = $grey;
-					my $string = $zgreen;
-					my $number = BRIGHT_YELLOW;
-					my $null   = BRIGHT_CYAN;
-
-					my %color_scheme = (
-									 start_quote             => $string,
-									 end_quote               => RESET,
-									 start_string            => $string,
-									 end_string              => RESET,
-									 start_string_escape     => RESET . $string,
-									 end_string_escape       => RESET . $string,    # back to string
-									 start_number            => $number,
-									 end_number              => RESET,
-									 start_bool              => $null,
-									 end_bool                => RESET,
-									 start_null              => BOLD . $null,
-									 end_null                => RESET,
-									 start_object_key        => $key,
-									 end_object_key          => RESET,
-									 start_object_key_escape => BOLD,
-									 end_object_key_escape   => RESET . $key,       # back to object key
-									 start_linum             => REVERSE . WHITE,
-									 end_linum               => RESET,
-					);
-
-					%JSON::Color::theme = %color_scheme;
+					%JSON::Color::theme = %Color::Json;
 					$json_enc = JSON::Color::encode_json( $resp->{ json }, { pretty => 1 } );
 				};
 			}
@@ -1802,7 +1770,7 @@ Returns:
 
 sub isLoadBalancer
 {
-	return 0 if ($Env::OS eq 'win');
+	return 0 if ( $Env::OS eq 'win' );
 
 	my $cmd =
 	  'dpkg -l 2>/dev/null |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3';

@@ -103,7 +103,7 @@ sub createZcli
  /_____\\_____|______|_____|
 ";
 
-	$logo = "${Color::Green}$logo${Color::Clean}" if ($Env::Color);
+	$logo = "${Color::Logo}$logo${Color::Clean}" if ( $Env::Color );
 
 	my $welcome = "$logo
 
@@ -158,20 +158,20 @@ Returns:
 
 sub reloadPrompt
 {
-	my $err     = shift // 0;
+	my $err     = shift                   // 0;
 	my $profile = $Env::Profile->{ name } // "";
-	
-	if (!$Env::Color)
+
+	if ( !$Env::Color )
 	{
-		my $err_tag = ( $err ) ? 'x' : 'o'; 
+		my $err_tag = ( $err ) ? 'x' : 'o';
 		$Env::Zcli->prompt( "[$err_tag] zcli($profile): " );
 	}
 	else
 	{
-		my $conn    = $Env::Connectivity;
-		
-		my $color      = ( $err )   ? $Color::Red  : $Color::Green;
-		my $conn_color = ( !$conn ) ? $Color::Gray : "";
+		my $conn = $Env::Connectivity;
+
+		my $color      = ( $err )   ? $Color::Error      : $Color::Success;
+		my $conn_color = ( !$conn ) ? $Color::Disconnect : "";
 		$color      = $Color::Init . $color . $Color::End;
 		$conn_color = $Color::Init . $conn_color . $Color::End;
 
@@ -665,7 +665,7 @@ sub getCmdArgsCallBack
 	# get the previous completed parameter that was used
 	my $arg_previus = $args_used[$input->{ argno } - 1];
 
-	my ( $args_parsed, $next_arg, $success ) =
+	my ( $args_parsed, $next_arg, undef ) =
 	  &parseInput( $obj_def, 1,
 				   $obj_def->{ object },
 				   $obj_def->{ action }, @args_used );
