@@ -1,1 +1,3 @@
-JSON Term::Shell Hash::Merge LWP::Protocol::Https Term::ShellUI Config::Tiny IO:Socket:SSL JSON::Color IO::Pager
+common => JSON Term::Shell Hash::Merge LWP::Protocol::Https Term::ShellUI Config::Tiny IO:Socket:SSL JSON::Color IO::Pager
+linux =>  Term::ReadLine::Gnu
+windows => Term::ReadLine::Perl, PAR::Packer

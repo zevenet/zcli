@@ -25,6 +25,7 @@ use strict;
 use Data::Dumper;
 use feature "say";
 use POSIX qw(_exit);
+use File::Path qw(make_path);
 
 # https://metacpan.org/pod/Term::ShellUI
 use Term::ShellUI;
@@ -37,7 +38,7 @@ use ZCLI::Interactive;
 
 # Init!
 
-system ( "mkdir -p $Global::Config_dir" ) if ( !-d $Global::Config_dir );
+make_path ($Global::Config_dir) if ( !-d $Global::Config_dir );
 
 my $opt = &parseOptions( \@ARGV );
 
@@ -45,6 +46,7 @@ my $opt = &parseOptions( \@ARGV );
 
 # add local lb if it exists
 my $local_profile = &getProfile( $opt->{ 'profile' } );
+
 if ( &isLoadBalancer() )
 {
 	if ( !defined $local_profile )

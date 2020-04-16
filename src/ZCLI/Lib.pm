@@ -518,7 +518,7 @@ sub parseOptions
 	$Global::Debug   = $opt_st->{ 'debug' } if exists $opt_st->{ 'debug' };
 	$Env::Silence    = 1                    if exists $opt_st->{ silence };
 	$Env::Input_json = 1                    if exists $opt_st->{ json };
-	$Env::Color      = 0                    if exists $opt_st->{ nocolor };
+	$Env::Color      = 0                    if exists $opt_st->{ nocolor } or $Env::OS eq 'win';
 
 	if ( %{ $opt_st } )
 	{
@@ -1802,6 +1802,8 @@ Returns:
 
 sub isLoadBalancer
 {
+	return 0 if ($Env::OS eq 'win');
+
 	my $cmd =
 	  'dpkg -l 2>/dev/null |grep -E "\szevenet\s" | sed -E "s/ +/ /g" | cut -d " " -f3';
 	my $version = `$cmd`;

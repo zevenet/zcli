@@ -40,11 +40,14 @@ Steps to build:
 
 - Install Strawberry Perl for windows (It was tested with strawberry-perl-5.16.3.1-64bit.msi)
 - Install CPAN dependences adding the **pp** package
-- Build package (from the root repo directory) adding the **.exe** extension:
-`pp -c -m -x -I src/ -M ZCLI::Define -M ZCLI::Lib -M ZCLI::Objects -o zcli.exe src/zcli.pl`
+- Build package (from the src repo directory) adding the **.exe** extension:
+`dir zcli\src`
+`pp -c -x -o ..\zcli.exe zcli.pl`
 
 
-* These steps are based on the following links:*
+*The Term::ReadKey perl module was modified in the Windown host to delete a Carp message.*
+
+*These steps are based on the following links:*
 https://metacpan.org/pod/pp
 https://stackoverflow.com/questions/8055063/how-to-install-pp-par-packager
 

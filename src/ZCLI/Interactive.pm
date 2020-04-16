@@ -102,7 +102,10 @@ sub createZcli
   / /_| |____| |____ _| |_
  /_____\\_____|______|_____|
 ";
-	my $welcome = "${Color::Green}$logo${Color::Clean}
+
+	$logo = "${Color::Green}$logo${Color::Clean}" if ($Env::Color);
+
+	my $welcome = "$logo
 
 Welcome to the Zevenet Command Line Interface.
 
@@ -156,17 +159,25 @@ Returns:
 sub reloadPrompt
 {
 	my $err     = shift // 0;
-	my $conn    = $Env::Connectivity;
 	my $profile = $Env::Profile->{ name } // "";
+	
+	if (!$Env::Color)
+	{
+		my $err_tag = ( $err ) ? 'x' : 'o'; 
+		$Env::Zcli->prompt( "[$err_tag] zcli($profile): " );
+	}
+	else
+	{
+		my $conn    = $Env::Connectivity;
+		
+		my $color      = ( $err )   ? $Color::Red  : $Color::Green;
+		my $conn_color = ( !$conn ) ? $Color::Gray : "";
+		$color      = $Color::Init . $color . $Color::End;
+		$conn_color = $Color::Init . $conn_color . $Color::End;
 
-	my $color      = ( $err )   ? $Color::Red  : $Color::Green;
-	my $conn_color = ( !$conn ) ? $Color::Gray : "";
-	$color      = $Color::Init . $color . $Color::End;
-	$conn_color = $Color::Init . $conn_color . $Color::End;
-
-	my $tag = "zcli($conn_color$profile$color)";
-	$Env::Zcli->prompt( "${Color::Reset}$color$tag${Color::Reset}: " );
-
+		my $tag = "zcli($conn_color$profile$color)";
+		$Env::Zcli->prompt( "${Color::Reset}$color$tag${Color::Reset}: " );
+	}
 }
 
 =begin nd
