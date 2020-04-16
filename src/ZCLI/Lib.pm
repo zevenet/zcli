@@ -643,6 +643,8 @@ sub getLBIdsTree
 		$tree->{ 'stats' }->{ 'farms' }   = $tree->{ 'farms' };
 	}
 
+	&dev( Dumper( $tree ), 'ids tree', 2 );
+
 	return $tree;
 }
 
