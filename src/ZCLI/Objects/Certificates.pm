@@ -64,7 +64,7 @@ our $Certificates = {
 							  upload_file  => undef,
 							  param_uri    => [
 									  {
-										name => "name",
+										name => "name.pem",
 										desc => "the name which the certificate will be saved",
 									  },
 							  ],

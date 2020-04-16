@@ -227,7 +227,7 @@ our $Farms = {
 										uri    => "/farms/<$K{FARM}>/certificates",
 										method => 'POST',
 										params_autocomplete => {
-																 name => ['certificates'],
+																 file => ['certificates'],
 										},
 						 },
 						 $V{ MOVE } => {
