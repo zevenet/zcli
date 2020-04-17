@@ -79,7 +79,7 @@ sub createZcli
 	my @args = ();
 	if ( $Env::Silence )
 	{
-		&dev( "execute and exit", undef, 1 );
+		&devMsg( "execute and exit", undef, 1 );
 		@args = @ARGV;
 	}
 
@@ -573,7 +573,7 @@ sub geCmdProccessCallback
 
 		unless ( $success )
 		{
-			&dev( "The parameter list is not complete" );
+			&devMsg( "The parameter list is not complete" );
 
 			if ( $next_arg eq 'output_filter' )
 			{
@@ -635,7 +635,7 @@ sub geCmdProccessCallback
 		  &createZapiRequest( $obj_def, $input_parsed, $Env::Profile,
 							  $Env::Profile_ids_tree );
 
-		&dev( "calling zapi" );
+		&devMsg( "Do zapi request..." );
 		$resp = &zapi( $request, $Env::Profile );
 		$err  = $resp->{ err };
 
@@ -670,10 +670,11 @@ sub getCmdArgsCallBack
 				   $obj_def->{ object },
 				   $obj_def->{ action }, @args_used );
 
-	$Env::Zcli->completemsg( "  ## getting '$next_arg'\n" ) if ( $Global::Debug );
+	&devMsg( "getting '$next_arg'" );
 
 	if ( $next_arg eq 'id' )
 	{
+		&devMsg( "Getting the id list for $args_parsed->{ id }" );
 		$possible_values = &getIdNext( $obj_def, $id_tree, $args_parsed->{ id } );
 	}
 	elsif ( $next_arg eq 'param_uri' )
@@ -725,13 +726,10 @@ sub completeArgsBodyParams
 
 	my $p_obj = $Env::Cmd_params_def;
 
-	$Env::Zcli->completemsg( "  ## prev: $p_obj->{ $previus_param }\n" )
-	  if ( $Global::Debug );
-
 	# manage the 'value' of the parameter
 	if ( exists $p_obj->{ $previus_param } )
 	{
-		$Env::Zcli->completemsg( "  ## getting value\n" ) if ( $Global::Debug );
+		&devMsg( "getting the value for the key '$previus_param'" );
 		my $p_def = $p_obj->{ $previus_param };
 
 		# list the possible values
@@ -761,7 +759,7 @@ sub completeArgsBodyParams
 	# manage the 'key' of the parameter
 	else
 	{
-		$Env::Zcli->completemsg( "  ## getting key \n" ) if ( $Global::Debug );
+		&devMsg( "getting key" );
 
 		# remove the parameters already exists
 		my @params = ();
@@ -780,8 +778,7 @@ sub completeArgsBodyParams
 		if ( !@params )
 		{
 			@params = ();
-			$Env::Zcli->completemsg(
-									 "  ## This command does not expect more parameters\n" );
+			&printCompleteMsg( "This command does not expect more parameters" );
 		}
 
 		$out = \@params;
@@ -818,10 +815,7 @@ sub getIdNext
 		}
 
 		my @values = keys %{ $nav_tree };
-		if ( !@values )
-		{
-			$Env::Zcli->completemsg( "  ## There is not any '$key'\n" );
-		}
+		&printCompleteMsg( "There is not any '$key'" ) if ( !@values );
 
 		return \@values;
 	}
