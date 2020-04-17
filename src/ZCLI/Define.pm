@@ -122,9 +122,36 @@ our %Json = (
 );
 
 package Define;
-our $Profile_local = "localhost"
-  ; # it is the reserve word to automaticaly modify the conf when zcli is running in a load balancer
-our $Zapi_doc_uri      = "https://www.zevenet.com/zapidocv4.0/";
+
+# it is the ZAPI connection timeout
+our $Zapi_timeout = 8;
+
+# it is the reserve word to automaticaly modify the conf when zcli is running in a load balancer
+our $Profile_local = "localhost";
+
+# it is the zapi version that is configured when a new profile is added
+our $Default_zapi = "4.0";
+
+# it is the ZAPI documentation URL
+our $Zapi_doc_uri = "https://www.zevenet.com/zapidocv4.0/";
+
+# it is the configuration file of the load balancer http service
+our $LB_http_cfg = "/usr/local/zevenet/app/cherokee/etc/cherokee/cherokee.conf";
+
+# it is the IP directive of the http cfg file
+our $LB_http_ip_directive = 'server!bind!1!interface';
+
+# it is the port directive of the http cfg file
+our $LB_http_port_directive = 'server!bind!1!port';
+
+# it is the default port for lb http service
+our $LB_http_port = 444;
+
+# it is the default ip for lb http service
+our $LB_http_ip = "127.0.0.1";
+
+# those are constant strings to use in ZCLI
+our $Uri_param_tag     = "PARAM_URI";
 our $Description_param = "[params list]";
 our $L4_service        = "default_service";
 
@@ -186,8 +213,5 @@ our %Actions = (
 	RELOAD => 'reload',                    # Refresh a item or reload an object
 	QUIT   => 'quit',                      # exit from program
 );
-
-our $Uri_param_tag =
-  "PARAM_URI";    # is a tag used to replace a parameter of the uri
 
 1;

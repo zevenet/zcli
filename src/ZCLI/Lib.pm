@@ -394,7 +394,6 @@ sub parseInput
 				&printError( "Error decoding the input JSON" );
 				die $Global::Fin;
 			}
-
 		}
 		else
 		{
@@ -1323,7 +1322,7 @@ sub setProfile
 		my ( $localip, $localport ) = &getHttpServerConf();
 
 		$cfg = {
-			zapi_version => "4.0",
+			zapi_version => $Define::Default_zapi_version,
 			name         => $Define::Profile_local,
 			description =>
 			  "This profile is the root admin that is used to manage the current load balancer",
@@ -1445,7 +1444,7 @@ sub setProfile
 #			print ( "Invalid zapi version. It expects once of the following versions: 4.0\n" );
 #		}
 #	} while ( !$valid_flag );
-	$cfg->{ zapi_version } = "4.0";
+	$cfg->{ zapi_version } = $Define::Default_zapi_version;
 
 	# get a description
 	if ( $name ne $Define::Profile_local )
@@ -1704,27 +1703,21 @@ Returns:
 
 sub getHttpServerConf
 {
-	my $confhttp = "/usr/local/zevenet/app/cherokee/etc/cherokee/cherokee.conf";
-
-	# read line matching 'server!bind!1!port = 444'
-	my $ip_directive   = 'server!bind!1!interface';
-	my $port_directive = 'server!bind!1!port';
-
-	my $port = 444;
-	my $ip   = "127.0.0.1";
+	my $port = $Define::LB_http_port;
+	my $ip   = $Define::LB_http_ip;
 
 	my $params = 0;    # when 2 params have been found
-	open my $fh, "<", "$confhttp";
+	open my $fh, "<", $Define::LB_http_cfg;
 	while ( my $line = <$fh> )
 	{
-		if ( $line =~ /^\s*$ip_directive/ )
+		if ( $line =~ /^\s*$Define::LB_http_ip_directive/ )
 		{
 			$params++;
 			( undef, $ip ) = split ( "=", $line );
 			$ip =~ s/\s//g;
 			chomp ( $ip );
 		}
-		elsif ( $line =~ /^\s*$port_directive/ )
+		elsif ( $line =~ /^\s*$Define::LB_http_port_directive/ )
 		{
 			$params++;
 			( undef, $port ) = split ( "=", $line );
@@ -1765,7 +1758,7 @@ sub checkConnectivity
 						   PeerAddr => $profile->{ host },
 						   PeerPort => $profile->{ port },
 						   Proto    => 'tcp',
-						   Timeout  => 8
+						   Timeout  => $Define::Zapi_timeout
 	  )
 	  or do
 	{
