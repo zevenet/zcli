@@ -35,9 +35,13 @@ use ZCLI::Objects;
 ## Global functions
 
 =begin nd
-Function: dev
+Function: devMsg
 
 	Function to print debug messages.
+
+	lvl 1. It prints messages and light variables (not array or hashes)
+	lvl 2. It prints zapi requests
+	lvl 3. It prints structs
 
 Parametes:
 	String - String to print. Use 'Dumper($ref)' to print the value of a reference
@@ -49,7 +53,7 @@ Returns:
 
 =cut
 
-sub dev
+sub devMsg
 {
 	my $st  = shift;
 	my $tag = shift;
@@ -57,20 +61,17 @@ sub dev
 
 	chomp ( $st );
 
+	#~ $st .= "\n###### " if ($st =~ /\n/);
+
 	return if ( $lvl > $Global::Debug );
 
-	say "";
-	if ( $tag )
-	{
-		say ">>>> $tag >>>>";
-	}
-	else
-	{
-		say ">>>> Debug >>>>";
-	}
-	print "$st\n";
-	say "<<<<<<<<<<<<<<< ";
-	say "";
+	my $msg = "# Debug $lvl";
+	$msg .= ", $tag" if defined ( $tag );
+	$msg .= ": $st";
+
+	&printMsg( "$msg" );
+
+	#~ &printCompleteMsg( $msg );
 }
 
 =begin nd
@@ -366,7 +367,7 @@ sub parseInput
 				my $str = shift @args;
 				if ( !$str or !defined $str )
 				{
-					&dev( "Error parsing filter" );
+					&devMsg( "Error parsing filter" );
 				}
 				else
 				{
@@ -417,10 +418,7 @@ sub parseInput
 				elsif ( $param_flag )
 				{
 					$parsed_completed = 0;
-					&printError(
-						"Error parsing the parameters. The parameters have to have the following format:"
-					);
-					&printError( "  $Define::Description_param" );
+					&printCompleteMsg( "The '$args[$ind]' argument is not expected" );
 					return ( $input, $final_step, $parsed_completed );
 				}
 			}
@@ -432,8 +430,32 @@ sub parseInput
 		}
 	}
 
-	&dev( Dumper( $input ), 'input parsed', 2 );
+	&devMsg( Dumper( $input ), 'input parsed', 2 );
 	return ( $input, $final_step, $parsed_completed );
+}
+
+=begin nd
+Function: printCompleteMsg
+
+	It prints useful information aboute the command when the user is pressing 'tab' to autocomplete.
+
+Parametes:
+	Message - It is an string with the message to print
+
+Returns:
+	none - .
+
+=cut
+
+sub printCompleteMsg
+{
+	my $msg = shift;
+	my $tag = "  ## ";
+
+	if ( defined $Env::Zcli )
+	{
+		$Env::Zcli->completemsg( "$tag$msg\n" );
+	}
 }
 
 =begin nd
@@ -522,7 +544,7 @@ sub parseOptions
 
 	if ( %{ $opt_st } )
 	{
-		&dev( Dumper( $opt_st ), "Execution options: " );
+		&devMsg( Dumper( $opt_st ), "Execution options: " );
 	}
 
 	return $opt_st;
@@ -595,7 +617,7 @@ sub createZapiRequest
 		}
 	}
 
-	&dev( Dumper( $call ), "request sumary", 2 );
+	&devMsg( Dumper( $call ), "request sumary", 2 );
 
 	return $call;
 }
@@ -643,7 +665,7 @@ sub getLBIdsTree
 		$tree->{ 'stats' }->{ 'farms' }   = $tree->{ 'farms' };
 	}
 
-	&dev( Dumper( $tree ), 'ids tree', 2 );
+	&devMsg( Dumper( $tree ), 'ids tree', 2 );
 
 	return $tree;
 }
@@ -716,7 +738,8 @@ sub zapi
 	my $arg     = shift;
 	my $profile = shift;
 
-	&dev( Dumper( $arg ), 'req', 2 );
+	&devMsg( "Do zapi request..." );
+	&devMsg( Dumper( $arg ), 'request', 2 );
 
 	# This is a workaround to manage l4 and datalink services.
 	$arg->{ uri } =~ s|/services/$Define::L4_service/|/|m;
@@ -771,7 +794,7 @@ sub zapi
 	my $ua       = &getUserAgent();
 	my $response = $ua->request( $request );
 
-	#~ &dev( Dumper( $response ), 'HTTP response', 1 );
+	&devMsg( Dumper( $response ), 'response', 2 );
 
 	my $txt;
 	my $json_dec;
@@ -1012,7 +1035,7 @@ sub refreshParameters
 {
 	my ( $obj_def, $args_parsed, $profile ) = @_;
 
-	&dev( "Checking refreshing paramters list" );
+	&devMsg( "Checking refreshing paramters list" );
 
 	# command that is being executed
 	my $cmd_string = "$obj_def->{object} $obj_def->{action}";
@@ -1021,7 +1044,7 @@ sub refreshParameters
 	# get list or refreshing the parameters list
 	if ( $Env::Cmd_string eq '' or $Env::Cmd_string ne $cmd_string )
 	{
-		&dev( "Executing refreshing paramters list" );
+		&devMsg( "Executing refreshing paramters list" );
 		&listParams( $obj_def, $args_parsed, $profile );
 
 		# refresh values
@@ -1052,7 +1075,7 @@ sub printOutput
 {
 	my $resp = shift;
 
-	&dev( Dumper( $resp ), "responsed json", 2 );
+	&devMsg( Dumper( $resp ), "responsed json", 3 );
 
 	if ( exists $resp->{ json }->{ description } )
 	{
@@ -1105,7 +1128,7 @@ sub printOutput
 					$json_enc = JSON::Color::encode_json( $resp->{ json }, { pretty => 1 } );
 				};
 			}
-			&dev( $@ ) if ( $@ );
+			&devMsg( $@ ) if ( $@ );
 
 			&printSuccess( "$json_enc", 0 ) if ( $json_enc );
 		}
@@ -1652,7 +1675,7 @@ sub getProfile
 		$profile_name = $Config->{ _ }->{ default_profile };
 		if ( !defined $profile_name )
 		{
-			&dev( "Warning, there is no default profile set\n" );
+			&devMsg( "Warning, there is no default profile set" );
 			return undef;
 		}
 	}
