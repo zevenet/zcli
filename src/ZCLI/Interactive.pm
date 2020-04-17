@@ -489,7 +489,21 @@ sub getCmdDescription
 	return $msg;
 }
 
-sub getMissingParam
+=begin nd
+Function: getMissingArgument
+
+	It returns the first mandatory argument that is missing in the command
+
+Parametes:
+	Description - It is the command description. It is a string with the command syntaxsis.
+	Input argmument - It is the list of arguments used in the command.
+
+Returns:
+	String - It returns the argument name that is missing with the same name that it appears in the description. It returns undef if the argument name cannot be found.
+
+=cut
+
+sub getMissingArgument
 {
 	my ( $desc, $input_args ) = @_;
 
@@ -586,7 +600,7 @@ sub geCmdProccessCallback
 			&refreshParameters( $obj_def, $input_parsed, $Env::Profile );
 
 			my $desc      = &getCmdDescription( $obj_def );
-			my $missing_p = &getMissingParam( $desc, \@input_args );
+			my $missing_p = &getMissingArgument( $desc, \@input_args );
 
 			if ( !defined $missing_p )
 			{
@@ -650,7 +664,30 @@ sub geCmdProccessCallback
 	( $err );
 }
 
-# [ids list] [ids_params list] [file_upload|download] [param_body list]
+=begin nd
+Function: getCmdArgsCallBack
+
+	It manages how to autocomplete the current input argument depend on his type.
+
+	[ids list] [ids_params list] [file_upload|download] [param_body list] [output_filter]
+
+Parametes:
+	none - .
+	Input arguments - It is a hash with the input arguments parsed.
+	Object def - It is the command definition.
+	ID tree - It is the load balancer ID tree.
+
+Returns:
+	Depend on the argument type, this function returns ones of the following values:
+	- ids list, it looks for the possible values in the load balancer IDs tree and it returns an array ref.
+	- ids params list, it returns a string with the name of the argument expected.
+	- file, it retuns the output of the 'complete_files' function.
+	- param body, it returns the output of the function 'completeArgsBodyParams'.
+	- output_filter, it returns a string with input format.
+	- empty array ref, this command does not expect more arguments.
+
+=cut
+
 sub getCmdArgsCallBack
 {
 	my ( undef, $input, $obj_def, $id_tree ) = @_;
@@ -674,7 +711,7 @@ sub getCmdArgsCallBack
 
 	if ( $next_arg eq 'id' )
 	{
-		&devMsg( "Getting the id list for $args_parsed->{ id }" );
+		&devMsg( "Getting the id list " . scalar @{ $args_parsed->{ id } } );
 		$possible_values = &getIdNext( $obj_def, $id_tree, $args_parsed->{ id } );
 	}
 	elsif ( $next_arg eq 'param_uri' )
@@ -713,10 +750,93 @@ sub getCmdArgsCallBack
 	return $possible_values;
 }
 
+=begin nd
+Function: validateIds
+
+	It matchs the command input IDs with the load balancer IDs to look for if there
+	was any error.
+
+Parametes:
+	Object def - It is the command definition.
+	Input arguments - It is a hash with the input arguments parsed.
+	ID tree - It is the load balancer ID tree.
+
+Returns:
+	String - It returns an error message. It there was an error and it already was printed, this function returns "". It retuns undef if there isn't an error.
+
+=cut
+
+sub validateIds
+{
+	my ( $obj_def, $args_parsed, $id_tree ) = @_;
+
+	my $msg;
+
+	return $msg if !exists $obj_def->{ ids };
+
+	if ( @{ $obj_def->{ ids } } > @{ $args_parsed->{ id } } )
+	{
+		$msg = "The argument '$obj_def->{id}' is missing";
+	}
+	elsif ( @{ $obj_def->{ ids } } < @{ $args_parsed->{ id } } )
+	{
+		$msg = "The argument '$args_parsed->{id}' is not expected";
+	}
+	else
+	{
+		my @id_list = ();
+		my $ind     = 0;
+		my $possible_values;
+		foreach my $id ( @{ $args_parsed->{ id } } )
+		{
+			$possible_values = &getIdNext( $obj_def, $id_tree, \@id_list );
+			if ( !@{ $possible_values } )
+			{
+				&dev();
+				return "";
+			}
+			return "The $obj_def->{ids}->[$ind] '$id' is not found"
+			  unless ( grep ( /^$id$/, @{ $possible_values } ) );
+			push @id_list, $id;
+			$ind++;
+		}
+	}
+
+	return $msg;
+}
+
+=begin nd
+Function: completeArgsBodyParams
+
+	It parses the command input arguments that apply to the HTTP body parameters.
+	It updates the object with the list of expected parameter list (using refreshParameters).
+	It returns the list of following parameters depend on the previous input parameters
+	of the command.
+
+Parametes:
+	Object def - It is the command definition.
+	Input arguments parsed - It is a hash with the input arguments parsed by type.
+	Input arguments list - It is a list with all the input arguements
+	Previous argument - It is the last complete argument, it is not the current one that is autocompleting.
+	ID tree - It is the load balancer ID tree.
+
+Returns:
+	String or Array ref - If the current input argument is a key (-param) it retuns an array reference with the list of expected ZAPI parameters.
+						If the current input argument is a value, it retuns the list of possible values that the ZAPI responds in the field 'possible_values' or an string repeating the parameter name
+
+=cut
+
 sub completeArgsBodyParams
 {
 	my ( $obj_def, $args_parsed, $args_used, $arg_previus, $id_tree ) = @_;
 	my $out;
+
+	my $msg = &validateIds( $obj_def, $args_parsed, $id_tree );
+	if ( defined $msg )
+	{
+		&printCompleteMsg( $msg ) if ( $msg ne '' );
+		return [];
+	}
 
 	&refreshParameters( $obj_def, $args_parsed, $Env::Profile );
 
@@ -787,6 +907,24 @@ sub completeArgsBodyParams
 	return $out;
 }
 
+=begin nd
+Function: getIdNext
+
+	It expands the URI request using the input arguments and the IDs tree to
+	look for the list of possible values that the load balancer accepts for the
+	following uri ID.
+	It will print a autocomplete message if the list of possible values is empty..
+
+Parametes:
+	Object def - It is the command definition.
+	ID tree - It is the load balancer ID tree.
+	ID Arguments list - It is the list of IDs arguments used in the command
+
+Returns:
+	Array ref - It is the list of possibles values for a key.
+
+=cut
+
 sub getIdNext
 {
 	my $obj_def = shift;
@@ -802,20 +940,38 @@ sub getIdNext
 	if ( $url =~ /([^\<]+)\<([\w -]+)\>/ )
 	{
 		my $sub_url = $1;           # Getting the url keys to be used in the IDs tree
-		my $key     = $2;
 
 		my @keys_list = split ( '/', $sub_url );
-		shift
-		  @keys_list; # Remove the first item, because url begins with the character '/'
 
+		# Remove the first item, because url begins with the character '/'
+		shift @keys_list;
+
+		my @values   = ();
 		my $nav_tree = $id_tree;
+		my $key_flag = 0;
+		my $prev_key = "";
 		foreach my $k ( @keys_list )
 		{
-			$nav_tree = $nav_tree->{ $k };
-		}
+			$key_flag = !$key_flag;
+			$prev_key = $k if ( $key_flag );
 
-		my @values = keys %{ $nav_tree };
-		&printCompleteMsg( "There is not any '$key'" ) if ( !@values );
+			# check previous ids exist
+			if ( !defined $nav_tree->{ $k } )
+			{
+				if ( $key_flag )
+				{
+					&printCompleteMsg( "The are not any '$k' available" );
+				}
+				else
+				{
+					&printCompleteMsg( "The $prev_key '$k' does not exist" );
+				}
+				return [];
+			}
+
+			$nav_tree = $nav_tree->{ $k };
+			@values   = keys %{ $nav_tree };
+		}
 
 		return \@values;
 	}
