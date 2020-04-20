@@ -726,7 +726,11 @@ sub getCmdArgsCallBack
 	}
 	elsif ( $next_arg =~ /file/ )
 	{
+		my $sust = 0;
+		$sust            = 1 if $input->{ str } =~ s!^~!$ENV{HOME}!;
 		$possible_values = shift->complete_files( $input );
+		@{ $possible_values } = grep ( s!^$ENV{HOME}!\~!, @{ $possible_values } )
+		  if ( $sust );
 	}
 	elsif ( $next_arg eq 'param_body' )
 	{
