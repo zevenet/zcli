@@ -85,12 +85,17 @@ sub createZcli
 
 	# code of ShellUI->run modified
 	# $Env::Zcli->run(@args); this function is not completed
-	my $incmd = join " ", @args;
+	my $incmd = "";
+	foreach my $arg ( @args )
+	{
+		$arg = quotemeta $arg;
+		$incmd .= " $arg";
+	}
 
 	$Env::Zcli = new Term::ShellUI(
 									commands     => $Env::Zcli_cmd_st,
 									history_file => $Global::History_path,
-									keep_quotes  => 1,
+									keep_quotes  => 0,
 									token_chars  => '',
 	);
 
