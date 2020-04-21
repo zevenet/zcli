@@ -29,7 +29,6 @@ function die() {
 }
 
 
-
 #### Initial setup ####
 
 INST_PATH_LIB="usr/share/perl5"
@@ -41,7 +40,6 @@ cd "$BASE_DIR"
 msg "Setting up a clean environment..."
 rm -rf workdir
 mkdir workdir
-cp -r DEBIAN workdir/
 mkdir -p "workdir/$INST_PATH_LIB"
 mkdir -p "workdir/$INST_PATH_BIN"
 cp -r src/ZCLI "workdir/$INST_PATH_LIB"
@@ -49,13 +47,28 @@ cp -r src/zcli.pl "workdir/$INST_PATH_BIN/zcli"
 cd workdir
 
 
-# Set version and package name
-version=$(grep '$Version' ${INST_PATH_LIB}/ZCLI/Define.pm | sed -E 's/[^\.0-1]//g')
-sed -i "s/#VERSION#/$version/" DEBIAN/control
-pkgname_prefix="zcli_${version}_${arch}"
-pkgname=${pkgname_prefix}_${DATE}.deb
+
+#### Control cfg ####
+
+version=$(grep '$Version' ${INST_PATH_LIB}/ZCLI/Define.pm | sed -E 's/[^\.0-1b]//g')
+deps=$(grep debian ${BASE_DIR}/dependencies.txt | sed -E 's/debian\s*=>\s*//')
+
+control="Package: zcli\nVersion: $version\n\
+Maintainer: ZEVENET Company SL <support@zevenet.com>\n\
+Architecture: amd64\n\
+Section: admin\n\
+Priority: optional\n\
+Description: Zevenet client line interface\n\
+Depends: $deps\n"
+
+mkdir DEBIAN
+echo -e $control >DEBIAN/control
+
 
 #### Package preparation ####
+
+pkgname_prefix="zcli_${version}_${arch}"
+pkgname=${pkgname_prefix}_${DATE}.deb
 
 msg "Preparing package..."
 
