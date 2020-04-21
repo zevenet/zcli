@@ -152,7 +152,7 @@ our $Farms = {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg",
 										 method              => 'POST',
 										 params_autocomplete => {
-																  name => ['farmguardian'],
+																  name => ['farmguardians'],
 										 },
 						  },
 						  $V{ REMOVE } => {
