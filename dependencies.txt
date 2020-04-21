@@ -1,3 +1,4 @@
 common => JSON Term::Shell Hash::Merge LWP::Protocol::Https Term::ShellUI Config::Tiny IO:Socket:SSL JSON::Color IO::Pager
 linux =>  Term::ReadLine::Gnu
 windows => Term::ReadLine::Perl, PAR::Packer
+debian => libterm-readline-gnu-perl, libjson-perl, libhash-merge-perl, liblwp-protocol-https-perl, libterm-shellui-perl, libconfig-tiny-perl, libio-socket-ssl-perl, libio-pager-perl, libjson-color-perl
