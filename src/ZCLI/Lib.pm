@@ -874,6 +874,10 @@ Returns:
 					ip,
 					hash_port
 				],
+			},
+			slaves : {
+				# the input is an array or hash ref. Do not complete in auto-complete. Input parameters must be json
+				ref => 1,
 			}
 		}
 
@@ -932,6 +936,7 @@ sub listParams
 			$Env::Cmd_params_def->{ $p->{ name } }->{ possible_values } =
 			  $p->{ possible_values }
 			  if ( exists $p->{ possible_values } );
+			$Env::Cmd_params_def->{ $p->{ name } }->{ ref } = 1 if ( exists $p->{ ref } );
 		}
 	}
 
@@ -1011,6 +1016,12 @@ sub printOutput
 	if ( $resp->{ err } )
 	{
 		&printError( "Error! $resp->{msg}" );
+		if ( $resp->{ msg } =~ /expects a '(hash|array)' reference as input/ )
+		{
+			&printError(
+				 "This parameter should be set using a JSON as command input (ZCLI option: -j)."
+			);
+		}
 	}
 	else
 	{
