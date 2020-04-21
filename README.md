@@ -12,7 +12,7 @@ ZCLI is a wrapper of the ZAPI (Zevenet Application Programming Interface), it ha
 
 # How to use
 
-The ZCLI user guide is in the following link, [guide](????).
+The ZCLI user guide is in the following link, [guide](https://www.zevenet.com/knowledge-base/howtos/zevenet-command-line-interface-zcli-user-guide/).
 
 
 
@@ -36,7 +36,7 @@ The way to update the code is getting the last changes of the git repository:
 
 ## Windows
 
-Steps to build:
+Steps to build .exe:
 
 - Install Strawberry Perl for windows (It was tested with strawberry-perl-5.16.3.1-64bit.msi)
 - Install CPAN dependences adding the **pp** package

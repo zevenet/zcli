@@ -17,6 +17,7 @@ ZCLI_LIB=$(realpath ${BASE_DIR}/$GIT_ZCLI_LIB)
 DEPENDENCIES="$BASE_DIR/dependencies.txt"
 
 
-cpan install `cat $DEPENDENCIES`
+cpan install `grep common $DEPENDENCIES | sed -E 's/common\s*=>\s*//'`
+cpan install `grep linux $DEPENDENCIES | sed -E 's/linux\s*=>\s*//'`
 ln -s $ZCLI_BIN $BIN_PATH
 ln -s $ZCLI_LIB $PERL_PATH
