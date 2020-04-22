@@ -414,7 +414,7 @@ sub parseInput
 
 					$input->{ params }->{ $key } = $val;
 				}
-				elsif ( $param_flag )
+				else
 				{
 					$parsed_completed = 0;
 					&printCompleteMsg( "The '$args[$ind]' argument is not expected" );
