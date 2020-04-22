@@ -653,7 +653,7 @@ sub getLBIdsTree
 	if ( $resp->{ code } == 404 )
 	{
 		&printError(
-			"Error connecting to the load balancer, ZCLI can be used from the version $Global::Req_ee_zevenet_version of Enterprise or $Global::Req_ce_zevenet_version of The Community."
+			"Error connecting to the load balancer.\nZCLI connects with Zevenet versions greater or equal to $Global::Req_ee_zevenet_version for Enterprise Edition or $Global::Req_ce_zevenet_version for Community Edition."
 		);
 	}
 	elsif ( $resp->{ 'json' }->{ 'params' } )

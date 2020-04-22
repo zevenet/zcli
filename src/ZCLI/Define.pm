@@ -56,7 +56,7 @@ our $Debug   = 0;
 our $Fin = ( $Debug ) ? "" : "\n";  # This will add the dying line in debug mode
 
 our $Req_ee_zevenet_version = "6.1";
-our $Req_ce_zevenet_version = "5.10.3";
+our $Req_ce_zevenet_version = "5.11";
 
 my $home = File::HomeDir->my_home;
 
@@ -130,7 +130,7 @@ our $Zapi_timeout = 8;
 our $Profile_local = "localhost";
 
 # it is the zapi version that is configured when a new profile is added
-our $Default_zapi = "4.0";
+our $Default_zapi_version = "4.0";
 
 # it is the ZAPI documentation URL
 our $Zapi_doc_uri = "https://www.zevenet.com/zapidocv4.0/";
