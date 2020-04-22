@@ -44,10 +44,13 @@ our $Zcli_cmd_st; # It is the ZCLI commands struct used for the TERM module
 
 # save the last parameter list to avoid repeat the params zapi call for each tab
 our $Cmd_params_def = undef;
-; # It is the last parameter object returned by the ZAPI. It is used to autocomplete the command
-our $Cmd_string = ''
-  ; # It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded.
-    # This string contains the string without the parameters
+
+# It is the ZAPI error message when command params could not the get.
+our $Cmd_params_msg = undef;
+
+# It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded.
+# This string contains the string without the parameters
+our $Cmd_string = '';
 
 package Global;
 
@@ -143,6 +146,9 @@ our $LB_http_ip_directive = 'server!bind!1!interface';
 
 # it is the port directive of the http cfg file
 our $LB_http_port_directive = 'server!bind!1!port';
+
+# it is the ZAPI message returned when the API params help is requested
+our $Zapi_param_help_msg = "No parameter has been sent. Please, try with:";
 
 # it is the default port for lb http service
 our $LB_http_port = 444;

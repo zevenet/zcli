@@ -957,7 +957,18 @@ sub listParams
 	my $request =
 	  &createZapiRequest( $obj_def, $args, $profile, $Env::Profile_ids_tree );
 
-	my $params_ref = &zapi( $request, $profile )->{ json }->{ params };
+	my $resp = &zapi( $request, $profile );
+
+	$Env::Cmd_params_def = undef;
+	$Env::Cmd_params_msg = undef;
+
+	if ( $resp->{ msg } ne $Define::Zapi_param_help_msg and exists $resp->{ msg } )
+	{
+		$Env::Cmd_params_msg = $resp->{ msg };
+		return $Env::Cmd_params_def;
+	}
+
+	my $params_ref = $resp->{ json }->{ params };
 
 	# 		Example:
 	#		$params_ref =  [
@@ -983,7 +994,6 @@ sub listParams
 	# set again the predefined parameters
 	$obj_def->{ params } = $predef_params if ( defined $predef_params );
 
-	$Env::Cmd_params_def = undef;
 	if ( defined $params_ref )
 	{
 		$Env::Cmd_params_def = {};
