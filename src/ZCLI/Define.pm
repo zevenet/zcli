@@ -34,7 +34,7 @@ our $Input_json   = 0;  # It is the execution options to run without interactive
 our @OutputFilter = ()
   ; # it is an array reference with the parameters that must be listed in the output
 our $Silence = 0;    # It is the execution options to run without interactive
-our $Color   = 1;    # It is the execution options to run without interactive
+our $Color   = 1;    # ZCLI will not use colors in the output or prompt
 our $Profile;    # It is a struct with info to connect with the load balancer
 our $Profile_ids_tree
   ;              # It is the tree with the IDs that the load balancer contains
