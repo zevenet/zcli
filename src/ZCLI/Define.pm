@@ -34,7 +34,7 @@ our $Input_json   = 0;  # It is the execution options to run without interactive
 our @OutputFilter = ()
   ; # it is an array reference with the parameters that must be listed in the output
 our $Silence = 0;    # It is the execution options to run without interactive
-our $Color   = 1;    # It is the execution options to run without interactive
+our $Color   = 1;    # ZCLI will not use colors in the output or prompt
 our $Profile;    # It is a struct with info to connect with the load balancer
 our $Profile_ids_tree
   ;              # It is the tree with the IDs that the load balancer contains
@@ -44,10 +44,13 @@ our $Zcli_cmd_st; # It is the ZCLI commands struct used for the TERM module
 
 # save the last parameter list to avoid repeat the params zapi call for each tab
 our $Cmd_params_def = undef;
-; # It is the last parameter object returned by the ZAPI. It is used to autocomplete the command
-our $Cmd_string = ''
-  ; # It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded.
-    # This string contains the string without the parameters
+
+# It is the ZAPI error message when command params could not the get.
+our $Cmd_params_msg = undef;
+
+# It is the last command used with autocomplete. It is used as flag, if it changes, the ZAPI parameters will be reloaded.
+# This string contains the string without the parameters
+our $Cmd_string = '';
 
 package Global;
 
@@ -56,7 +59,7 @@ our $Debug   = 0;
 our $Fin = ( $Debug ) ? "" : "\n";  # This will add the dying line in debug mode
 
 our $Req_ee_zevenet_version = "6.1";
-our $Req_ce_zevenet_version = "5.10.3";
+our $Req_ce_zevenet_version = "5.11";
 
 my $home = File::HomeDir->my_home;
 
@@ -130,7 +133,7 @@ our $Zapi_timeout = 8;
 our $Profile_local = "localhost";
 
 # it is the zapi version that is configured when a new profile is added
-our $Default_zapi = "4.0";
+our $Default_zapi_version = "4.0";
 
 # it is the ZAPI documentation URL
 our $Zapi_doc_uri = "https://www.zevenet.com/zapidocv4.0/";
@@ -143,6 +146,9 @@ our $LB_http_ip_directive = 'server!bind!1!interface';
 
 # it is the port directive of the http cfg file
 our $LB_http_port_directive = 'server!bind!1!port';
+
+# it is the ZAPI message returned when the API params help is requested
+our $Zapi_param_help_msg = "No parameter has been sent. Please, try with:";
 
 # it is the default port for lb http service
 our $LB_http_port = 444;

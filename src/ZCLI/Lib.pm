@@ -414,7 +414,7 @@ sub parseInput
 
 					$input->{ params }->{ $key } = $val;
 				}
-				elsif ( $param_flag )
+				else
 				{
 					$parsed_completed = 0;
 					&printCompleteMsg( "The '$args[$ind]' argument is not expected" );
@@ -451,7 +451,7 @@ sub printCompleteMsg
 	my $msg = shift;
 	my $tag = "  ## ";
 
-	if ( defined $Env::Zcli )
+	if ( defined $Env::Zcli and !$Env::Silence )
 	{
 		$Env::Zcli->completemsg( "$tag$msg\n" );
 	}
@@ -653,7 +653,7 @@ sub getLBIdsTree
 	if ( $resp->{ code } == 404 )
 	{
 		&printError(
-			"Error connecting to the load balancer, ZCLI can be used from the version $Global::Req_ee_zevenet_version of Enterprise or $Global::Req_ce_zevenet_version of The Community."
+			"Error connecting to the load balancer.\nZCLI connects with Zevenet versions greater or equal to $Global::Req_ee_zevenet_version for Enterprise Edition or $Global::Req_ce_zevenet_version for Community Edition."
 		);
 	}
 	elsif ( $resp->{ 'json' }->{ 'params' } )
@@ -957,7 +957,18 @@ sub listParams
 	my $request =
 	  &createZapiRequest( $obj_def, $args, $profile, $Env::Profile_ids_tree );
 
-	my $params_ref = &zapi( $request, $profile )->{ json }->{ params };
+	my $resp = &zapi( $request, $profile );
+
+	$Env::Cmd_params_def = undef;
+	$Env::Cmd_params_msg = undef;
+
+	if ( $resp->{ msg } ne $Define::Zapi_param_help_msg and exists $resp->{ msg } )
+	{
+		$Env::Cmd_params_msg = $resp->{ msg };
+		return $Env::Cmd_params_def;
+	}
+
+	my $params_ref = $resp->{ json }->{ params };
 
 	# 		Example:
 	#		$params_ref =  [
@@ -983,7 +994,6 @@ sub listParams
 	# set again the predefined parameters
 	$obj_def->{ params } = $predef_params if ( defined $predef_params );
 
-	$Env::Cmd_params_def = undef;
 	if ( defined $params_ref )
 	{
 		$Env::Cmd_params_def = {};

@@ -907,7 +907,9 @@ sub completeArgsBodyParams
 		if ( !@params )
 		{
 			@params = ();
-			&printCompleteMsg( "This command does not expect more parameters" );
+			my $msg = $Env::Cmd_params_msg
+			  // "This command does not expect more parameters";
+			&printCompleteMsg( $msg );
 		}
 
 		$out = \@params;
