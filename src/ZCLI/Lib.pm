@@ -451,7 +451,7 @@ sub printCompleteMsg
 	my $msg = shift;
 	my $tag = "  ## ";
 
-	if ( defined $Env::Zcli )
+	if ( defined $Env::Zcli and !$Env::Silence )
 	{
 		$Env::Zcli->completemsg( "$tag$msg\n" );
 	}
