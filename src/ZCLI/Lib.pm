@@ -1136,6 +1136,7 @@ sub printOutput
 					%JSON::Color::theme = %Color::Json;
 					$json_enc = JSON::Color::encode_json( $resp->{ json }, { pretty => 1 } );
 				};
+				&printError( "There was an error printing the output: $@", 0 ) if ($@);
 			}
 			&devMsg( $@ ) if ( $@ );
 
