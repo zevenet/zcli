@@ -1092,6 +1092,9 @@ sub printOutput
 		delete $resp->{ json }->{ description };
 	}
 
+	# clean success parameter
+	delete $resp->{ json }->{ success } if exists ( $resp->{ json }->{ success } );
+
 	if ( $resp->{ err } )
 	{
 		&printError( "Error! $resp->{msg}" );
@@ -1132,11 +1135,12 @@ sub printOutput
 			else
 			{
 				eval {
+					no warnings 'once';
 					require JSON::Color;
 					%JSON::Color::theme = %Color::Json;
 					$json_enc = JSON::Color::encode_json( $resp->{ json }, { pretty => 1 } );
 				};
-				&printError( "There was an error printing the output: $@", 0 ) if ($@);
+				&printError( "There was an error printing the output: $@", 0 ) if ( $@ );
 			}
 			&devMsg( $@ ) if ( $@ );
 
@@ -1420,7 +1424,7 @@ sub setProfile
 			unless ( $cfg->{ port } > 0 and $cfg->{ port } <= 65535 )
 			{
 				$valid_flag = 0;
-				print (
+				&print(
 					   "Invalid 'port for load balancer. It expects a port between 1 and 65535\n" );
 			}
 		} while ( !$valid_flag );
@@ -1482,7 +1486,7 @@ sub setProfile
 	}
 	elsif ( $Config->{ _ }->{ default_profile } ne $name )
 	{
-		print (
+		&print(
 			"Do you want to set this load balancer profile as the default one? [yes|no=default]: "
 		);
 		my $confirmation = <STDIN>;
