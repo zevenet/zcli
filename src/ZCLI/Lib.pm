@@ -1129,7 +1129,8 @@ sub printOutput
 			{
 				eval {
 					require JSON;
-					$json_enc = JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1 } );
+					$json_enc =
+					  JSON::to_json( $resp->{ json }, { utf8 => 1, pretty => 1, canonical => 1 } );
 				};
 			}
 			else
@@ -1138,7 +1139,8 @@ sub printOutput
 					no warnings 'once';
 					require JSON::Color;
 					%JSON::Color::theme = %Color::Json;
-					$json_enc = JSON::Color::encode_json( $resp->{ json }, { pretty => 1 } );
+					$json_enc =
+					  JSON::Color::encode_json( $resp->{ json }, { pretty => 1, canonical => 1 } );
 				};
 				&printError( "There was an error printing the output: $@", 0 ) if ( $@ );
 			}
