@@ -50,32 +50,32 @@ our $Interfaces = {
 								   },
 					},
 					'network-default-gateway-ipv4' => {
-										  $V{ GET } => {
-												  uri => "/interfaces/default-gateway/ipv4",
-												  method => 'GET',
-										  },
-										  $V{ SET } => {
-												  uri => "/interfaces/default-gateway/ipv4",
-												  method => 'PUT',
-										  },
-										  $V{ DELETE } => {
-												  uri => "/interfaces/default-gateway/ipv4",
-												  method => 'DELETE',
-										  },
+												  $V{ GET } => {
+														  uri => "/interfaces/gateway/ipv4",
+														  method => 'GET',
+												  },
+												  $V{ SET } => {
+														  uri => "/interfaces/gateway/ipv4",
+														  method => 'PUT',
+												  },
+												  $V{ DELETE } => {
+														  uri => "/interfaces/gateway/ipv4",
+														  method => 'DELETE',
+												  },
 					},
 					'network-default-gateway-ipv6' => {
-										  $V{ GET } => {
-												  uri => "/interfaces/default-gateway/ipv6",
-												  method => 'GET',
-										  },
-										  $V{ SET } => {
-												  uri => "/interfaces/default-gateway/ipv6",
-												  method => 'PUT',
-										  },
-										  $V{ DELETE } => {
-												  uri => "/interfaces/default-gateway/ipv6",
-												  method => 'DELETE',
-										  },
+												  $V{ GET } => {
+														  uri => "/interfaces/gateway/ipv6",
+														  method => 'GET',
+												  },
+												  $V{ SET } => {
+														  uri => "/interfaces/gateway/ipv6",
+														  method => 'PUT',
+												  },
+												  $V{ DELETE } => {
+														  uri => "/interfaces/gateway/ipv6",
+														  method => 'DELETE',
+												  },
 					},
 };
 
