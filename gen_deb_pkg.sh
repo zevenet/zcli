@@ -50,7 +50,11 @@ cd workdir
 
 #### Control cfg ####
 
-version=$(grep '$Version' ${INST_PATH_LIB}/ZCLI/Define.pm | sed -E 's/[^\.0-1b]//g')
+echo
+version=$(grep '$Version' ${INST_PATH_LIB}/ZCLI/Define.pm | sed -E 's/[^\.0-9b]//g')
+
+echo $version
+
 deps=$(grep debian ${BASE_DIR}/dependencies.txt | sed -E 's/debian\s*=>\s*//')
 
 control="Package: zcli\nVersion: $version\n\
