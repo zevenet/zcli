@@ -74,8 +74,11 @@ our $Farms = {
 								   },
 				},
 				$V{ CREATE } => {
-								  uri    => "/farms",
-								  method => 'POST',
+								  uri                 => "/farms",
+								  method              => 'POST',
+								  params_autocomplete => {
+														   copy_from => ['farms'],
+								  },
 				},
 	},
 

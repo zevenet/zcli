@@ -45,8 +45,11 @@ our $Farmguardian = {
 														 method => 'GET',
 										  },
 										  $V{ CREATE } => {
-															uri    => "/monitoring/fg",
-															method => 'POST',
+														 uri    => "/monitoring/fg",
+														 method => 'POST',
+														 params_autocomplete => {
+																 copy_from => ['farmguardians'],
+														 },
 										  },
 										  $V{ SET } => {
 														 uri => "/monitoring/fg/<$K{FG}>",
