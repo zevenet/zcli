@@ -177,12 +177,17 @@ PROMPT:
 ";
 
 	# print the help paged
+	if ( $Env::OS ne 'win' )
 	{
 		require IO::Pager;
 		{
 			IO::Pager::open( my $fh ) or warn ( $! );
 			print $fh $msg;
 		}
+	}
+	else
+	{
+		print $msg;
 	}
 
 	return 0;
