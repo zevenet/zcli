@@ -1382,8 +1382,8 @@ sub setProfile
 			if ( $name !~ /\S+/ )
 			{
 				$valid_flag = 0;
-				&print(
-					  "Invalid 'name'. It expects a string with the load balancer profile name\n" );
+				print
+				  "Invalid 'name'. It expects a string with the load balancer profile name\n";
 			}
 			elsif ( exists $Config->{ $name } )
 			{
@@ -1426,8 +1426,8 @@ sub setProfile
 			unless ( $cfg->{ port } > 0 and $cfg->{ port } <= 65535 )
 			{
 				$valid_flag = 0;
-				&print(
-					   "Invalid 'port for load balancer. It expects a port between 1 and 65535\n" );
+				print
+				  "Invalid 'port for load balancer. It expects a port between 1 and 65535\n";
 			}
 		} while ( !$valid_flag );
 	}
@@ -1488,9 +1488,8 @@ sub setProfile
 	}
 	elsif ( $Config->{ _ }->{ default_profile } ne $name )
 	{
-		&print(
-			"Do you want to set this load balancer profile as the default one? [yes|no=default]: "
-		);
+		print
+		  "Do you want to set this load balancer profile as the default one? [yes|no=default]: ";
 		my $confirmation = <STDIN>;
 		chomp $confirmation;
 		if ( $confirmation =~ /^(y|yes)$/i )
