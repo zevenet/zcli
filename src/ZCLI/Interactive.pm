@@ -305,17 +305,43 @@ sub createCmdObjectProfile
 	my $profile_st;
 	my @profile_list = &listProfiles();
 	$profile_st->{ $V{ LIST } }->{ proc } = sub {
-		for ( &listProfiles )
+
+		if ( @_ )
 		{
-			my $st   = $_;
-			my $desc = &getProfile( $_ )->{ description };
-			$st .= "  -  $desc";
-			printSuccess( $st, 0 );
+			if ( @_ < 3 and $_[0] eq '-filter' and defined $_[1] )
+			{
+				@Env::OutputFilter = split ( ',', $_[1] );
+			}
+			else
+			{
+				&printError(
+					"Command syntaxis error. The expected command is:\nzcli profile list [-filter <item1[,item2]>]"
+				);
+				return 1;
+			}
 		}
 
+		my @out     = ();
+		my $default = &getProfileDefaut;
+		for ( &listProfiles )
+		{
+			my $def = &getProfile( $_ );
+			my $p = {
+					  name        => $_,
+					  description => $def->{ description } // '',
+					  edition     => $def->{ edition } // '',
+					  host        => $def->{ host } // '',
+					  port        => $def->{ port } // '',
+					  zapi_key    => $def->{ zapi_key } // '',
+			};
+
+			$p->{ default } = 'true' if ( $_ eq $default );
+			push @out, $p;
+		}
+		&printOutput( { json => { profiles => \@out } } );
+		return 0;
 	};
-	$profile_st->{ $V{ LIST } }->{ maxargs } = 1;
-	$profile_st->{ $V{ LIST } }->{ desc }    = "It lists the ZCLI saved profiles";
+	$profile_st->{ $V{ LIST } }->{ desc } = "It lists the ZCLI saved profiles";
 
 	$profile_st->{ $V{ CREATE } }->{ proc } = sub {
 		my $out = &setProfile;

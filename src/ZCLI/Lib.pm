@@ -1704,6 +1704,25 @@ sub getProfile
 }
 
 =begin nd
+Function: getProfileDefaut
+
+	It returns the default profile name
+
+Parametes:
+	none - .
+
+Returns:
+	String - It is the profile name
+
+=cut
+
+sub getProfileDefaut
+{
+	my $Config = Config::Tiny->read( $Global::Profiles_path );
+	return $Config->{ _ }->{ default_profile };
+}
+
+=begin nd
 Function: getHttpServerConf
 
 	Looks for in the cherokee configuration file the IP and PORT directives. This is only useful
