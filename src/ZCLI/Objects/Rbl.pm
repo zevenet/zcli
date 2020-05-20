@@ -47,9 +47,12 @@ our $Rbl = {
 											enterprise => 1,
 							 },
 							 $V{ CREATE } => {
-											   uri        => "/ipds/rbl",
-											   method     => 'POST',
-											   enterprise => 1,
+											   uri                 => "/ipds/rbl",
+											   method              => 'POST',
+											   enterprise          => 1,
+											   params_autocomplete => {
+																   copy_from => ['ipds', 'rbl'],
+											   },
 							 },
 							 $V{ SET } => {
 											uri        => "/ipds/rbl/<$K{RBL}>",
