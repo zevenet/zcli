@@ -7,6 +7,7 @@ ZCLI is the acronym of Zevenet Command Line Interface. This tool allows managing
 ZCLI is a wrapper of the ZAPI (Zevenet Application Programming Interface), it has an autocompletion feature to navigate easier for the load balancer modules and its items.
 
 *It depends on the Zevenet EE 6.1 or higher.*
+*It depends on the Zevenet CE 5.11 or higher.*
 
 
 
