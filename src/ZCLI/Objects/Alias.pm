@@ -47,7 +47,7 @@ our $Alias = {
 								 enterprise => 1,
 								 param_uri  => [
 											   {
-												 name => "backend IP",
+												 name => "backend_IP",
 												 desc => "IP to assign it a friendly name",
 											   },
 								 ],

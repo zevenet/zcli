@@ -103,7 +103,7 @@ our $Blacklist = {
 			 method    => 'PUT',
 			 param_uri => [
 						   {
-							 name => "source ID",
+							 name => "source_ID",
 							 desc => "the IP address of the source which will be modified",
 						   },
 			 ],
@@ -114,7 +114,7 @@ our $Blacklist = {
 			  method    => 'DELETE',
 			  param_uri => [
 							{
-							  name => "source ID",
+							  name => "source_ID",
 							  desc => "the IP address of the source which will be removed",
 							},
 			  ],

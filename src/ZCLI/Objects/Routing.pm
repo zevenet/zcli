@@ -51,7 +51,7 @@ our $Routing = {
 					  method    => 'PUT',
 					  param_uri => [
 							  {
-								name => "rule ID",
+								name => "rule_ID",
 								desc => "the rule id of the rule that is going to be modified",
 							  },
 					  ],
@@ -62,7 +62,7 @@ our $Routing = {
 			 method    => 'DELETE',
 			 param_uri => [
 						   {
-							 name => "rule ID",
+							 name => "rule_ID",
 							 desc => "the rule id of the rule that is going to be deleted",
 						   },
 			 ],

@@ -206,7 +206,7 @@ our $Farms = {
 			 method    => 'PUT',
 			 param_uri => [
 						   {
-							 name => "resource ID",
+							 name => "resource_ID",
 							 desc => "the IP address of the source which will be modified",
 						   },
 			 ],
@@ -217,7 +217,7 @@ our $Farms = {
 			  method    => 'DELETE',
 			  param_uri => [
 							{
-							  name => "resource ID",
+							  name => "resource_ID",
 							  desc => "the IP address of the source which will be removed",
 							},
 			  ],
