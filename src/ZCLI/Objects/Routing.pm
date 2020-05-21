@@ -51,7 +51,7 @@ our $Routing = {
 					  method    => 'PUT',
 					  param_uri => [
 							  {
-								name => "rule",
+								name => "rule ID",
 								desc => "the rule id of the rule that is going to be modified",
 							  },
 					  ],
@@ -62,7 +62,7 @@ our $Routing = {
 			 method    => 'DELETE',
 			 param_uri => [
 						   {
-							 name => "rule",
+							 name => "rule ID",
 							 desc => "the rule id of the rule that is going to be deleted",
 						   },
 			 ],
@@ -109,10 +109,10 @@ our $Routing = {
 		},
 	},
 	'network-routing-table-unmanaged' => {
-		$V{ LIST } => {
-						uri        => "/routing/tables",
-						method     => 'GET',
-						enterprise => 1,
+		$V{ GET } => {
+					   uri        => "/routing/tables/<$K{ROUTING_TABLE}>/unmanaged",
+					   method     => 'GET',
+					   enterprise => 1,
 		},
 		$V{ ADD } => {
 					   uri        => "/routing/tables/<$K{ROUTING_TABLE}>/unmanaged",
