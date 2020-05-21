@@ -387,6 +387,7 @@ sub parseInput
 
 	if (     !exists $def->{ 'upload_file' }
 		 and !exists $def->{ 'download_file' }
+		 and !exists $def->{ 'param_complete' }
 		 and $def->{ method } =~ /POST|PUT/ )
 	{
 		if ( $Env::Input_json )

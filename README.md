@@ -7,6 +7,7 @@ ZCLI is the acronym of Zevenet Command Line Interface. This tool allows managing
 ZCLI is a wrapper of the ZAPI (Zevenet Application Programming Interface), it has an autocompletion feature to navigate easier for the load balancer modules and its items.
 
 *It depends on the Zevenet EE 6.1 or higher.*
+
 *It depends on the Zevenet CE 5.11 or higher.*
 
 
@@ -168,6 +169,11 @@ Module key used in ZCLI commands
                 name =>        # name of the parameter to autocomplete
                     'ipds/blacklists',    # it is the information to look for the IDs to autocomplete. The keys of the id tree is separated by '/'.
         }
+
+        # The 'params_complete' parameter is a flag not to extend the command autocompleting more parameters.
+        # It is useful to create a command macro with a expecific configuration.
+        # I.E. "ipds-package upgrade"
+        params_complete => 1,
     }
 }
 ```
