@@ -35,64 +35,68 @@ my %K = %Define::Keys;
 package Objects;
 
 our $Bonding = {
-	 'network-bonding' => {
-							$V{ LIST } => {
-											uri        => "/interfaces/bonding",
-											method     => 'GET',
-											enterprise => 1,
-							},
-							$V{ GET } => {
-										   uri        => "/interfaces/bonding/<$K{IFACE}>",
+	'network-bonding' => {
+						   $V{ LIST } => {
+										   uri        => "/interfaces/bonding",
 										   method     => 'GET',
 										   enterprise => 1,
-							},
-							$V{ CREATE } => {
-											  uri        => "/interfaces/bonding",
-											  method     => 'POST',
-											  enterprise => 1,
-							},
-							$V{ SET } => {
-										   uri        => "/interfaces/bonding/<$K{IFACE}>",
-										   method     => 'PUT',
-										   enterprise => 1,
-							},
-							$V{ UNSET } => {
-											 uri    => "/interfaces/bonding/<$K{IFACE}>",
-											 method => 'DELETE',
+						   },
+						   $V{ GET } => {
+										  uri        => "/interfaces/bonding/<$K{IFACE}>",
+										  method     => 'GET',
+										  enterprise => 1,
+						   },
+						   $V{ CREATE } => {
+											 uri        => "/interfaces/bonding",
+											 method     => 'POST',
 											 enterprise => 1,
-							},
-							$V{ DELETE } => {
+						   },
+						   $V{ SET } => {
+										  uri        => "/interfaces/bonding/<$K{IFACE}>",
+										  method     => 'PUT',
+										  enterprise => 1,
+						   },
+						   $V{ UNSET } => {
+											uri        => "/interfaces/bonding/<$K{IFACE}>",
+											method     => 'DELETE',
+											enterprise => 1,
+						   },
+						   $V{ DELETE } => {
 										   uri => "/interfaces/bonding/<$K{IFACE}>/actions",
 										   method => 'POST',
 										   params => {
 													   'action' => 'destroy',
 										   },
 										   enterprise => 1,
-							},
-							$V{ START } => {
+						   },
+						   $V{ START } => {
 										   uri => "/interfaces/bonding/<$K{IFACE}>/actions",
 										   method => 'POST',
 										   params => {
 													   'action' => 'up',
 										   },
 										   enterprise => 1,
-							},
-							$V{ STOP } => {
+						   },
+						   $V{ STOP } => {
 										   uri => "/interfaces/bonding/<$K{IFACE}>/actions",
 										   method => 'POST',
 										   params => {
 													   'action' => 'down',
 										   },
 										   enterprise => 1,
-							},
-	 },
-	 'network-bonding-slave' => {
-			 $V{ ADD } => {
-							uri        => "/interfaces/bonding/<$K{IFACE}>/slaves",
-							method     => 'POST',
-							enterprise => 1,
-			 },
-			 $V{ REMOVE } => {
+						   },
+	},
+	'network-bonding-slave' => {
+		$V{ ADD } => {
+			uri                 => "/interfaces/bonding/<$K{IFACE}>/slaves",
+			method              => 'POST',
+			enterprise          => 1,
+			params_autocomplete => {
+									 name => ['interfaces', 'nic'],
+			},
+
+		},
+		$V{ REMOVE } => {
 					 uri => "/interfaces/bonding/<$K{IFACE}>/slaves/$Define::Uri_param_tag",
 					 param_uri => [
 								   {
@@ -102,8 +106,8 @@ our $Bonding = {
 					 ],
 					 method     => 'DELETE',
 					 enterprise => 1,
-			 },
-	 },
+		},
+	},
 };
 
 1;
