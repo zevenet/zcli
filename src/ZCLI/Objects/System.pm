@@ -144,6 +144,12 @@ our $System = {
 												   download_file => undef,
 							   },
 	 },
+	 'system-factory' => {
+						   $V{ APPLY } => {
+											uri    => "/system/factory",
+											method => 'POST',
+						   },
+	 },
 	 'system-cluster' => {
 						   $V{ GET } => {
 										  uri        => "/system/cluster",
