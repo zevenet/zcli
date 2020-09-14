@@ -970,13 +970,29 @@ sub getIdNext
 
 	my $url = $obj_def->{ uri };    # copy data from def
 
+	# get the position of the keys
+	my @sup = split ( "/", $url );
+	shift @sup;
+	my @keys_flags = ();
+	foreach my $it ( @sup )
+	{
+		if ( $it =~ /^\</ )
+		{
+			push @keys_flags, 1;
+		}
+		else
+		{
+			push @keys_flags, 0;
+		}
+	}
+
 	# replace the obtained ids untill getting the next arg key
 	$url = &replaceUrl( $url, $args );
 
 	# getting next args
 	if ( $url =~ /([^\<]+)\<([\w -]+)\>/ )
 	{
-		my $sub_url = $1;           # Getting the url keys to be used in the IDs tree
+		my $sub_url = $1;    # Getting the url keys to be used in the IDs tree
 
 		my @keys_list = split ( '/', $sub_url );
 
@@ -985,17 +1001,17 @@ sub getIdNext
 
 		my @values   = ();
 		my $nav_tree = $id_tree;
-		my $key_flag = 0;
 		my $prev_key = "";
+		my $it       = 0;
+
 		foreach my $k ( @keys_list )
 		{
-			$key_flag = !$key_flag;
-			$prev_key = $k if ( $key_flag );
+			$prev_key = $k if ( !$keys_flags[$it] );
 
 			# check previous ids exist
 			if ( !defined $nav_tree->{ $k } )
 			{
-				if ( $key_flag )
+				if ( !$keys_flags[$it] )
 				{
 					&printCompleteMsg( "The are not any '$k' available" );
 				}
@@ -1008,6 +1024,7 @@ sub getIdNext
 
 			$nav_tree = $nav_tree->{ $k };
 			@values   = keys %{ $nav_tree };
+			$it++;
 		}
 
 		return \@values;
