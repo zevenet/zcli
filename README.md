@@ -156,6 +156,11 @@ Module key used in ZCLI commands
             'action' => 'stop',
         }
 
+		# This field is used to parse the parameters as an array. Example: creating bonding
+		params_arr => {
+								'slaves' => 1,
+						},
+
         # Optional parameters is a hash with API request parameters and the list of possible values.
         params_opt => {
 			mode => ['drain','cut']

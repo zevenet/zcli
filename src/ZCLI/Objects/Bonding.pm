@@ -50,6 +50,9 @@ our $Bonding = {
 											 uri        => "/interfaces/bonding",
 											 method     => 'POST',
 											 enterprise => 1,
+											 params_arr => {
+															 'slaves' => 1,
+											 },
 						   },
 						   $V{ SET } => {
 										  uri        => "/interfaces/bonding/<$K{IFACE}>",

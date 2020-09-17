@@ -418,6 +418,12 @@ sub parseInput
 					my $val = $args[$ind + 1];
 					$ind++;
 
+					# decode arrays inputs
+					if ( exists $def->{ params_arr }->{ $key } )
+					{
+						my @vals = split ( $Define::Params_array_splitter, $val );
+						$val = \@vals;
+					}
 					$input->{ params }->{ $key } = $val;
 				}
 				else
@@ -1011,7 +1017,6 @@ sub listParams
 			$Env::Cmd_params_def->{ $p->{ name } }->{ possible_values } =
 			  $p->{ possible_values }
 			  if ( exists $p->{ possible_values } );
-			$Env::Cmd_params_def->{ $p->{ name } }->{ ref } = 1 if ( exists $p->{ ref } );
 		}
 	}
 

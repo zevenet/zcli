@@ -156,6 +156,9 @@ our $LB_http_port = 444;
 # it is the default ip for lb http service
 our $LB_http_ip = "127.0.0.1";
 
+# Character used to split the array parameters that are serialized
+our $Params_array_splitter = ",";
+
 # those are constant strings to use in ZCLI
 our $Uri_param_tag     = "PARAM_URI";
 our $Description_param = "[params list]";

@@ -97,6 +97,9 @@ our $Blacklist = {
 					   uri        => "/ipds/blacklists/<$K{BL}>/sources",
 					   method     => 'POST',
 					   enterprise => 1,
+					   params_arr => {
+									   'source' => 1,
+					   },
 		},
 		$V{ SET } => {
 			 uri       => "/ipds/blacklists/<$K{BL}>/sources/$Define::Uri_param_tag",
