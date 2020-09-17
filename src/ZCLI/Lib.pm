@@ -387,7 +387,7 @@ sub parseInput
 
 	if (     !exists $def->{ 'upload_file' }
 		 and !exists $def->{ 'download_file' }
-		 and !exists $def->{ 'param_complete' }
+		 and !exists $def->{ 'params_complete' }
 		 and $def->{ method } =~ /POST|PUT/ )
 	{
 		if ( $Env::Input_json )
@@ -397,7 +397,7 @@ sub parseInput
 			eval { $input->{ params } = JSON::decode_json( $json_args ); };
 			if ( $@ )
 			{
-				&printError( "Error decoding the input JSON" );
+				&printError( "Error decoding the input JSON: $@" );
 				die $Global::Fin;
 			}
 		}

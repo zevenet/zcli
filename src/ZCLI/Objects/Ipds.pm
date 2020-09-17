@@ -56,8 +56,8 @@ our $Ipds = {
 								  $V{ UPGRADE } => {
 													 uri    => "/ipds/package/actions",
 													 method => 'POST',
-													 param_complete => 1,
-													 params         => {
+													 params_complete => 1,
+													 params          => {
 																 'action' => 'upgrade',
 													 },
 													 enterprise => 1,

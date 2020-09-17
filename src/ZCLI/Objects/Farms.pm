@@ -245,6 +245,82 @@ our $Farms = {
 						 },
 	},
 
+	'farm-add-request-header' => {
+			  $V{ ADD } => {
+							 uri        => "/farms/<$K{FARM}>/addheader",
+							 method     => 'POST',
+							 enterprise => 1,
+			  },
+			  $V{ REMOVE } => {
+					  uri       => "/farms/<$K{FARM}>/addheader/$Define::Uri_param_tag",
+					  param_uri => [
+									{
+									  name => "index",
+									  desc => "It is the index of the directive to remove",
+									},
+					  ],
+					  method     => 'DELETE',
+					  enterprise => 1,
+			  },
+	},
+
+	'farm-remove-request-header' => {
+			  $V{ ADD } => {
+							 uri        => "/farms/<$K{FARM}>/headremove",
+							 method     => 'POST',
+							 enterprise => 1,
+			  },
+			  $V{ REMOVE } => {
+					  uri       => "/farms/<$K{FARM}>/headremove/$Define::Uri_param_tag",
+					  param_uri => [
+									{
+									  name => "index",
+									  desc => "It is the index of the directive to remove",
+									},
+					  ],
+					  method     => 'DELETE',
+					  enterprise => 1,
+			  },
+	},
+
+	'farm-add-response-header' => {
+			  $V{ ADD } => {
+							 uri        => "/farms/<$K{FARM}>/addresponseheader",
+							 method     => 'POST',
+							 enterprise => 1,
+			  },
+			  $V{ REMOVE } => {
+					  uri => "/farms/<$K{FARM}>/addresponseheader/$Define::Uri_param_tag",
+					  param_uri => [
+									{
+									  name => "index",
+									  desc => "It is the index of the directive to remove",
+									},
+					  ],
+					  method     => 'DELETE',
+					  enterprise => 1,
+			  },
+	},
+
+	'farm-remove-response-header' => {
+			 $V{ ADD } => {
+							uri        => "/farms/<$K{FARM}>/removeresponseheader",
+							method     => 'POST',
+							enterprise => 1,
+			 },
+			 $V{ REMOVE } => {
+					 uri => "/farms/<$K{FARM}>/removeresponseheader/$Define::Uri_param_tag",
+					 param_uri => [
+								   {
+									 name => "index",
+									 desc => "It is the index of the directive to remove",
+								   },
+					 ],
+					 method     => 'DELETE',
+					 enterprise => 1,
+			 },
+	},
+
 	'farm-waf' => {
 					$V{ ADD } => {
 								   uri                 => "/farms/<$K{FARM}>/ipds/waf",
@@ -281,6 +357,7 @@ our $Farms = {
 										enterprise => 1,
 						  },
 	},
+
 	'farm-dos' => {
 					$V{ ADD } => {
 								   uri                 => "/farms/<$K{FARM}>/ipds/dos",
@@ -296,6 +373,7 @@ our $Farms = {
 									  enterprise => 1,
 					},
 	},
+
 	'farm-rbl' => {
 					$V{ ADD } => {
 								   uri                 => "/farms/<$K{FARM}>/ipds/rbl",
