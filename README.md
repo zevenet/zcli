@@ -179,6 +179,13 @@ Module key used in ZCLI commands
         # It is useful to create a command macro with a expecific configuration.
         # I.E. "ipds-package upgrade"
         params_complete => 1,
+
+        # It is used to customized the parsing of the parameters for a command. There is an example in 'rbac-role set'.
+        # If this parameter is used, previously only will be parsed the URI parameters.
+        params_funct_parse => 'Objects::complete_rbac_roles',
+
+        # It is used to customized the building of the parameters for a request body. There is an example in 'rbac-role set'
+        params_funct_build => 'Objects::body_rbac_roles',
     }
 }
 ```

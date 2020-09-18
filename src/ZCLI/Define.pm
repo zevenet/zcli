@@ -223,4 +223,108 @@ our %Actions = (
 	QUIT   => 'quit',                      # exit from program
 );
 
+our %Rbac_roles = (
+
+	"rbac-user" => {
+					 "show"   => "false",
+					 "delete" => "false",
+					 "create" => "false",
+					 "modify" => "false",
+					 "list"   => "false",
+					 "menu"   => "false"
+	},
+	"notification" => {
+						"show"   => "false",
+						"modify" => "false",
+						"action" => "false",
+						"menu"   => "false",
+						"test"   => "false"
+	},
+	"rbac-role" => {
+					 "modify" => "false",
+					 "menu"   => "false",
+					 "delete" => "false",
+					 "create" => "false",
+					 "show"   => "false"
+	},
+	"system-service" => {
+						  "modify" => "false",
+						  "menu"   => "false"
+	},
+	"supportsave" => {
+					   "download" => "false",
+					   "menu"     => "false"
+	},
+	"interface-virtual" => {
+							 "modify" => "false",
+							 "action" => "false",
+							 "delete" => "false",
+							 "create" => "false"
+	},
+	"farm" => {
+				"modify"      => "false",
+				"menu"        => "false",
+				"action"      => "false",
+				"delete"      => "false",
+				"create"      => "false",
+				"maintenance" => "false"
+	},
+	"ipds" => {
+				"menu"   => "false",
+				"modify" => "false",
+				"action" => "false"
+	},
+	"log" => {
+			   "show"     => "false",
+			   "download" => "false",
+			   "menu"     => "false"
+	},
+	"alias" => {
+				 "list"   => "false",
+				 "modify" => "false",
+				 "menu"   => "false",
+				 "delete" => "false"
+	},
+	"rbac-group" => {
+					  "show"   => "false",
+					  "menu"   => "false",
+					  "modify" => "false",
+					  "list"   => "false",
+					  "delete" => "false",
+					  "create" => "false"
+	},
+	"interface" => {
+					 "modify" => "false",
+					 "menu"   => "false"
+	},
+	"certificate" => {
+					   "menu"     => "false",
+					   "download" => "false",
+					   "upload"   => "false",
+					   "create"   => "false",
+					   "delete"   => "false",
+					   "show"     => "false"
+	},
+	"farmguardian" => {
+						"menu"   => "false",
+						"modify" => "false"
+	},
+	"backup" => {
+				  "menu"     => "false",
+				  "download" => "false",
+				  "upload"   => "false",
+				  "delete"   => "false",
+				  "create"   => "false",
+				  "apply"    => "false"
+	},
+	"cluster" => {
+				   "maintenance" => "false",
+				   "delete"      => "false",
+				   "create"      => "false",
+				   "menu"        => "false",
+				   "modify"      => "false"
+	}
+
+);
+
 1;

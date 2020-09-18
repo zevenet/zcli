@@ -265,6 +265,7 @@ sub parseInput
 	my $steps = {
 				  uri_id        => 'id',
 				  param_uri     => 'param_uri',
+				  params_funct  => 'params_funct',
 				  download_file => 'download_file',
 				  upload_file   => 'upload_file',
 				  output_filter => 'output_filter',
@@ -281,6 +282,7 @@ sub parseInput
 				  action        => shift @args,
 				  id            => [],
 				  param_uri     => [],
+				  params_funct  => [],
 				  download_file => undef,
 				  upload_file   => undef,
 				  output_filter => undef,
@@ -325,6 +327,12 @@ sub parseInput
 				return ( $input, $steps->{ param_uri }, $parsed_completed );
 			}
 		}
+	}
+
+	if ( exists $def->{ params_funct_parse } )
+	{
+		$input->{ params_funct } = \@args;
+		return ( $input, $steps->{ params_funct }, 1 );
 	}
 
 	# check if the call is expecting a file name to upload or download
@@ -600,6 +608,14 @@ sub createZapiRequest
 				die $Global::Fin;
 			}
 		}
+	}
+
+	if ( exists $def->{ params_funct_parse } and $def->{ params_funct_build } )
+	{
+		no strict 'refs';
+		$call->{ params } =
+		  &{ $def->{ params_funct_build } }( @{ $input->{ params_funct } } );
+		use strict 'refs';
 	}
 
 	# getting upload file

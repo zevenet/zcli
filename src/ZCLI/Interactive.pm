@@ -750,6 +750,13 @@ sub getCmdArgsCallBack
 		my $uri_index = scalar @{ $args_parsed->{ param_uri } };
 		$possible_values = "<$obj_def->{param_uri}->[$uri_index]->{name}>";
 	}
+	elsif ( $next_arg eq 'params_funct' )
+	{
+		no strict 'refs';
+		$possible_values =
+		  &{ $obj_def->{ params_funct_parse } }( @{ $args_parsed->{ params_funct } } );
+		use strict 'refs';
+	}
 	elsif ( $next_arg =~ /file/ )
 	{
 		my $sust = 0;

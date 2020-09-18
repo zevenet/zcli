@@ -154,8 +154,10 @@ our $Rbac = {
 												 enterprise => 1,
 							   },
 							   $V{ SET } => {
-											  uri    => "/rbac/roles/<$K{RBAC_ROLE}>",
-											  method => 'PUT',
+									   uri                => "/rbac/roles/<$K{RBAC_ROLE}>",
+									   method             => 'PUT',
+									   params_funct_parse => 'Objects::complete_rbac_roles',
+									   params_funct_build => 'Objects::body_rbac_roles',
 							   },
 							   $V{ DELETE } => {
 												 uri    => "/rbac/roles/<$K{RBAC_ROLE}>",
@@ -194,5 +196,98 @@ our $Rbac = {
 										},
 			  },
 };
+
+sub complete_rbac_roles
+{
+	my @args = @_;
+
+	if ( !@args )
+	{
+		return ["-section"];
+	}
+
+	my @out = keys %Define::Rbac_roles;
+	if ( @args == 1 )
+	{
+		return \@out;
+	}
+	elsif ( !grep ( /^$args[1]$/, @out ) )
+	{
+		print "# the section is not valid";
+		return [];
+	}
+
+	shift @args;
+	my $section = shift @args;
+
+	my $key_flag = 1;
+	my @list     = keys %{ $Define::Rbac_roles{ $section } };
+	$_ = "-$_" for ( @list );
+
+	my @used = ();
+	foreach my $a ( @args )
+	{
+		if ( $key_flag )
+		{
+			$key_flag = 0;
+			if ( !grep ( /^$a$/, @list ) )
+			{
+				print "# the parameter '$a' was not expected";
+				return [];
+			}
+			else
+			{
+				push @used, $a;
+			}
+		}
+		else
+		{
+			$key_flag = 1;
+		}
+	}
+
+	# the following parameter is:
+	if ( $key_flag )
+	{
+		my @notused = ();
+
+		foreach my $p ( @list )
+		{
+			push @notused, "$p" if ( !grep /^$p$/, @used );
+		}
+
+		return \@notused;
+	}
+	else
+	{
+		return ["false", "true"];
+	}
+}
+
+sub body_rbac_roles
+{
+	my @args = @_;
+
+	shift @args;    # remove the "-section" key
+	my $section = shift @args;    # get the key value
+
+	my $params;
+	my $key = "";
+	foreach my $a ( @args )
+	{
+		if ( !$key )
+		{
+			$key = $a;
+			$key =~ s/^-//;
+		}
+		else
+		{
+			$params->{ $section }->{ $key } = $a;
+			$key = "";
+		}
+	}
+
+	return $params;
+}
 
 1;
