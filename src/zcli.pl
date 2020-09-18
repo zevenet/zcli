@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ###############################################################################
 #
-#    Zevenet Software License
-#    This file is part of the Zevenet Load Balancer software package.
+#    ZEVENET Software License
+#    This file is part of the ZEVENET Load Balancer software package.
 #
 #    Copyright (C) 2014-today ZEVENET SL, Sevilla (Spain)
 #
@@ -38,7 +38,7 @@ use ZCLI::Interactive;
 
 # Init!
 
-make_path ($Global::Config_dir) if ( !-d $Global::Config_dir );
+make_path( $Global::Config_dir ) if ( !-d $Global::Config_dir );
 
 my $opt = &parseOptions( \@ARGV );
 
@@ -79,7 +79,7 @@ if ( !$Env::Profile )
 	$Env::Profile = &setProfile();
 }
 
-# update the Zevenet version if it does not exit
+# update the ZEVENET version if it does not exit
 if ( !exists $Env::Profile->{ edition } )
 {
 	my $edition = &getProfileEdition( $Env::Profile );

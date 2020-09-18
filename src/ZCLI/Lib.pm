@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ###############################################################################
 #
-#    Zevenet Software License
-#    This file is part of the Zevenet Load Balancer software package.
+#    ZEVENET Software License
+#    This file is part of the ZEVENET Load Balancer software package.
 #
 #    Copyright (C) 2014-today ZEVENET SL, Sevilla (Spain)
 #
@@ -117,7 +117,7 @@ The minimum number of expected arguments to execute a command are 2, the ‘obje
 If zcli is executed followed by argument, then zcli will exit once the action is done.
 
 Objects:
-  It selects the Zevenet module where the command is going to do the action.
+  It selects the ZEVENET module where the command is going to do the action.
   ZLI can be executed from command line with the following objects:
   *) help, list the ZCLI help.
   *) profile, manage the load balancer profiles. (See ’profile’ section for further help).
@@ -142,7 +142,7 @@ IDs:
 
 Parameters:
   It sets values of the command.
-  The parameters of each command are listed once the previous values (object, action and ids) have been set. This ZCLI tool is based on the ZAPI (Zevenet API), so, the parameter names are the same than the ZAPI, if further information about the availablie parameters for each ID is required, then you can check the ZAPI documentation in the following link: $Define::Zapi_doc_uri
+  The parameters of each command are listed once the previous values (object, action and ids) have been set. This ZCLI tool is based on the ZAPI (ZEVENET API), so, the parameter names are the same than the ZAPI, if further information about the availablie parameters for each ID is required, then you can check the ZAPI documentation in the following link: $Define::Zapi_doc_uri
 
   Parameters are set using a key and value combination. The key name is set using the character '-' previously to the name, followed by the value. An example is: -vip 192.168.100.100 -vport 80, where vip and vport are parameter keys and 192.168.100.100 and 80 are parameter values.
 
@@ -681,7 +681,7 @@ sub getLBIdsTree
 	if ( $resp->{ code } == 404 )
 	{
 		&printError(
-			"Error connecting to the load balancer.\nZCLI connects with Zevenet versions greater or equal to $Global::Req_ee_zevenet_version for Enterprise Edition or $Global::Req_ce_zevenet_version for Community Edition."
+			"Error connecting to the load balancer.\nZCLI connects with ZEVENET versions greater or equal to $Global::Req_ee_zevenet_version for Enterprise Edition or $Global::Req_ce_zevenet_version for Community Edition."
 		);
 	}
 	elsif ( $resp->{ 'json' }->{ 'params' } )
@@ -862,7 +862,7 @@ sub zapi
 	elsif ( $response->code == 401 )
 	{
 		$msg = "The authentication failed. Please, review the following settings
-	*) The zapi user is enabled: clicking on Zevenet Webgui 'System > User'.
+	*) The zapi user is enabled: clicking on ZEVENET Webgui 'System > User'.
 	*) The ZCLI zapikey is valid: using the ZCLI command with the arguments 'profile set $profile->{name}' to modify it.";
 	}
 
@@ -1329,7 +1329,7 @@ Returns:
 		host, it is the IP or nameserver or the load balancer
 		port, it is the ZAPI management port
 		zapikey, it is the user key used for the ZAPI requests
-		edition, it is the Zevenet edition used in the load balancer. The possible values are CE, EE or not exists (if zcli has not connected)
+		edition, it is the ZEVENET edition used in the load balancer. The possible values are CE, EE or not exists (if zcli has not connected)
 		description, it is a description mesage about the profile. This message is a line.
 
 	Example:
@@ -1535,13 +1535,13 @@ sub setProfile
 =begin nd
 Function: getProfileEdition
 
-	It does a zapi call to get the zevenet edition
+	It does a zapi call to get the ZEVENET edition
 
 Parametes:
 	Profile - It is a struct with profile information.
 
 Returns:
-	String - It returns 'EE' if Zevenet is entreprise, 'CE' if it is community or 'undef' if there was an error
+	String - It returns 'EE' if ZEVENET is entreprise, 'CE' if it is community or 'undef' if there was an error
 
 =cut
 
@@ -1568,7 +1568,7 @@ sub getProfileEdition
 =begin nd
 Function: updateProfileEdition
 
-	It saves the Zevenet edition (enterprise or community) in the load balancer profile configuration
+	It saves the ZEVENET edition (enterprise or community) in the load balancer profile configuration
 
 Parametes:
 	Profile name - It is the profile name used to save the configuration
@@ -1836,15 +1836,15 @@ sub checkConnectivity
 =begin nd
 Function: isLoadBalancer
 
-	It checks if the host (where is running ZCLI) is a Zevenet load balancer.
-	It looks at in the system if the zevenet package is installed.
-	The Zevenet version must be upper than 'REQUIRED_ZEVEVENET_VERSION'.
+	It checks if the host (where is running ZCLI) is a ZEVENET load balancer.
+	It looks at in the system if the ZEVENET package is installed.
+	The ZEVENET version must be upper than 'REQUIRED_ZEVEVENET_VERSION'.
 
 Parametes:
 	none - .
 
 Returns:
-	Integer - It returns: 1 if the host is a Zevenet load balancer, 0 if it doesn't.
+	Integer - It returns: 1 if the host is a ZEVENET load balancer, 0 if it doesn't.
 
 =cut
 

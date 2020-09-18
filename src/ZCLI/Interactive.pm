@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ###############################################################################
 #
-#    Zevenet Software License
-#    This file is part of the Zevenet Load Balancer software package.
+#    ZEVENET Software License
+#    This file is part of the ZEVENET Load Balancer software package.
 #
 #    Copyright (C) 2014-today ZEVENET SL, Sevilla (Spain)
 #
@@ -112,7 +112,7 @@ sub createZcli
 
 	my $welcome = "$logo
 
-Welcome to the Zevenet Command Line Interface.
+Welcome to the ZEVENET Command Line Interface.
 
 The extendend information can be displayed using the 'help' command.";
 

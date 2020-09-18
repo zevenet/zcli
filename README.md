@@ -2,13 +2,13 @@
 
 # What is ZCLI
 
-ZCLI is the acronym of Zevenet Command Line Interface. This tool allows managing multiple load balancers from a command line or automatizes load balancer actions in the operation scripts.
+ZCLI is the acronym of ZEVENET Command Line Interface. This tool allows managing multiple load balancers from a command line or automatizes load balancer actions in the operation scripts.
 
-ZCLI is a wrapper of the ZAPI (Zevenet Application Programming Interface), it has an autocompletion feature to navigate easier for the load balancer modules and its items.
+ZCLI is a wrapper of the ZAPI (ZEVENET Application Programming Interface), it has an autocompletion feature to navigate easier for the load balancer modules and its items.
 
-*It depends on the Zevenet EE 6.1 or higher.*
+*It depends on the ZEVENET EE 6.1 or higher.*
 
-*It depends on the Zevenet CE 5.11 or higher.*
+*It depends on the ZEVENET CE 5.11 or higher.*
 
 
 
@@ -81,7 +81,7 @@ zcli <object> <action> [ids list] [ids_params list] [file_upload|download] [para
 
 - object: it is the kind of object of the load balancer selected.
 - action: it is the verb to execute.
-- ids list: they are mandatories and they identify the object selected. They are taken from Zevenet with the GET /ids ZAPI request. It is used to make the HTTP URI. If the object is a subobject (e.g. service) the previous keys are mandatories (e.g. farm name).
+- ids list: they are mandatories and they identify the object selected. They are taken from ZEVENET with the GET /ids ZAPI request. It is used to make the HTTP URI. If the object is a subobject (e.g. service) the previous keys are mandatories (e.g. farm name).
 - ids_params list: they are ids mandatories that cannot be parsed from id tree. It is used to make the URI. e.g.: the number of lines to show from a log file.
 - file_upload and file_download: it is the local file to upload/download to/from the load balancer.
 - param_body: They are the JSON parameters that are sent in the ZAPI request. The parameter name is indicated using the hyphen operator followed by the value (e.g.: -vip 192.168.100.144). This field can use the JSON input format using the option *-j*.
