@@ -54,7 +54,7 @@ our $Cmd_string = '';
 
 package Global;
 
-our $Version = "1.0.3";
+our $Version = "1.0.5";
 our $Debug   = 0;
 our $Fin = ( $Debug ) ? "" : "\n";  # This will add the dying line in debug mode
 
