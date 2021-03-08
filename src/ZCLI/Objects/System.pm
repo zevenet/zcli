@@ -204,16 +204,6 @@ our $System = {
 												   enterprise => 1,
 									 },
 	 },
-	 'system-http-certificates' => {
-									 $V{ SET } => {
-												   uri => "/system/http/certificates",
-												   method     => 'PUT',
-												   enterprise => 1,
-												   params_autocomplete => {
-																 file => ['certificates'],
-										},
-									 },
-	 },
 };
 
 $Objects::Ipds = &Hash::Merge::merge( $Objects::Ipds, $Objects::Services );
