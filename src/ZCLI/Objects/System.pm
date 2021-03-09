@@ -225,7 +225,7 @@ our $System = {
 												   method     => 'POST',
 												   enterprise => 1,
 									 },
-									 $V{ DELETE } => {
+									 $V{ UNSET } => {
 												   uri => "/system/rsyslog",
 												   method     => 'DELETE',
 												   enterprise => 1,
