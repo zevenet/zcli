@@ -214,6 +214,23 @@ our $System = {
 										},
 									 },
 	 },
+	 'system-rsyslog' => {
+									 $V{ GET } => {
+												   uri => "/system/rsyslog",
+												   method     => 'GET',
+												   enterprise => 1,
+									 },
+									 $V{ SET } => {
+												   uri => "/system/rsyslog",
+												   method     => 'POST',
+												   enterprise => 1,
+									 },
+									 $V{ DELETE } => {
+												   uri => "/system/rsyslog",
+												   method     => 'DELETE',
+												   enterprise => 1,
+									 },
+	 },
 };
 
 $Objects::Ipds = &Hash::Merge::merge( $Objects::Ipds, $Objects::Services );
