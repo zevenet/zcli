@@ -204,16 +204,6 @@ our $System = {
 												   enterprise => 1,
 									 },
 	 },
-	 'system-http-certificates' => {
-									 $V{ SET } => {
-												   uri => "/system/http/certificates",
-												   method     => 'PUT',
-												   enterprise => 1,
-												   params_autocomplete => {
-																 file => ['certificates'],
-										},
-									 },
-	 },
 	 'system-rsyslog' => {
 									 $V{ GET } => {
 												   uri => "/system/rsyslog",

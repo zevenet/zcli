@@ -89,6 +89,21 @@ our $Services = {
 															 enterprise => 1,
 											  },
 				  },
+				  'system-services-https-certificate' => {
+									 $V{ SET } => {
+												   uri 					=> "/system/https/certificate",
+												   method     			=> 'POST',
+												   enterprise 			=> 1,
+												   params_autocomplete 	=> {
+																 certificate => ['certificates'],
+												   },
+									 },
+									 $V{ GET } => {
+												   uri 			=> "/system/https/certificate",
+												   method     	=> 'GET',
+												   enterprise 	=> 1,
+									 },
+	 			  },
 				  'system-services-proxy' => {
 											   $V{ GET } => {
 															  uri        => "/system/proxy",
