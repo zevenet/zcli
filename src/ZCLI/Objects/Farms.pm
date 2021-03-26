@@ -321,6 +321,25 @@ our $Farms = {
 			 },
 	},
 
+	'farm-replace-header' => {
+			 $V{ ADD } => {
+							uri        => "/farms/<$K{FARM}>/replaceheader",
+							method     => 'POST',
+							enterprise => 1,
+			 },
+			 $V{ REMOVE } => {
+					 uri => "/farms/<$K{FARM}>/replaceheader/$Define::Uri_param_tag",
+					 param_uri => [
+								   {
+									 name => "index",
+									 desc => "It is the index of the directive to remove",
+								   },
+					 ],
+					 method     => 'DELETE',
+					 enterprise => 1,
+			 },
+	},
+
 	'farm-waf' => {
 					$V{ ADD } => {
 								   uri                 => "/farms/<$K{FARM}>/ipds/waf",
