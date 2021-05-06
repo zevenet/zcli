@@ -321,14 +321,33 @@ our $Farms = {
 			 },
 	},
 
-	'farm-replace-header' => {
+	'farm-replace-request-header' => {
 			 $V{ ADD } => {
-							uri        => "/farms/<$K{FARM}>/replaceheader",
+							uri        => "/farms/<$K{FARM}>/replacerequestheader",
 							method     => 'POST',
 							enterprise => 1,
 			 },
 			 $V{ REMOVE } => {
-					 uri => "/farms/<$K{FARM}>/replaceheader/$Define::Uri_param_tag",
+					 uri => "/farms/<$K{FARM}>/replacerequestheader/$Define::Uri_param_tag",
+					 param_uri => [
+								   {
+									 name => "index",
+									 desc => "It is the index of the directive to remove",
+								   },
+					 ],
+					 method     => 'DELETE',
+					 enterprise => 1,
+			 },
+	},
+
+	'farm-replace-response-header' => {
+			 $V{ ADD } => {
+							uri        => "/farms/<$K{FARM}>/replaceresponseheader",
+							method     => 'POST',
+							enterprise => 1,
+			 },
+			 $V{ REMOVE } => {
+					 uri => "/farms/<$K{FARM}>/replaceresponseheader/$Define::Uri_param_tag",
 					 param_uri => [
 								   {
 									 name => "index",
