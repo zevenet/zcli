@@ -221,6 +221,21 @@ our $System = {
 												   enterprise => 1,
 									 },
 	 },
+	 'system-https-certificate' => {
+									 $V{ GET } => {
+												   uri => "/system/https/certificate",
+												   method     => 'GET',
+												   enterprise => 1,
+									 },
+									 $V{ SET } => {
+												   uri => "/system/https/certificate",
+												   method     => 'POST',
+												   enterprise => 1,
+												   params_autocomplete => {
+																 file => ['certificates'],
+												   }
+									 },
+	 },
 };
 
 $Objects::Ipds = &Hash::Merge::merge( $Objects::Ipds, $Objects::Services );
