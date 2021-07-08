@@ -38,6 +38,8 @@ use ZCLI::Objects::Statistics;
 use ZCLI::Objects::Ipds;
 use ZCLI::Objects::System;
 use ZCLI::Objects::Rbac;
+use ZCLI::Objects::Aws;
+use ZCLI::Objects::Azure;
 
 our $Zcli = {};
 
@@ -56,6 +58,8 @@ else
 	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Ipds );
 	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::System );
 	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Rbac );
+	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Aws );
+	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Azure );
 }
 
 1;
