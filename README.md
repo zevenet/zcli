@@ -16,9 +16,18 @@ ZCLI is a wrapper of the ZAPI (ZEVENET Application Programming Interface), it ha
 
 The ZCLI user guide is in the following link, [guide](https://www.zevenet.com/knowledge-base/howtos/zevenet-command-line-interface-zcli-user-guide/).
 
+## Docker
+
+Downloading image:
+
+`docker pull https://hub.docker.com/repository/docker/zevenet/zcli`
+
+Creating an alias ( in .bashrc, .zshrc or another):
+
+`alias zcli="docker run --rm -it -v $HOME/.zcli:/root/.zcli zcli:latest zcli`
 
 
-## How to install
+## How to install on Linux
 
 Downloading the code:
 
@@ -28,10 +37,7 @@ Installing depencencies and deploying in the system:
 
 `cd zcli && sudo ./install.sh`
 
-
-## How to update
-
-The way to update the code is getting the last changes of the git repository:
+Note: the way to **update** the code is getting the last changes of the git repository:
 
 `git pull`
 
