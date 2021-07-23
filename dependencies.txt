@@ -1,6 +1,8 @@
-build => cpan make gcc
-build_centos => openssl-devel readline-devel perl-open
+build => make gcc
+build_centos => cpan openssl-devel readline-devel perl-open
+build_debian => perl libnet-ssleay-perl libreadline-dev
 common => File::HomeDir Test JSON Term::Shell Hash::Merge LWP::UserAgent LWP::Protocol::https Term::ShellUI Config::Tiny IO:Socket:SSL JSON::Color IO::Pager
 linux =>  Term::ReadLine::Gnu
 windows => Term::ReadLine::Perl, PAR::Packer
+
 debian => libfile-homedir-perl, libterm-readline-gnu-perl, libjson-perl, libhash-merge-perl, liblwp-protocol-https-perl, libterm-shellui-perl, libconfig-tiny-perl, libio-socket-ssl-perl, libio-pager-perl, libjson-color-perl
