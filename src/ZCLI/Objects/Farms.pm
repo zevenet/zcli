@@ -284,6 +284,30 @@ our $Farms = {
 						},
 	},
 
+		'farm-service-session' => {
+			$V{ ADD } => {
+				uri        => "/farms/<$K{FARM}>/services/<$K{SRV}>/sessions",
+				method     => 'POST',
+				enterprise => 1,
+			},
+			$V{ REMOVE } => {
+				uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/sessions/$Define::Uri_param_tag",
+				param_uri => [
+					{
+						name => "session",
+						desc => "session to delete",
+					},
+				],
+				method     => 'DELETE',
+				enterprise => 1,
+			},
+			$V{ LIST } => {
+				uri        => "/farms/<$K{FARM}>/services/<$K{SRV}>/sessions",
+				method     => 'GET',
+				enterprise => 1,
+			},
+	},
+
 	'farm-service-farmguardian' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/fg",
