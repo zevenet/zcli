@@ -91,6 +91,103 @@ our $Notifications = {
 									  enterprise => 1,
 							  },
 					 },
+					 'system-notifications-alert-license' => {
+							  $V{ GET } => {
+											 uri => "/system/notifications/alerts/license",
+											 method     => 'GET',
+											 enterprise => 1,
+							  },
+							  $V{ START } => {
+									  uri => "/system/notifications/alerts/license/actions",
+									  method => 'POST',
+									  params => {
+												  action => 'enable',
+									  },
+									  enterprise => 1,
+							  },
+							  $V{ STOP } => {
+									  uri => "/system/notifications/alerts/license/actions",
+									  method => 'POST',
+									  params => {
+												  action => 'disable',
+									  },
+									  enterprise => 1,
+							  },
+					 },
+					 'system-notifications-alert-interface' => {
+							  $V{ GET } => {
+											 uri => "/system/notifications/alerts/interface",
+											 method     => 'GET',
+											 enterprise => 1,
+							  },
+							  $V{ SET } => {
+											 uri => "/system/notifications/alerts/interface",
+											 method     => 'POST',
+											 enterprise => 1,
+							  },
+							  $V{ START } => {
+									  uri => "/system/notifications/alerts/interface/actions",
+									  method => 'POST',
+									  params => {
+												  action => 'enable',
+									  },
+									  enterprise => 1,
+							  },
+							  $V{ STOP } => {
+									  uri => "/system/notifications/alerts/interface/actions",
+									  method => 'POST',
+									  params => {
+												  action => 'disable',
+									  },
+									  enterprise => 1,
+							  },
+					 },
+					 'system-notifications-alert-certificate' => {
+							  $V{ GET } => {
+											 uri => "/system/notifications/alerts/certificate",
+											 method     => 'GET',
+											 enterprise => 1,
+							  },
+							  $V{ START } => {
+									  uri => "/system/notifications/alerts/certificate/actions",
+									  method => 'POST',
+									  params => {
+												  action => 'enable',
+									  },
+									  enterprise => 1,
+							  },
+							  $V{ STOP } => {
+									  uri => "/system/notifications/alerts/certificate/actions",
+									  method => 'POST',
+									  params => {
+												  action => 'disable',
+									  },
+									  enterprise => 1,
+							  },
+					 },
+					 'system-notifications-alert-package' => {
+							  $V{ GET } => {
+											 uri => "/system/notifications/alerts/package",
+											 method     => 'GET',
+											 enterprise => 1,
+							  },
+							  $V{ START } => {
+									  uri => "/system/notifications/alerts/certificate/actions",
+									  method => 'POST',
+									  params => {
+												  action => 'enable',
+									  },
+									  enterprise => 1,
+							  },
+							  $V{ STOP } => {
+									  uri => "/system/notifications/alerts/certificate/actions",
+									  method => 'POST',
+									  params => {
+												  action => 'disable',
+									  },
+									  enterprise => 1,
+							  },
+					 },
 					 'system-notifications-method-email' => {
 							   $V{ GET } => {
 											  uri => "/system/notifications/methods/email",
