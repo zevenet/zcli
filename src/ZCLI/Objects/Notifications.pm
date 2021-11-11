@@ -103,11 +103,6 @@ our $Notifications = {
 											  enterprise => 1,
 							   },
 							   $V{ TEST } => {
-											   uri => "/system/notifications/methods/email",
-											   method     => 'POST',
-											   enterprise => 1,
-							   },
-							   $V{ STOP } => {
 									   uri => "/system/notifications/methods/email/actions",
 									   method => 'POST',
 									   params => {
