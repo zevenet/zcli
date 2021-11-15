@@ -204,6 +204,13 @@ our $System = {
 												   enterprise => 1,
 									 },
 	 },
+	 'system-language' => {
+									 $V{ SET } => {
+												   uri => "/system/language",
+												   method     => 'POST',
+												   enterprise => 1,
+									 },
+	 },
 };
 
 $Objects::Ipds = &Hash::Merge::merge( $Objects::Ipds, $Objects::Services );
