@@ -234,6 +234,13 @@ our $System = {
 												   params_autocomplete => {
 																 file => ['certificates'],
 												   }
+									},
+	 },
+	 'system-language' => {
+									 $V{ SET } => {
+												   uri => "/system/language",
+												   method     => 'POST',
+												   enterprise => 1,
 									 },
 	 },
 };
