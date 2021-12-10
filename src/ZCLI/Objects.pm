@@ -40,6 +40,7 @@ use ZCLI::Objects::System;
 use ZCLI::Objects::Rbac;
 use ZCLI::Objects::Aws;
 use ZCLI::Objects::Azure;
+use ZCLI::Objects::VPN;
 
 our $Zcli = {};
 
@@ -60,6 +61,7 @@ else
 	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Rbac );
 	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Aws );
 	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::Azure );
+	$Objects::Zcli = &Hash::Merge::merge( $Objects::Zcli, $Objects::VPN );
 }
 
 1;

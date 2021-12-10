@@ -191,10 +191,12 @@ our %Keys = (
 			  RBAC_GROUP    => 'group',
 			  RBAC_ROLE     => 'role',
 			  ROUTING_TABLE => 'table',
+			  VPN           => 'vpn',
 );
 
 our %Actions = (
 	LIST   => 'list',      # List all objects of the type
+	SUMMARY   => 'summary',  # List an all objects summary
 	GET    => 'get',       # get the object with all its configuration
 	SET    => 'set',       # modify an object
 	UNSET  => 'unset',     # remove the configuration
