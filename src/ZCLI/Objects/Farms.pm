@@ -106,10 +106,20 @@ our $Farms = {
 						},
 	},
 
-	'farm-service-replacerequestheader' => {
+	'farm-service-replace-request-header' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/replacerequestheader",
 										 method              => 'POST',
+						  },
+						  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/replacerequestheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
 						  },
 						  $V{ REMOVE } => {
 								  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/replacerequestheader/$Define::Uri_param_tag",
@@ -121,12 +131,32 @@ our $Farms = {
 								  ],
 								  method => 'DELETE',
 						  },
+						  $V{ MOVE } => {
+									  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/replacerequestheader/$Define::Uri_param_tag/actions",
+									  method     => 'POST',
+									  param_uri => [
+								  		{
+											name => "index",
+											desc => "It is the index of the directive to move",
+								  		}
+								  	  ]
+						  },
 	},
 
-	'farm-service-replaceresponseheader' => {
+	'farm-service-replace-response-header' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/replaceresponseheader",
 										 method              => 'POST',
+						  },
+						  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/replaceresponseheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
 						  },
 						  $V{ REMOVE } => {
 								  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/replaceresponseheader/$Define::Uri_param_tag",
@@ -138,12 +168,32 @@ our $Farms = {
 								  ],
 								  method => 'DELETE',
 						  },
+						  $V{ MOVE } => {
+									  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/replaceresponseheader/$Define::Uri_param_tag/actions",
+									  method     => 'POST',
+									  param_uri => [
+								  		{
+											name => "index",
+											desc => "It is the index of the directive to move",
+								  		}
+								  	  ]
+						  },
 	},
 
-	'farm-service-addrequestheader' => {
+	'farm-service-add-request-header' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/addrequestheader",
 										 method              => 'POST',
+						  },
+						  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/addrequestheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
 						  },
 						  $V{ REMOVE } => {
 								  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/addrequestheader/$Define::Uri_param_tag",
@@ -157,11 +207,21 @@ our $Farms = {
 						  },
 	},
 
-	'farm-service-addresponseheader' => {
+	'farm-service-add-response-header' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/addresponseheader",
 										 method              => 'POST',
 										 
+						  },
+						  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/addresponseheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
 						  },
 						  $V{ REMOVE } => {
 								  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/addresponseheader/$Define::Uri_param_tag",
@@ -175,11 +235,21 @@ our $Farms = {
 						  },
 	},
 
-	'farm-service-removerequestheader' => {
+	'farm-service-remove-request-header' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/removerequestheader",
 										 method              => 'POST',
 										 
+						  },
+						  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/removerequestheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
 						  },
 						  $V{ REMOVE } => {
 								  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/removerequestheader/$Define::Uri_param_tag",
@@ -193,10 +263,20 @@ our $Farms = {
 						  },
 	},
 
-	'farm-service-removeresponseheader' => {
+	'farm-service-remove-response-header' => {
 						  $V{ ADD } => {
 										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/removeresponseheader",
 										 method              => 'POST',
+						  },
+						  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/removeresponseheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
 						  },
 						  $V{ REMOVE } => {
 								  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/removeresponseheader/$Define::Uri_param_tag",
@@ -216,6 +296,16 @@ our $Farms = {
 										 method              => 'POST',
 										 
 						  },
+						  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/rewriteurl/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
+						  },
 						  $V{ REMOVE } => {
 								  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/rewriteurl/$Define::Uri_param_tag",
 					              param_uri => [
@@ -225,6 +315,16 @@ our $Farms = {
 								  	}
 								  ],
 								  method => 'DELETE',
+						  },
+						  $V{ MOVE } => {
+									  uri => "/farms/<$K{FARM}>/services/<$K{SRV}>/rewriteurl/$Define::Uri_param_tag/actions",
+									  method     => 'POST',
+									  param_uri => [
+								  		{
+											name => "index",
+											desc => "It is the index of the directive to move",
+								  		}
+								  	  ]
 						  },
 	},
 
@@ -401,6 +501,16 @@ our $Farms = {
 							 method     => 'POST',
 							 enterprise => 1,
 			  },
+			  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/addheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
+						  },
 			  $V{ REMOVE } => {
 					  uri       => "/farms/<$K{FARM}>/addheader/$Define::Uri_param_tag",
 					  param_uri => [
@@ -420,6 +530,16 @@ our $Farms = {
 							 method     => 'POST',
 							 enterprise => 1,
 			  },
+			  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/headremove/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
+						  },
 			  $V{ REMOVE } => {
 					  uri       => "/farms/<$K{FARM}>/headremove/$Define::Uri_param_tag",
 					  param_uri => [
@@ -439,6 +559,16 @@ our $Farms = {
 							 method     => 'POST',
 							 enterprise => 1,
 			  },
+			  $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/addresponseheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
+						  },
 			  $V{ REMOVE } => {
 					  uri => "/farms/<$K{FARM}>/addresponseheader/$Define::Uri_param_tag",
 					  param_uri => [
@@ -458,6 +588,16 @@ our $Farms = {
 							method     => 'POST',
 							enterprise => 1,
 			 },
+			 $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/removeresponseheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
+						  },
 			 $V{ REMOVE } => {
 					 uri => "/farms/<$K{FARM}>/removeresponseheader/$Define::Uri_param_tag",
 					 param_uri => [
@@ -477,6 +617,16 @@ our $Farms = {
 							method     => 'POST',
 							enterprise => 1,
 			 },
+			 $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/replacerequestheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
+						  },
 			 $V{ REMOVE } => {
 					 uri => "/farms/<$K{FARM}>/replacerequestheader/$Define::Uri_param_tag",
 					 param_uri => [
@@ -488,6 +638,16 @@ our $Farms = {
 					 method     => 'DELETE',
 					 enterprise => 1,
 			 },
+			 $V{ MOVE } => {
+									  uri => "/farms/<$K{FARM}>/replacerequestheader/$Define::Uri_param_tag/actions",
+									  method     => 'POST',
+									  param_uri => [
+								  		{
+											name => "index",
+											desc => "It is the index of the directive to move",
+								  		}
+								  	  ]
+						  },
 	},
 
 	'farm-replace-response-header' => {
@@ -496,6 +656,16 @@ our $Farms = {
 							method     => 'POST',
 							enterprise => 1,
 			 },
+			 $V{ SET } => {
+										 uri => "/farms/<$K{FARM}>/replaceresponseheader/$Define::Uri_param_tag",
+										  param_uri => [
+								  			{
+										 name => "index",
+										 desc => "It is the index of the directive to modify",
+								  	}
+								  ],
+										 method              => 'PUT',
+						  },
 			 $V{ REMOVE } => {
 					 uri => "/farms/<$K{FARM}>/replaceresponseheader/$Define::Uri_param_tag",
 					 param_uri => [
@@ -507,6 +677,16 @@ our $Farms = {
 					 method     => 'DELETE',
 					 enterprise => 1,
 			 },
+			 $V{ MOVE } => {
+									  uri => "/farms/<$K{FARM}>/replaceresponseheader/$Define::Uri_param_tag/actions",
+									  method     => 'POST',
+									  param_uri => [
+								  		{
+											name => "index",
+											desc => "It is the index of the directive to move",
+								  		}
+								  	  ]
+						  },
 	},
 
 	'farm-waf' => {
