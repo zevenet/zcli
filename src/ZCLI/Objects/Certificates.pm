@@ -79,6 +79,67 @@ our $Certificates = {
 	# 															  method => 'GET',
 	# 											  },
 	# 				  },
+	'certificate-le-config' => {
+								  $V{ LIST } => {
+												  uri    => "/certificates/letsencryptz/config",
+												  method => 'GET',
+								  },
+								  $V{ SET } => {
+												 uri    => "/certificates/letsencryptz/config",
+												 method => 'PUT',
+								  }
+	},
+	'certificate-le' => {
+								  $V{ LIST } => {
+												  uri    => "/certificates/letsencryptz",
+												  method => 'GET',
+								  },
+								  $V{ CREATE } => {
+												  uri    => "/certificates/letsencryptz",
+												  method => 'POST',
+												  params_arr => {
+															 'domains' => 1,
+											      },
+								  },
+								  $V{ RENEW } => {
+												  uri    => "/certificates/letsencryptz/<$K{CERT}>/actions",
+												  method => 'POST',
+												  params => {
+													   'action' => 'renew',
+										   		  },
+								  },
+								  $V{ DELETE } => {
+												  uri    => "/certificates/letsencryptz/<$K{CERT}>",
+												  method => 'DELETE',
+								  }
+	},
+	'certificate-le-wildcard' => {
+								  $V{ CREATE } => {
+												  uri    => "/certificates/letsencryptz-wildcard",
+												  method => 'POST',
+												  params_arr => {
+															 'domains' => 1,
+											      },
+								  },
+								  $V{ RENEW } => {
+												  uri    => "/certificates/letsencryptz-wildcard/<$K{CERT}>/actions",
+												  method => 'POST',
+												  params => {
+													   'action' => 'renew',
+										   		  },
+								  },
+								  $V{ TEST } => {
+												  uri    => "/certificates/letsencryptz-wildcard/<$K{CERT}>/actions",
+												  method => 'POST',
+												  params => {
+													   'action' => 'test',
+										   	 	  },
+								  },
+								  $V{ DELETE } => {
+												  uri    => "/certificates/letsencryptz-wildcard/<$K{CERT}>",
+												  method => 'DELETE',
+								  }
+	},
 };
 
 1;

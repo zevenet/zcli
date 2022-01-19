@@ -203,6 +203,7 @@ our %Actions = (
 	DELETE => 'delete',    # delete an object
 	CREATE => 'create',    #  create a new object
 	REMOVE => 'remove',    # unlink an object with another one
+	RENEW  =>  'renew',     # renew an object
 	ADD    => 'add',       # link an object with another one
 	START =>
 	  'start', # apply a status action about the object start/stop/restart/up/down..
