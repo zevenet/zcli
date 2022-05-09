@@ -82,6 +82,13 @@ our $Farms = {
 				},
 	},
 
+	'farm-status' => {
+						$V{ GET } => {
+									   uri    => "/farms/<$K{FARM}>/status",
+									   method => 'GET',
+						},
+	},
+
 	'farm-service' => {
 						$V{ GET } => {
 									   uri    => "/farms/<$K{FARM}>/services/<$K{SRV}>",
